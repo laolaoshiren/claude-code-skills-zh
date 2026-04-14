@@ -18,9 +18,12 @@ Claude Code Skills 是可复用的指令模块，让 Claude Code 拥有特定领
 **安装方式：** 将 skill 目录复制到 `~/.claude/skills/` 即可。
 
 ```bash
-# 一键安装本仓库所有原创技能
-git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+# 国内镜像（GitHub 访问困难时使用）
+git clone https://gh-proxy.com/https://github.com/laolaoshiren/claude-code-skills-zh.git
 cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
+
+# 或者直接下载 ZIP（无需 git）
+# 国内镜像：https://gh-proxy.com/https://github.com/laolaoshiren/claude-code-skills-zh/archive/main.zip
 ```
 
 ---
