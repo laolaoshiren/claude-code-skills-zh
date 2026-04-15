@@ -4,8 +4,8 @@
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-80+-green.svg)](#-原创技能)
-[![Updated](https://img.shields.io/badge/updated-2026--04--14-orange.svg)](#)
+|[![Skills](https://img.shields.io/badge/skills-90+-green.svg)](#-原创技能)
+|[![Updated](https://img.shields.io/badge/updated-2026--04--15-orange.svg)](#)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
 
@@ -48,6 +48,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [review-checkpoint](https://github.com/Atharva-Kanherkar/review-checkpoint) | 结构化自审查工作流：先契约后代码 |
 | [ship](https://github.com/maxtechera/ship) | 端到端 GTM 流水线 + 凭证预检 |
 | [diagent-cli](https://github.com/daniellee-ux/diagent-cli) | Diagent 图表 URL 编解码 CLI + Skill |
+| [archflow](https://github.com/rafaelolsr/archflow) | 将代码库转为动画 HTML 架构图（14⭐）|
 
 ### 🎨 内容创作
 
@@ -83,6 +84,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [nanobananas-api-guide](https://github.com/ailingqu/nanobananas-api-guide) | NanoBananas.AI 图片/视频生成 API 指南 |
 | [myquant-dev](https://github.com/aliwangzai/myquant-dev) | 掘金量化开发助手 |
 | [TESSNG_secondary_dev_Skills](https://github.com/passengerxuhongli/TESSNG_secondary_dev_Skills) | TESS NG 仿真二次开发技能 |
+| [AIGC-Detector-Pro](https://github.com/free-revalution/AIGC-Detector-Pro) | AIGC 检测论文 AI 降率工具（7⭐）|
 
 ---
 
@@ -114,6 +116,8 @@ cp -r skills/* ~/.claude/skills/
 | [zh-readme](skills/zh-readme/) | 文档 | 一键生成高质量中文 README |
 | [perf-profiler](skills/perf-profiler/) | 性能 | 性能分析：瓶颈识别 + 优化建议 |
 | [db-migrator](skills/db-migrator/) | 数据库 | 数据库迁移助手：Schema diff + 迁移脚本 |
+| [i18n-helper](skills/i18n-helper/) | 开发效率 | 国际化/本地化：扫描硬编码文本 + i18n 配置生成 |
+| [log-analyzer](skills/log-analyzer/) | 调试 | 日志分析：异常模式检测 + 根因定位 + 分析报告 |
 
 ---
 
@@ -167,6 +171,7 @@ description: 技能的一句话描述
 - [OpenClaw Skills Registry](https://registry.openclaw.ai)
 - [awesome-chatgpt-prompts-zh](https://github.com/PlexPt/awesome-chatgpt-prompts-zh) — 59K ⭐
 - [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) — 53K ⭐
+- [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) — 38K ⭐
 - [awesome-openclaw-skills](https://github.com/VoltAgent/awesome-openclaw-skills) — 45K ⭐
 
 ---
