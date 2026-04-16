@@ -4,8 +4,8 @@
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-|[![Skills](https://img.shields.io/badge/skills-90+-green.svg)](#-原创技能)
-|[![Updated](https://img.shields.io/badge/updated-2026--04--15-orange.svg)](#)
+|[![Skills](https://img.shields.io/badge/skills-93+-green.svg)](#-原创技能)
+|[![Updated](https://img.shields.io/badge/updated-2026--04--16-orange.svg)](#)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
 
@@ -34,7 +34,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 
 | 技能 | 说明 | ⭐ |
 |------|------|-----|
-| [caveman](https://github.com/JuliusBrussee/caveman) | 🪨 用最少的 token 说最短的话，节省 65% token | 27K+ |
+| [caveman](https://github.com/JuliusBrussee/caveman) | 🪨 用最少的 token 说最短的话，节省 65% token | 32K+ |
 | [planning-with-files](https://github.com/OthmanAdi/planning-with-files) | 📋 Manus 风格的持久化 Markdown 规划工作流 | 18K+ |
 | [humanizer](https://github.com/blader/humanizer) | ✍️ 消除 AI 写作痕迹，让文本更自然 | 13K+ |
 | [Humanizer-zh](https://github.com/op7418/Humanizer-zh) | ✍️ Humanizer 中文版，消除中文 AI 写作痕迹 | 6K+ |
@@ -49,6 +49,10 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [ship](https://github.com/maxtechera/ship) | 端到端 GTM 流水线 + 凭证预检 |
 | [diagent-cli](https://github.com/daniellee-ux/diagent-cli) | Diagent 图表 URL 编解码 CLI + Skill |
 | [archflow](https://github.com/rafaelolsr/archflow) | 将代码库转为动画 HTML 架构图（14⭐）|
+| [claude-skills](https://github.com/alirezarezvani/claude-skills) | 232+ 技能包，支持 Claude Code / Codex / Gemini CLI / Cursor（11K⭐）|
+| [slavingia-skills](https://github.com/slavingia/skills) | 基于《极简创业者》理念的实用技能集（7.9K⭐）|
+| [trailofbits-skills](https://github.com/trailofbits/skills) | Trail of Bits 安全研究与审计技能（4.6K⭐）|
+| [pinme](https://github.com/glitternetwork/pinme) | 前端一键部署，Claude Code 技能驱动（3.1K⭐）|
 
 ### 🎨 内容创作
 
@@ -66,6 +70,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [ai-second-brain-skills](https://github.com/NulightJens/ai-second-brain-skills) | Karpathy 风格的 LLM Wiki — AI 第二大脑 |
 | [planning-with-files](https://github.com/OthmanAdi/planning-with-files) | 持久化 Markdown 规划，Manus 工作流模式 |
 | [godogen](https://github.com/htdt/godogen) | 从游戏描述构建完整 Godot 4 项目 |
+| [awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) | 100+ 子代理合集，覆盖各类开发场景（17K⭐）|
 
 ### 💰 金融/商业
 
@@ -118,6 +123,8 @@ cp -r skills/* ~/.claude/skills/
 | [db-migrator](skills/db-migrator/) | 数据库 | 数据库迁移助手：Schema diff + 迁移脚本 |
 | [i18n-helper](skills/i18n-helper/) | 开发效率 | 国际化/本地化：扫描硬编码文本 + i18n 配置生成 |
 | [log-analyzer](skills/log-analyzer/) | 调试 | 日志分析：异常模式检测 + 根因定位 + 分析报告 |
+| [error-translator](skills/error-translator/) | 调试 | 编程错误翻译：英文报错 → 中文解释 + 修复方案 |
+| [eslint-fix](skills/eslint-fix/) | 开发效率 | ESLint 自动修复：批量检测 + 自动修复 + 配置建议 |
 
 ---
 
@@ -170,9 +177,12 @@ description: 技能的一句话描述
 - [Claude Code 官方文档](https://docs.anthropic.com/en/docs/claude-code)
 - [OpenClaw Skills Registry](https://registry.openclaw.ai)
 - [awesome-chatgpt-prompts-zh](https://github.com/PlexPt/awesome-chatgpt-prompts-zh) — 59K ⭐
-- [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) — 53K ⭐
-- [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) — 38K ⭐
+- [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) — 54K ⭐
+- [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) — 39K ⭐
+- [awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) — 17K ⭐
+- [awesome-claude-skills-vn](https://github.com/travisvn/awesome-claude-skills) — 11K ⭐
 - [awesome-openclaw-skills](https://github.com/VoltAgent/awesome-openclaw-skills) — 45K ⭐
+- [awesome-claude-code-toolkit](https://github.com/rohitg00/awesome-claude-code-toolkit) — 1.3K ⭐
 
 ---
 
