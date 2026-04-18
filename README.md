@@ -4,8 +4,8 @@
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-|[![Skills](https://img.shields.io/badge/skills-94+-green.svg)](#-原创技能)
-|[![Updated](https://img.shields.io/badge/updated-2026--04--17-orange.svg)](#)
+|[![Skills](https://img.shields.io/badge/skills-96+-green.svg)](#-原创技能)
+|[![Updated](https://img.shields.io/badge/updated-2026--04--18-orange.svg)](#)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
 
@@ -34,7 +34,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 
 | 技能 | 说明 | ⭐ |
 |------|------|-----|
-| [caveman](https://github.com/JuliusBrussee/caveman) | 🪨 用最少的 token 说最短的话，节省 65% token | 35K+ |
+| [caveman](https://github.com/JuliusBrussee/caveman) | 🪨 用最少的 token 说最短的话，节省 65% token | 37K+ |
 | [planning-with-files](https://github.com/OthmanAdi/planning-with-files) | 📋 Manus 风格的持久化 Markdown 规划工作流 | 19K+ |
 | [humanizer](https://github.com/blader/humanizer) | ✍️ 消除 AI 写作痕迹，让文本更自然 | 14K+ |
 | [Humanizer-zh](https://github.com/op7418/Humanizer-zh) | ✍️ Humanizer 中文版，消除中文 AI 写作痕迹 | 6K+ |
@@ -49,14 +49,14 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [ship](https://github.com/maxtechera/ship) | 端到端 GTM 流水线 + 凭证预检 |
 | [diagent-cli](https://github.com/daniellee-ux/diagent-cli) | Diagent 图表 URL 编解码 CLI + Skill |
 | [archflow](https://github.com/rafaelolsr/archflow) | 将代码库转为动画 HTML 架构图（14⭐）|
-| [claude-skills](https://github.com/alirezarezvani/claude-skills) | 232+ 技能包，支持 Claude Code / Codex / Gemini CLI / Cursor（11K⭐）|
+| [claude-skills](https://github.com/alirezarezvani/claude-skills) | 232+ 技能包，支持 Claude Code / Codex / Gemini CLI / Cursor（12K⭐）|
 | [slavingia-skills](https://github.com/slavingia/skills) | 基于《极简创业者》理念的实用技能集（8K⭐）|
-| [trailofbits-skills](https://github.com/trailofbits/skills) | Trail of Bits 安全研究与审计技能（4.6K⭐）|
+| [trailofbits-skills](https://github.com/trailofbits/skills) | Trail of Bits 安全研究与审计技能（5K⭐）|
 | [pinme](https://github.com/glitternetwork/pinme) | 前端一键部署，Claude Code 技能驱动（3.2K⭐）|
-| [playwright-skill](https://github.com/lackeyjb/playwright-skill) | Playwright 浏览器自动化，Claude 自主编写+执行测试（2.4K⭐）|
-| [android-reverse](https://github.com/SimoneAvogadro/android-reverse-engineering-skill) | Android 应用逆向工程辅助（2.3K⭐）|
+| [playwright-skill](https://github.com/lackeyjb/playwright-skill) | Playwright 浏览器自动化，Claude 自主编写+执行测试（2.5K⭐）|
+| [android-reverse](https://github.com/SimoneAvogadro/android-reverse-engineering-skill) | Android 应用逆向工程辅助（2.8K⭐）|
 | [skill-codex](https://github.com/skills-directory/skill-codex) | 将提示词委派给 Codex 执行（1.2K⭐）|
-| [claude-trading-skills](https://github.com/tradermonty/claude-trading-skills) | 股票投资者工具：技术分析、选股器、交易策略（872⭐）|
+| [claude-trading-skills](https://github.com/tradermonty/claude-trading-skills) | 股票投资者工具：技术分析、选股器、交易策略（895⭐）|
 
 ### 🎨 内容创作
 
@@ -94,8 +94,8 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [nanobananas-api-guide](https://github.com/ailingqu/nanobananas-api-guide) | NanoBananas.AI 图片/视频生成 API 指南 |
 | [myquant-dev](https://github.com/aliwangzai/myquant-dev) | 掘金量化开发助手 |
 | [TESSNG_secondary_dev_Skills](https://github.com/passengerxuhongli/TESSNG_secondary_dev_Skills) | TESS NG 仿真二次开发技能 |
-| [AIGC-Detector-Pro](https://github.com/free-revalution/AIGC-Detector-Pro) | AIGC 检测论文 AI 降率工具（7⭐）|
-| [wx-favorites-report](https://github.com/zhuyansen/wx-favorites-report) | 微信收藏可视化：加密 DB → 交互式 HTML 报告（10⭐）|
+| [AIGC-Detector-Pro](https://github.com/free-revalution/AIGC-Detector-Pro) | AIGC 检测论文 AI 降率工具（13⭐）|
+| [wx-favorites-report](https://github.com/zhuyansen/wx-favorites-report) | 微信收藏可视化：加密 DB → 交互式 HTML 报告（279⭐）|
 
 ---
 
@@ -132,6 +132,7 @@ cp -r skills/* ~/.claude/skills/
 | [error-translator](skills/error-translator/) | 调试 | 编程错误翻译：英文报错 → 中文解释 + 修复方案 |
 | [eslint-fix](skills/eslint-fix/) | 开发效率 | ESLint 自动修复：批量检测 + 自动修复 + 配置建议 |
 | [dep-auditor](skills/dep-auditor/) | 安全 | 依赖安全审计：CVE 漏洞检测 + 过期检查 + 许可证风险 |
+| [test-generator](skills/test-generator/) | 测试 | 自动生成单元测试：识别函数逻辑 + 边界条件覆盖 + 多语言支持 |
 
 ---
 
@@ -184,13 +185,13 @@ description: 技能的一句话描述
 - [Claude Code 官方文档](https://docs.anthropic.com/en/docs/claude-code)
 - [OpenClaw Skills Registry](https://registry.openclaw.ai)
 - [awesome-chatgpt-prompts-zh](https://github.com/PlexPt/awesome-chatgpt-prompts-zh) — 59K ⭐
-- [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) — 54K ⭐
+- [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) — 55K ⭐
 - [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) — 39K ⭐
 - [awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) — 18K ⭐
 - [awesome-claude-skills-vn](https://github.com/travisvn/awesome-claude-skills) — 11K ⭐
-- [awesome-openclaw-skills](https://github.com/VoltAgent/awesome-openclaw-skills) — 45K ⭐
+- [awesome-openclaw-skills](https://github.com/VoltAgent/awesome-openclaw-skills) — 46K ⭐
 - [awesome-claude-code-toolkit](https://github.com/rohitg00/awesome-claude-code-toolkit) — 1.3K ⭐
-- [playwright-skill](https://github.com/lackeyjb/playwright-skill) — 2.4K ⭐
+- [playwright-skill](https://github.com/lackeyjb/playwright-skill) — 2.5K ⭐
 
 ---
 
