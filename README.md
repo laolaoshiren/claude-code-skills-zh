@@ -4,8 +4,8 @@
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-|[![Skills](https://img.shields.io/badge/skills-96+-green.svg)](#-原创技能)
-|[![Updated](https://img.shields.io/badge/updated-2026--04--18-orange.svg)](#)
+|[![Skills](https://img.shields.io/badge/skills-98+-green.svg)](#-原创技能)
+|[![Updated](https://img.shields.io/badge/updated-2026--04--19-orange.svg)](#)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
 
@@ -76,6 +76,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [godogen](https://github.com/htdt/godogen) | 从游戏描述构建完整 Godot 4 项目 |
 | [awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) | 100+ 子代理合集，覆盖各类开发场景（18K⭐）|
 | [videocut-skills](https://github.com/Ceeon/videocut-skills) | 视频剪辑 Agent，Claude Code 驱动（1.4K⭐）|
+| [ultimate-gemini-skill](https://github.com/bradAGI/ultimate-gemini-skill) | Gemini 3.1 Flash 图片生成，无需 MCP 服务器（4⭐）|
 
 ### 💰 金融/商业
 
@@ -133,6 +134,8 @@ cp -r skills/* ~/.claude/skills/
 | [eslint-fix](skills/eslint-fix/) | 开发效率 | ESLint 自动修复：批量检测 + 自动修复 + 配置建议 |
 | [dep-auditor](skills/dep-auditor/) | 安全 | 依赖安全审计：CVE 漏洞检测 + 过期检查 + 许可证风险 |
 | [test-generator](skills/test-generator/) | 测试 | 自动生成单元测试：识别函数逻辑 + 边界条件覆盖 + 多语言支持 |
+| [github-actions-gen](skills/github-actions-gen/) | CI/CD | GitHub Actions 流水线生成器：根据技术栈自动创建 workflows |
+| [env-manager](skills/env-manager/) | 开发效率 | 环境变量管理：扫描 .env 文件 + 校验 + 安全检查 + 生成模板 |
 
 ---
 
