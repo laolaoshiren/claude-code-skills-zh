@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code Skills 中文精选集 | 中文开发者最好的技能资源站</title>
+<meta name="description" content="最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 100+ | 按场景分类 | 复制即装 | 持续更新">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a2e;--accent:#6c5ce7;--accent2:#a29bfe;--accent3:#74b9ff;--green:#00b894;--orange:#fdcb6e;--red:#ff7675;--text:#e8e8f0;--text2:#a0a0b8;--text3:#6c6c80;--border:#2a2a3e;--glass:rgba(255,255,255,0.03)}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+a{color:var(--accent2);text-decoration:none;transition:.2s}
+a:hover{color:var(--accent3)}
+
+/* Navbar */
+.navbar{position:fixed;top:0;width:100%;z-index:100;backdrop-filter:blur(20px);background:rgba(10,10,15,0.8);border-bottom:1px solid var(--border);padding:0 2rem}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px}
+.nav-logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem}
+.nav-logo span{background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;gap:1.5rem;align-items:center}
+.nav-links a{color:var(--text2);font-size:.9rem;font-weight:500}
+.nav-links a:hover{color:var(--text)}
+.nav-star{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff!important;padding:8px 16px;border-radius:8px;font-weight:600;font-size:.85rem;transition:transform .2s,box-shadow .2s}
+.nav-star:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(108,92,231,0.4)}
+
+/* Hero */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(108,92,231,0.15) 0%,transparent 60%),radial-gradient(ellipse at 80% 50%,rgba(116,185,255,0.08) 0%,transparent 50%),radial-gradient(ellipse at 20% 80%,rgba(0,184,148,0.06) 0%,transparent 50%)}
+.hero-content{position:relative;z-index:1;max-width:800px}
+.hero h1{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:900;line-height:1.1;margin-bottom:1.5rem}
+.hero h1 .gradient{background:linear-gradient(135deg,#6c5ce7,#a29bfe,#74b9ff,#00b894);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:300% 300%;animation:gradientShift 4s ease infinite}
+@keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.hero-sub{font-size:1.25rem;color:var(--text2);margin-bottom:2rem;max-width:600px;margin-left:auto;margin-right:auto}
+.hero-badges{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:2.5rem}
+.badge{padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:600;background:var(--bg3);border:1px solid var(--border);display:inline-flex;align-items:center;gap:6px}
+.badge.green{color:var(--green);border-color:rgba(0,184,148,0.3)}
+.badge.orange{color:var(--orange);border-color:rgba(253,203,110,0.3)}
+.badge.purple{color:var(--accent2);border-color:rgba(162,155,254,0.3)}
+.hero-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn{padding:14px 28px;border-radius:12px;font-weight:700;font-size:1rem;cursor:pointer;border:none;transition:.2s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;box-shadow:0 4px 20px rgba(108,92,231,0.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(108,92,231,0.4);color:#fff}
+.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent);color:var(--text);transform:translateY(-2px)}
+
+/* Sections */
+section{padding:5rem 2rem}
+.container{max-width:1200px;margin:0 auto}
+.section-title{text-align:center;margin-bottom:3rem}
+.section-title h2{font-size:2.5rem;font-weight:800;margin-bottom:.5rem}
+.section-title p{color:var(--text2);font-size:1.1rem}
+
+/* What is */
+.what-is{background:var(--bg2)}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}
+.feature-card{background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:2rem;transition:.3s}
+.feature-card:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:0 8px 30px rgba(108,92,231,0.1)}
+.feature-icon{font-size:2.5rem;margin-bottom:1rem}
+.feature-card h3{font-size:1.1rem;margin-bottom:.5rem}
+.feature-card p{color:var(--text2);font-size:.9rem}
+
+/* Install */
+.install-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1.5rem}
+.install-card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.install-card-header{padding:1.2rem 1.5rem;background:rgba(108,92,231,0.1);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;font-weight:700}
+.install-card pre{padding:1.5rem;font-size:.85rem;overflow-x:auto;line-height:1.8;color:var(--text2)}
+.install-card .comment{color:var(--text3)}
+.install-card .cmd{color:var(--green)}
+.install-card .path{color:var(--orange)}
+
+/* Skills Grid */
+.skills-tabs{display:flex;justify-content:center;gap:8px;margin-bottom:2rem;flex-wrap:wrap}
+.tab-btn{padding:8px 18px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);cursor:pointer;font-size:.85rem;font-weight:600;transition:.2s}
+.tab-btn.active,.tab-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem}
+.skill-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.5rem;transition:.3s;position:relative;overflow:hidden}
+.skill-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent3));opacity:0;transition:.3s}
+.skill-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,0.3)}
+.skill-card:hover::before{opacity:1}
+.skill-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.8rem}
+.skill-name{font-weight:700;font-size:1rem}
+.skill-stars{display:flex;align-items:center;gap:4px;color:var(--orange);font-size:.8rem;font-weight:600;white-space:nowrap}
+.skill-desc{color:var(--text2);font-size:.85rem;line-height:1.5}
+.skill-tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:.7rem;font-weight:600;margin-top:.8rem}
+.tag-security{background:rgba(255,118,117,0.15);color:var(--red)}
+.tag-docs{background:rgba(116,185,255,0.15);color:var(--accent3)}
+.tag-dev{background:rgba(0,184,148,0.15);color:var(--green)}
+.tag-test{background:rgba(253,203,110,0.15);color:var(--orange)}
+.tag-quality{background:rgba(108,92,231,0.15);color:var(--accent2)}
+.tag-cicd{background:rgba(162,155,254,0.15);color:var(--accent2)}
+.tag-debug{background:rgba(255,118,117,0.15);color:var(--red)}
+.tag-database{background:rgba(0,184,148,0.15);color:var(--green)}
+.tag-star{background:linear-gradient(135deg,rgba(253,203,110,0.2),rgba(255,118,117,0.1));color:var(--orange)}
+
+/* Original Skills */
+.original-skills{background:var(--bg2)}
+.original-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem}
+.original-card{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:1.5rem;transition:.3s}
+.original-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.original-card .oc-icon{font-size:1.8rem;margin-bottom:.8rem}
+.original-card h3{font-size:.95rem;margin-bottom:.5rem}
+.original-card p{color:var(--text2);font-size:.8rem}
+
+/* Stats */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;text-align:center;padding:3rem 0}
+.stat-item h3{font-size:2.5rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-item p{color:var(--text2);font-size:.85rem;margin-top:.3rem}
+
+/* Ecosystem */
+.eco-table{width:100%;border-collapse:collapse}
+.eco-table th,.eco-table td{padding:1rem;text-align:left;border-bottom:1px solid var(--border)}
+.eco-table th{color:var(--text2);font-size:.8rem;text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.eco-table .trend{color:var(--green);font-weight:600}
+
+/* Footer */
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 2rem;text-align:center}
+footer p{color:var(--text3);font-size:.85rem}
+footer .footer-links{display:flex;justify-content:center;gap:2rem;margin-bottom:1.5rem}
+footer .footer-links a{color:var(--text2);font-size:.9rem}
+
+/* Responsive */
+@media(max-width:768px){
+  .nav-links a:not(.nav-star){display:none}
+  .hero h1{font-size:2.2rem}
+  .stats-bar{grid-template-columns:repeat(2,1fr)}
+  .skills-grid,.original-grid{grid-template-columns:1fr}
+  .install-cards{grid-template-columns:1fr}
+}
+
+/* Floating particles */
+.particles{position:fixed;inset:0;pointer-events:none;z-index:0}
+.particle{position:absolute;width:2px;height:2px;background:var(--accent);border-radius:50%;opacity:0.3;animation:float linear infinite}
+@keyframes float{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:0.3}90%{opacity:0.3}100%{transform:translateY(-10vh) scale(1);opacity:0}}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--border)}
+
+/* Animations */
+.fade-in{opacity:0;transform:translateY(30px);transition:opacity .6s,transform .6s}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- Particles -->
+<div class="particles" id="particles"></div>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <div class="nav-logo">
+      🛠️ <span>Claude Code Skills</span>
+    </div>
+    <div class="nav-links">
+      <a href="#skills">精选技能</a>
+      <a href="#original">原创技能</a>
+      <a href="#install">安装指南</a>
+      <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star">⭐ GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <h1>Claude Code Skills<br><span class="gradient">中文精选集</span></h1>
+    <p class="hero-sub">最实用的 Claude Code Skills / Agents / Plugins 合集。不只是列表，更包含可直接安装的原创技能包。</p>
+    <div class="hero-badges">
+      <span class="badge green">✅ 100+ 精选技能</span>
+      <span class="badge purple">🎁 18 个原创技能</span>
+      <span class="badge orange">🔄 持续更新</span>
+    </div>
+    <div class="hero-actions">
+      <a href="#install" class="btn btn-primary">🚀 一键安装</a>
+      <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-secondary">⭐ 给个 Star</a>
+    </div>
+  </div>
+</section>
+
+<!-- What is -->
+<section class="what-is">
+  <div class="container">
+    <div class="section-title fade-in">
+      <h2>📖 什么是 Claude Code Skills？</h2>
+      <p>可复用的指令模块，让 Claude Code 拥有特定领域的专业能力</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card fade-in">
+        <div class="feature-icon">⚡</div>
+        <h3>即装即用</h3>
+        <p>只需一个 SKILL.md 文件，复制到 ~/.claude/skills/ 目录即可生效。无需配置、无需重启。</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">🎯</div>
+        <h3>场景驱动</h3>
+        <p>每个 Skill 聚焦一个场景：代码审查、安全审计、文档生成、API 测试…让 Claude 成为领域专家。</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">🌏</div>
+        <h3>中文友好</h3>
+        <p>精选并优化适合中文开发者的技能，附带原创中文专属技能包。中英混合，技术术语保留英文。</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-icon">🔄</div>
+        <h3>持续更新</h3>
+        <p>每周追踪社区最新技能，持续补充高质量内容。定期优化原创技能的触发条件和工作流程。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Install -->
+<section id="install">
+  <div class="container">
+    <div class="section-title fade-in">
+      <h2>📦 安装指南</h2>
+      <p>复制粘贴，30 秒搞定</p>
+    </div>
+    <div class="install-cards">
+      <div class="install-card fade-in">
+        <div class="install-card-header">⚡ 一键安装全部原创技能</div>
+        <pre><span class="comment"># 克隆仓库</span>
+<span class="cmd">git clone</span> https://github.com/laolaoshiren/claude-code-skills-zh.git
+
+<span class="comment"># 复制全部技能</span>
+<span class="cmd">cp -r</span> claude-code-skills-zh/skills/* <span class="path">~/.claude/skills/</span></pre>
+      </div>
+      <div class="install-card fade-in">
+        <div class="install-card-header">🇨🇳 国内镜像（GitHub 访问困难）</div>
+        <pre><span class="comment"># 使用 gh-proxy 镜像</span>
+<span class="cmd">git clone</span> https://gh-proxy.com/https://github.com/laolaoshiren/claude-code-skills-zh.git
+
+<span class="comment"># 或下载 ZIP（无需 git）</span>
+<span class="comment"># https://gh-proxy.com/.../archive/main.zip</span>
+
+<span class="cmd">cp -r</span> claude-code-skills-zh/skills/* <span class="path">~/.claude/skills/</span></pre>
+      </div>
+      <div class="install-card fade-in">
+        <div class="install-card-header">🎯 安装单个技能</div>
+        <pre><span class="comment"># 只安装你需要的</span>
+<span class="cmd">cp -r</span> skills/zh-code-reviewer <span class="path">~/.claude/skills/</span>
+<span class="cmd">cp -r</span> skills/security-audit <span class="path">~/.claude/skills/</span>
+
+<span class="comment"># 查看全部可用技能</span>
+<span class="cmd">ls</span> skills/</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Original Skills -->
+<section class="original-skills" id="original">
+  <div class="container">
+    <div class="section-title fade-in">
+      <h2>🎁 原创技能</h2>
+      <p>本仓库独有，可直接安装使用</p>
+    </div>
+    <div class="original-grid">
+      <div class="original-card fade-in">
+        <div class="oc-icon">🔍</div>
+        <h3>zh-code-reviewer</h3>
+        <p>中文代码审查专家，生成详细的中文审查报告</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">📄</div>
+        <h3>zh-docgen</h3>
+        <p>从代码库自动生成中文技术文档</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">📝</div>
+        <h3>zh-readme</h3>
+        <p>一键生成高质量中文 README</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">🔀</div>
+        <h3>git-workflow</h3>
+        <p>Git 工作流自动化：智能分支、提交、PR</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">🔒</div>
+        <h3>security-audit</h3>
+        <p>代码安全审计：漏洞扫描 + 修复建议</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">🛡️</div>
+        <h3>dep-auditor</h3>
+        <p>依赖安全审计：CVE 检测 + 许可证风险</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">🧪</div>
+        <h3>api-tester</h3>
+        <p>API 自动化测试：OpenAPI 解析 + 用例生成</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">✅</div>
+        <h3>test-generator</h3>
+        <p>自动生成单元测试，覆盖边界条件</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">📋</div>
+        <h3>changelog-gen</h3>
+        <p>从 Git 历史自动生成 CHANGELOG</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">♻️</div>
+        <h3>refactor-advisor</h3>
+        <p>识别代码坏味道，提供重构方案</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">⚡</div>
+        <h3>perf-profiler</h3>
+        <p>性能分析：瓶颈识别 + 优化建议</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">🗄️</div>
+        <h3>db-migrator</h3>
+        <p>数据库迁移：Schema diff + 迁移脚本</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">🌍</div>
+        <h3>i18n-helper</h3>
+        <p>国际化助手：扫描硬编码 + i18n 配置生成</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">📋</div>
+        <h3>log-analyzer</h3>
+        <p>日志分析：异常检测 + 根因定位</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">🐛</div>
+        <h3>error-translator</h3>
+        <p>英文报错 → 中文解释 + 修复方案</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">🧹</div>
+        <h3>eslint-fix</h3>
+        <p>ESLint 自动修复：批量检测 + 自动修复</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">⚙️</div>
+        <h3>github-actions-gen</h3>
+        <p>CI/CD 流水线生成器，根据技术栈自动创建</p>
+      </div>
+      <div class="original-card fade-in">
+        <div class="oc-icon">🔑</div>
+        <h3>env-manager</h3>
+        <p>环境变量管理：扫描 + 校验 + 安全检查</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Curated Skills -->
+<section id="skills">
+  <div class="container">
+    <div class="section-title fade-in">
+      <h2>⭐ 精选第三方技能</h2>
+      <p>从数千个项目中精选的高质量技能</p>
+    </div>
+    <div class="skills-tabs">
+      <button class="tab-btn active" data-tab="star">🏆 明星技能</button>
+      <button class="tab-btn" data-tab="dev">💻 开发效率</button>
+      <button class="tab-btn" data-tab="creative">🎨 内容创作</button>
+      <button class="tab-btn" data-tab="agent">🤖 AI Agent</button>
+      <button class="tab-btn" data-tab="finance">💰 金融/商业</button>
+      <button class="tab-btn" data-tab="chinese">🌏 中文专属</button>
+    </div>
+    <div class="skills-grid" id="skillsContainer"></div>
+  </div>
+</section>
+
+<!-- Stats -->
+<section style="background:var(--bg2)">
+  <div class="container">
+    <div class="stats-bar fade-in">
+      <div class="stat-item">
+        <h3>100+</h3>
+        <p>精选技能</p>
+      </div>
+      <div class="stat-item">
+        <h3>18</h3>
+        <p>原创技能</p>
+      </div>
+      <div class="stat-item">
+        <h3>6</h3>
+        <p>场景分类</p>
+      </div>
+      <div class="stat-item">
+        <h3>∞</h3>
+        <p>持续更新</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Ecosystem -->
+<section>
+  <div class="container">
+    <div class="section-title fade-in">
+      <h2>📊 技能生态</h2>
+      <p>AI Coding Skills 正在爆发式增长</p>
+    </div>
+    <div class="fade-in" style="overflow-x:auto">
+      <table class="eco-table">
+        <thead><tr><th>平台</th><th>技能数量</th><th>趋势</th></tr></thead>
+        <tbody>
+          <tr><td>Claude Code</td><td>1,000+</td><td class="trend">📈 爆发增长中</td></tr>
+          <tr><td>OpenClaw</td><td>5,400+</td><td class="trend">📈 最大生态</td></tr>
+          <tr><td>Hermes Agent</td><td>500+</td><td class="trend">📈 稳定增长</td></tr>
+          <tr><td>Cursor Rules</td><td>3,000+</td><td class="trend">📈 增长中</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Contribute -->
+<section style="background:var(--bg2)">
+  <div class="container" style="text-align:center">
+    <div class="section-title fade-in">
+      <h2>🤝 贡献</h2>
+      <p>欢迎提交 PR，将你的 skill 放入 skills/ 目录并更新上方列表</p>
+    </div>
+    <div class="fade-in" style="margin-top:2rem">
+      <a href="https://github.com/laolaoshiren/claude-code-skills-zh/issues/1" class="btn btn-primary">📢 提交你的 Skill →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-links">
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh">GitHub</a>
+    <a href="https://docs.anthropic.com/en/docs/claude-code">Claude Code 文档</a>
+    <a href="https://star-history.com/#laolaoshiren/claude-code-skills-zh&Date">Star History</a>
+  </div>
+  <p>MIT License · Made with ❤️ for Chinese Developers</p>
+</footer>
+
+<script>
+// Skills data
+const skillsData = {
+  star: [
+    {name:'caveman',stars:'37K+',desc:'用最少的 token 说最短的话，节省 65% token',tag:'star',url:'https://github.com/JuliusBrussee/caveman'},
+    {name:'planning-with-files',stars:'19K+',desc:'Manus 风格的持久化 Markdown 规划工作流',tag:'dev',url:'https://github.com/OthmanAdi/planning-with-files'},
+    {name:'humanizer',stars:'14K+',desc:'消除 AI 写作痕迹，让文本更自然',tag:'star',url:'https://github.com/blader/humanizer'},
+    {name:'Humanizer-zh',stars:'6K+',desc:'Humanizer 中文版，消除中文 AI 写作痕迹',tag:'star',url:'https://github.com/op7418/Humanizer-zh'},
+    {name:'awesome-claude-code-subagents',stars:'18K+',desc:'100+ 子代理合集，覆盖各类开发场景',tag:'star',url:'https://github.com/VoltAgent/awesome-claude-code-subagents'},
+    {name:'claude-skills',stars:'12K+',desc:'232+ 技能包，支持 Claude Code / Codex / Gemini CLI / Cursor',tag:'star',url:'https://github.com/alirezarezvani/claude-skills'},
+    {name:'slavingia-skills',stars:'8K+',desc:'基于《极简创业者》理念的实用技能集',tag:'star',url:'https://github.com/slavingia/skills'},
+    {name:'trailofbits-skills',stars:'5K+',desc:'Trail of Bits 安全研究与审计技能',tag:'security',url:'https://github.com/trailofbits/skills'},
+  ],
+  dev: [
+    {name:'plugins-plus-skills',stars:'1.9K',desc:'423 插件 + 2,849 技能 + 177 代理，超大合集',url:'https://github.com/jeremylongshore/claude-code-plugins-plus-skills'},
+    {name:'skill-factory',stars:'706',desc:'技能工厂：一键生成、测试、发布 Claude Code 技能',url:'https://github.com/alirezarezvani/claude-code-skill-factory'},
+    {name:'daymade-skills',stars:'876',desc:'专业技能市场，生产就绪的高质量技能集',url:'https://github.com/daymade/claude-code-skills'},
+    {name:'pinme',stars:'3.2K',desc:'前端一键部署，Claude Code 技能驱动',url:'https://github.com/glitternetwork/pinme'},
+    {name:'playwright-skill',stars:'2.5K',desc:'Playwright 浏览器自动化，Claude 自主编写+执行测试',url:'https://github.com/lackeyjb/playwright-skill'},
+    {name:'skill-codex',stars:'1.2K',desc:'将提示词委派给 Codex 执行',url:'https://github.com/skills-directory/skill-codex'},
+    {name:'bmad-skills',stars:'389',desc:'BMAD Method：自动检测 + Memory 集成',url:'https://github.com/aj-geddes/claude-code-bmad-skills'},
+    {name:'apple-skills',stars:'196',desc:'iOS/macOS/iPadOS 开发专用技能集',url:'https://github.com/rshankras/claude-code-apple-skills'},
+    {name:'scrapling',stars:'224',desc:'智能网页爬虫，自动 Fetcher 选择 + 反爬绕过',url:'https://github.com/Cedriccmh/claude-code-skill-scrapling'},
+    {name:'codebase-to-course',stars:'',desc:'将代码库转为交互式 HTML 课程',url:'https://github.com/zarazhangrui/codebase-to-course'},
+    {name:'github-tech-scanner',stars:'',desc:'扫描 GitHub 仓库的语言和框架',url:'https://github.com/claude-access/github-tech-scanner'},
+    {name:'review-checkpoint',stars:'',desc:'结构化自审查工作流：先契约后代码',url:'https://github.com/Atharva-Kanherkar/review-checkpoint'},
+    {name:'ship',stars:'',desc:'端到端 GTM 流水线 + 凭证预检',url:'https://github.com/maxtechera/ship'},
+    {name:'archflow',stars:'14',desc:'将代码库转为动画 HTML 架构图',url:'https://github.com/rafaelolsr/archflow'},
+    {name:'rails-upgrade',stars:'245',desc:'Rails 一键升级技能，自动化版本迁移',url:'https://github.com/ombulabs/claude-code_rails-upgrade-skill'},
+    {name:'android-reverse',stars:'2.8K',desc:'Android 应用逆向工程辅助',url:'https://github.com/SimoneAvogadro/android-reverse-engineering-skill'},
+  ],
+  creative: [
+    {name:'make-mermaid',stars:'',desc:'从代码/描述生成 Mermaid 图表，输出 PNG/SVG',url:'https://github.com/gy1041/make-mermaid'},
+    {name:'fireworks-tech-graph',stars:'',desc:'生产级 SVG+PNG 技术图表，支持 8 种图表类型',url:'https://github.com/yizhiyanhua-ai/fireworks-tech-graph'},
+    {name:'nothing-design-skill',stars:'',desc:'Nothing 设计语言：单色、排版、工业风',url:'https://github.com/dominikmartn/nothing-design-skill'},
+    {name:'gongnangi-chart-skill',stars:'',desc:'麦肯锡/贝恩风格咨询图表生成器',url:'https://github.com/kimsh-1/gongnangi-chart-skill'},
+  ],
+  agent: [
+    {name:'ai-second-brain-skills',stars:'',desc:'Karpathy 风格的 LLM Wiki — AI 第二大脑',url:'https://github.com/NulightJens/ai-second-brain-skills'},
+    {name:'planning-with-files',stars:'19K',desc:'持久化 Markdown 规划，Manus 工作流模式',url:'https://github.com/OthmanAdi/planning-with-files'},
+    {name:'godogen',stars:'',desc:'从游戏描述构建完整 Godot 4 项目',url:'https://github.com/htdt/godogen'},
+    {name:'videocut-skills',stars:'1.4K',desc:'视频剪辑 Agent，Claude Code 驱动',url:'https://github.com/Ceeon/videocut-skills'},
+    {name:'ultimate-gemini-skill',stars:'4',desc:'Gemini 3.1 Flash 图片生成，无需 MCP 服务器',url:'https://github.com/bradAGI/ultimate-gemini-skill'},
+  ],
+  finance: [
+    {name:'financial-report-minesweeper',stars:'',desc:'A 股财报排雷工具，28 条唐朝方法论检查',url:'https://github.com/terancejiang/financial-report-minesweeper'},
+    {name:'tax-filer',stars:'',desc:'美国联邦/州所得税申报指导',url:'https://github.com/chaturchatur/tax-filer'},
+    {name:'tech-digest',stars:'',desc:'HN/Lobste.rs 每日科技摘要，评分过滤',url:'https://github.com/camilleroux/tech-digest'},
+    {name:'claude-trading-skills',stars:'895',desc:'股票投资者工具：技术分析、选股器、交易策略',url:'https://github.com/tradermonty/claude-trading-skills'},
+  ],
+  chinese: [
+    {name:'Humanizer-zh',stars:'6K',desc:'消除中文 AI 写作痕迹',url:'https://github.com/op7418/Humanizer-zh'},
+    {name:'financial-report-minesweeper',stars:'',desc:'A 股财报排雷（唐朝方法论）',url:'https://github.com/terancejiang/financial-report-minesweeper'},
+    {name:'nanobananas-api-guide',stars:'',desc:'NanoBananas.AI 图片/视频生成 API 指南',url:'https://github.com/ailingqu/nanobananas-api-guide'},
+    {name:'myquant-dev',stars:'',desc:'掘金量化开发助手',url:'https://github.com/aliwangzai/myquant-dev'},
+    {name:'AIGC-Detector-Pro',stars:'13',desc:'AIGC 检测论文 AI 降率工具',url:'https://github.com/free-revalution/AIGC-Detector-Pro'},
+    {name:'wx-favorites-report',stars:'279',desc:'微信收藏可视化：加密 DB → 交互式 HTML 报告',url:'https://github.com/zhuyansen/wx-favorites-report'},
+  ]
+};
+
+const tagMap = {star:'tag-star',security:'tag-security',docs:'tag-docs',dev:'tag-dev',test:'tag-test',quality:'tag-quality',cicd:'tag-cicd',debug:'tag-debug',database:'tag-database'};
+
+function renderSkills(tab) {
+  const container = document.getElementById('skillsContainer');
+  const data = skillsData[tab] || [];
+  container.innerHTML = data.map(s => `
+    <div class="skill-card">
+      <div class="skill-header">
+        <a class="skill-name" href="${s.url}" target="_blank">${s.name}</a>
+        ${s.stars ? `<span class="skill-stars">⭐ ${s.stars}</span>` : ''}
+      </div>
+      <div class="skill-desc">${s.desc}</div>
+      ${s.tag ? `<span class="skill-tag ${tagMap[s.tag]||''}">${s.tag}</span>` : ''}
+    </div>
+  `).join('');
+}
+
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderSkills(btn.dataset.tab);
+  });
+});
+renderSkills('star');
+
+// Particles
+const pc = document.getElementById('particles');
+for(let i=0;i<30;i++){
+  const p = document.createElement('div');
+  p.className='particle';
+  p.style.left = Math.random()*100+'%';
+  p.style.animationDuration = (8+Math.random()*12)+'s';
+  p.style.animationDelay = Math.random()*10+'s';
+  p.style.width = p.style.height = (1+Math.random()*2)+'px';
+  pc.appendChild(p);
+}
+
+// Scroll animation
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, {threshold:0.1});
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
