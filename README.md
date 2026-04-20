@@ -1,10 +1,10 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 80+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 100+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-|[![Skills](https://img.shields.io/badge/skills-100+-green.svg)](#-原创技能)
+|[![Skills](https://img.shields.io/badge/skills-120+-green.svg)](#-原创技能)
 |[![Updated](https://img.shields.io/badge/updated-2026--04--20-orange.svg)](#)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -34,11 +34,19 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 
 | 技能 | 说明 | ⭐ |
 |------|------|-----|
+| [everything-claude-code](https://github.com/affaan-m/everything-claude-code) | 🧠 Claude Code 全栈技能系统：Skills + 记忆 + 安全 + 研究驱动开发 | 161K+ |
+| [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) | 📚 1,400+ 可安装技能库，覆盖 Claude Code / Cursor / Codex / Gemini CLI | 34K+ |
 | [caveman](https://github.com/JuliusBrussee/caveman) | 🪨 用最少的 token 说最短的话，节省 65% token | 39K+ |
 | [career-ops](https://github.com/santifer/career-ops) | 💼 AI 求职系统：14 种技能模式 + Go 仪表盘 + PDF 生成 | 36K+ |
 | [graphify](https://github.com/safishamsi/graphify) | 🕸️ 将代码/文档/论文转为可查询知识图谱 | 31K+ |
+| [marketingskills](https://github.com/coreyhaines31/marketingskills) | 📈 营销技能包：CRO、文案、SEO、数据分析、增长工程 | 22K+ |
 | [planning-with-files](https://github.com/OthmanAdi/planning-with-files) | 📋 Manus 风格的持久化 Markdown 规划工作流 | 19K+ |
 | [humanizer](https://github.com/blader/humanizer) | ✍️ 消除 AI 写作痕迹，让文本更自然 | 14K+ |
+| [Claude-Code-Game-Studios](https://github.com/Donchitos/Claude-Code-Game-Studios) | 🎮 49 个 AI 代理 + 72 个工作流，完整游戏开发工作室 | 14K+ |
+| [open-saas](https://github.com/wasp-lang/open-saas) | 🔥 100% 免费 SaaS 模板，React + Node + Prisma，AI-ready | 14K+ |
+| [ai-guide](https://github.com/liyupi/ai-guide) | 🇨🇳 程序员鱼皮 AI 资源大全：Claude Code / Cursor / DeepSeek 全攻略 | 12K+ |
+| [notebooklm-py](https://github.com/teng-lin/notebooklm-py) | 📓 Google NotebookLM 非官方 Python API + Agent 技能 | 11K+ |
+| [claude-skills](https://github.com/alirezarezvani/claude-skills) | 📦 232+ 技能包，支持 Claude Code / Codex / Gemini CLI / Cursor | 12K+ |
 | [Humanizer-zh](https://github.com/op7418/Humanizer-zh) | ✍️ Humanizer 中文版，消除中文 AI 写作痕迹 | 6K+ |
 
 ### 💻 开发效率
@@ -51,13 +59,13 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [ship](https://github.com/maxtechera/ship) | 端到端 GTM 流水线 + 凭证预检 |
 | [diagent-cli](https://github.com/daniellee-ux/diagent-cli) | Diagent 图表 URL 编解码 CLI + Skill |
 | [archflow](https://github.com/rafaelolsr/archflow) | 将代码库转为动画 HTML 架构图（14⭐）|
-| [claude-skills](https://github.com/alirezarezvani/claude-skills) | 232+ 技能包，支持 Claude Code / Codex / Gemini CLI / Cursor（12K⭐）|
 | [autoresearch](https://github.com/uditgoenka/autoresearch) | 自主迭代研究：修改→验证→保留/丢弃→循环（3.8K⭐）|
 | [SwiftUI-Agent-Skill](https://github.com/twostraws/SwiftUI-Agent-Skill) | iOS/macOS SwiftUI 开发专用技能（3.6K⭐）|
 | [plugins-plus-skills](https://github.com/jeremylongshore/claude-code-plugins-plus-skills) | 423 插件 + 2,849 技能 + 177 代理，超大合集（1.9K⭐）|
 | [slavingia-skills](https://github.com/slavingia/skills) | 基于《极简创业者》理念的实用技能集（8K⭐）|
 | [trailofbits-skills](https://github.com/trailofbits/skills) | Trail of Bits 安全研究与审计技能（4.6K⭐）|
 | [skill-factory](https://github.com/alirezarezvani/claude-code-skill-factory) | 技能工厂：一键生成、测试、发布 Claude Code 技能（706⭐）|
+| [jeffallan-skills](https://github.com/Jeffallan/claude-skills) | 66 个全栈开发者专用技能，成为你的专家配对程序员（8.3K⭐）|
 | [daymade-skills](https://github.com/daymade/claude-code-skills) | 专业技能市场，生产就绪的高质量技能集（876⭐）|
 | [pinme](https://github.com/glitternetwork/pinme) | 前端一键部署，Claude Code 技能驱动（3.1K⭐）|
 | [playwright-skill](https://github.com/lackeyjb/playwright-skill) | Playwright 浏览器自动化，Claude 自主编写+执行测试（2.4K⭐）|
@@ -68,6 +76,8 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [rails-upgrade](https://github.com/ombulabs/claude-code_rails-upgrade-skill) | Rails 一键升级技能，自动化版本迁移（245⭐）|
 | [apple-skills](https://github.com/rshankras/claude-code-apple-skills) | iOS/macOS/iPadOS 开发专用技能集（197⭐）|
 | [scrapling](https://github.com/Cedriccmh/claude-code-skill-scrapling) | 智能网页爬虫，自动 Fetcher 选择 + 反爬绕过（224⭐）|
+| [context-mode](https://github.com/mksglu/context-mode) | 上下文窗口优化：工具输出沙箱化，减少 98%，支持 12 平台（8.2K⭐）|
+| [claude-code-infrastructure-showcase](https://github.com/diet103/claude-code-infrastructure-showcase) | Claude Code 基础设施展示：技能自动激活 + Hooks + Agents（9.5K⭐）|
 
 ### 🎨 内容创作
 
@@ -77,6 +87,8 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [fireworks-tech-graph](https://github.com/yizhiyanhua-ai/fireworks-tech-graph) | 生产级 SVG+PNG 技术图表，支持 8 种图表类型 |
 | [nothing-design-skill](https://github.com/dominikmartn/nothing-design-skill) | Nothing 设计语言：单色、排版、工业风 |
 | [gongnangi-chart-skill](https://github.com/kimsh-1/gongnangi-chart-skill) | 麦肯锡/贝恩风格咨询图表生成器 |
+| [mcp_excalidraw](https://github.com/yctimlin/mcp_excalidraw) | Excalidraw MCP 服务器：AI 驱动的图表绘制 + 实时画布同步（1.7K⭐）|
+| [gtm-engineer-skills](https://github.com/onvoyage-ai/gtm-engineer-skills) | AI/GEO 优化：16 项基础检查 + 6 维智能分析（873⭐）|
 
 ### 🤖 AI Agent
 
@@ -189,10 +201,11 @@ description: 技能的一句话描述
 
 | 平台 | 技能数量 | 趋势 |
 |------|---------|------|
-| Claude Code | 1000+ | 📈 爆发增长中 |
+| Claude Code | 2000+ | 📈 爆发增长中 |
 | OpenClaw | 5400+ | 📈 最大生态 |
 | Hermes Agent | 500+ | 📈 稳定增长 |
 | Cursor Rules | 3000+ | 📈 增长中 |
+| Gemini CLI | 500+ | 📈 新兴生态 |
 
 ---
 
@@ -206,6 +219,8 @@ description: 技能的一句话描述
 - [awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) — 17K ⭐
 - [awesome-claude-skills-vn](https://github.com/travisvn/awesome-claude-skills) — 11K ⭐
 - [awesome-openclaw-skills](https://github.com/VoltAgent/awesome-openclaw-skills) — 46K ⭐
+- [everything-claude-code](https://github.com/affaan-m/everything-claude-code) — 161K ⭐
+- [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) — 34K ⭐
 - [awesome-claude-code-toolkit](https://github.com/rohitg00/awesome-claude-code-toolkit) — 1.3K ⭐
 - [playwright-skill](https://github.com/lackeyjb/playwright-skill) — 2.4K ⭐
 
