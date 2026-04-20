@@ -4,8 +4,8 @@
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-|[![Skills](https://img.shields.io/badge/skills-98+-green.svg)](#-原创技能)
-|[![Updated](https://img.shields.io/badge/updated-2026--04--19-orange.svg)](#)
+|[![Skills](https://img.shields.io/badge/skills-100+-green.svg)](#-原创技能)
+|[![Updated](https://img.shields.io/badge/updated-2026--04--20-orange.svg)](#)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
 
@@ -50,13 +50,20 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [diagent-cli](https://github.com/daniellee-ux/diagent-cli) | Diagent 图表 URL 编解码 CLI + Skill |
 | [archflow](https://github.com/rafaelolsr/archflow) | 将代码库转为动画 HTML 架构图（14⭐）|
 | [claude-skills](https://github.com/alirezarezvani/claude-skills) | 232+ 技能包，支持 Claude Code / Codex / Gemini CLI / Cursor（12K⭐）|
+| [plugins-plus-skills](https://github.com/jeremylongshore/claude-code-plugins-plus-skills) | 423 插件 + 2,849 技能 + 177 代理，超大合集（1.9K⭐）|
 | [slavingia-skills](https://github.com/slavingia/skills) | 基于《极简创业者》理念的实用技能集（8K⭐）|
 | [trailofbits-skills](https://github.com/trailofbits/skills) | Trail of Bits 安全研究与审计技能（5K⭐）|
+| [skill-factory](https://github.com/alirezarezvani/claude-code-skill-factory) | 技能工厂：一键生成、测试、发布 Claude Code 技能（706⭐）|
+| [daymade-skills](https://github.com/daymade/claude-code-skills) | 专业技能市场，生产就绪的高质量技能集（876⭐）|
 | [pinme](https://github.com/glitternetwork/pinme) | 前端一键部署，Claude Code 技能驱动（3.2K⭐）|
 | [playwright-skill](https://github.com/lackeyjb/playwright-skill) | Playwright 浏览器自动化，Claude 自主编写+执行测试（2.5K⭐）|
 | [android-reverse](https://github.com/SimoneAvogadro/android-reverse-engineering-skill) | Android 应用逆向工程辅助（2.8K⭐）|
 | [skill-codex](https://github.com/skills-directory/skill-codex) | 将提示词委派给 Codex 执行（1.2K⭐）|
 | [claude-trading-skills](https://github.com/tradermonty/claude-trading-skills) | 股票投资者工具：技术分析、选股器、交易策略（895⭐）|
+| [bmad-skills](https://github.com/aj-geddes/claude-code-bmad-skills) | BMAD Method：自动检测 + Memory 集成 + 完整开发流程（389⭐）|
+| [rails-upgrade](https://github.com/ombulabs/claude-code_rails-upgrade-skill) | Rails 一键升级技能，自动化版本迁移（245⭐）|
+| [apple-skills](https://github.com/rshankras/claude-code-apple-skills) | iOS/macOS/iPadOS 开发专用技能集（196⭐）|
+| [scrapling](https://github.com/Cedriccmh/claude-code-skill-scrapling) | 智能网页爬虫，自动 Fetcher 选择 + 反爬绕过（224⭐）|
 
 ### 🎨 内容创作
 
