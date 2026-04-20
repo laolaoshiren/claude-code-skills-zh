@@ -34,7 +34,9 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 
 | 技能 | 说明 | ⭐ |
 |------|------|-----|
-| [caveman](https://github.com/JuliusBrussee/caveman) | 🪨 用最少的 token 说最短的话，节省 65% token | 37K+ |
+| [caveman](https://github.com/JuliusBrussee/caveman) | 🪨 用最少的 token 说最短的话，节省 65% token | 39K+ |
+| [career-ops](https://github.com/santifer/career-ops) | 💼 AI 求职系统：14 种技能模式 + Go 仪表盘 + PDF 生成 | 36K+ |
+| [graphify](https://github.com/safishamsi/graphify) | 🕸️ 将代码/文档/论文转为可查询知识图谱 | 31K+ |
 | [planning-with-files](https://github.com/OthmanAdi/planning-with-files) | 📋 Manus 风格的持久化 Markdown 规划工作流 | 19K+ |
 | [humanizer](https://github.com/blader/humanizer) | ✍️ 消除 AI 写作痕迹，让文本更自然 | 14K+ |
 | [Humanizer-zh](https://github.com/op7418/Humanizer-zh) | ✍️ Humanizer 中文版，消除中文 AI 写作痕迹 | 6K+ |
@@ -50,19 +52,21 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [diagent-cli](https://github.com/daniellee-ux/diagent-cli) | Diagent 图表 URL 编解码 CLI + Skill |
 | [archflow](https://github.com/rafaelolsr/archflow) | 将代码库转为动画 HTML 架构图（14⭐）|
 | [claude-skills](https://github.com/alirezarezvani/claude-skills) | 232+ 技能包，支持 Claude Code / Codex / Gemini CLI / Cursor（12K⭐）|
+| [autoresearch](https://github.com/uditgoenka/autoresearch) | 自主迭代研究：修改→验证→保留/丢弃→循环（3.8K⭐）|
+| [SwiftUI-Agent-Skill](https://github.com/twostraws/SwiftUI-Agent-Skill) | iOS/macOS SwiftUI 开发专用技能（3.6K⭐）|
 | [plugins-plus-skills](https://github.com/jeremylongshore/claude-code-plugins-plus-skills) | 423 插件 + 2,849 技能 + 177 代理，超大合集（1.9K⭐）|
 | [slavingia-skills](https://github.com/slavingia/skills) | 基于《极简创业者》理念的实用技能集（8K⭐）|
-| [trailofbits-skills](https://github.com/trailofbits/skills) | Trail of Bits 安全研究与审计技能（5K⭐）|
+| [trailofbits-skills](https://github.com/trailofbits/skills) | Trail of Bits 安全研究与审计技能（4.6K⭐）|
 | [skill-factory](https://github.com/alirezarezvani/claude-code-skill-factory) | 技能工厂：一键生成、测试、发布 Claude Code 技能（706⭐）|
 | [daymade-skills](https://github.com/daymade/claude-code-skills) | 专业技能市场，生产就绪的高质量技能集（876⭐）|
-| [pinme](https://github.com/glitternetwork/pinme) | 前端一键部署，Claude Code 技能驱动（3.2K⭐）|
-| [playwright-skill](https://github.com/lackeyjb/playwright-skill) | Playwright 浏览器自动化，Claude 自主编写+执行测试（2.5K⭐）|
-| [android-reverse](https://github.com/SimoneAvogadro/android-reverse-engineering-skill) | Android 应用逆向工程辅助（2.8K⭐）|
-| [skill-codex](https://github.com/skills-directory/skill-codex) | 将提示词委派给 Codex 执行（1.2K⭐）|
-| [claude-trading-skills](https://github.com/tradermonty/claude-trading-skills) | 股票投资者工具：技术分析、选股器、交易策略（895⭐）|
+| [pinme](https://github.com/glitternetwork/pinme) | 前端一键部署，Claude Code 技能驱动（3.1K⭐）|
+| [playwright-skill](https://github.com/lackeyjb/playwright-skill) | Playwright 浏览器自动化，Claude 自主编写+执行测试（2.4K⭐）|
+| [android-reverse](https://github.com/SimoneAvogadro/android-reverse-engineering-skill) | Android 应用逆向工程辅助（3.7K⭐）|
+| [skill-codex](https://github.com/skills-directory/skill-codex) | 将提示词委派给 Codex 执行（1.1K⭐）|
+| [claude-trading-skills](https://github.com/tradermonty/claude-trading-skills) | 股票投资者工具：技术分析、选股器、交易策略（943⭐）|
 | [bmad-skills](https://github.com/aj-geddes/claude-code-bmad-skills) | BMAD Method：自动检测 + Memory 集成 + 完整开发流程（389⭐）|
 | [rails-upgrade](https://github.com/ombulabs/claude-code_rails-upgrade-skill) | Rails 一键升级技能，自动化版本迁移（245⭐）|
-| [apple-skills](https://github.com/rshankras/claude-code-apple-skills) | iOS/macOS/iPadOS 开发专用技能集（196⭐）|
+| [apple-skills](https://github.com/rshankras/claude-code-apple-skills) | iOS/macOS/iPadOS 开发专用技能集（197⭐）|
 | [scrapling](https://github.com/Cedriccmh/claude-code-skill-scrapling) | 智能网页爬虫，自动 Fetcher 选择 + 反爬绕过（224⭐）|
 
 ### 🎨 内容创作
@@ -81,15 +85,16 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [ai-second-brain-skills](https://github.com/NulightJens/ai-second-brain-skills) | Karpathy 风格的 LLM Wiki — AI 第二大脑 |
 | [planning-with-files](https://github.com/OthmanAdi/planning-with-files) | 持久化 Markdown 规划，Manus 工作流模式 |
 | [godogen](https://github.com/htdt/godogen) | 从游戏描述构建完整 Godot 4 项目 |
-| [awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) | 100+ 子代理合集，覆盖各类开发场景（18K⭐）|
+| [awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) | 100+ 子代理合集，覆盖各类开发场景（17K⭐）|
 | [videocut-skills](https://github.com/Ceeon/videocut-skills) | 视频剪辑 Agent，Claude Code 驱动（1.4K⭐）|
+| [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep) | ⚔️ 自主 ML 研究：跨模型审查 + 想法发现 + 实验自动化（7K⭐）|
 | [ultimate-gemini-skill](https://github.com/bradAGI/ultimate-gemini-skill) | Gemini 3.1 Flash 图片生成，无需 MCP 服务器（4⭐）|
 
 ### 💰 金融/商业
 
 | 技能 | 说明 |
 |------|------|
-| [financial-report-minesweeper](https://github.com/terancejiang/financial-report-minesweeper) | A 股财报排雷工具，28 条唐朝方法论检查 |
+| [financial-report-minesweeper](https://github.com/terancejiang/financial-report-minesweeper) | A 股财报排雷工具，28 条唐朝方法论检查（76⭐）|
 | [tax-filer](https://github.com/chaturchatur/tax-filer) | 美国联邦/州所得税申报指导 |
 | [tech-digest](https://github.com/camilleroux/tech-digest) | HN/Lobste.rs 每日科技摘要，评分过滤 |
 
@@ -102,8 +107,9 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [nanobananas-api-guide](https://github.com/ailingqu/nanobananas-api-guide) | NanoBananas.AI 图片/视频生成 API 指南 |
 | [myquant-dev](https://github.com/aliwangzai/myquant-dev) | 掘金量化开发助手 |
 | [TESSNG_secondary_dev_Skills](https://github.com/passengerxuhongli/TESSNG_secondary_dev_Skills) | TESS NG 仿真二次开发技能 |
+| [wx-favorites-report](https://github.com/zhuyansen/wx-favorites-report) | 微信收藏可视化：加密 DB → 交互式 HTML 报告（500⭐）|
+| [web-access](https://github.com/eze-is/web-access) | 给 Claude Code 装上完整联网能力：三层通道调度 + 浏览器 CDP（5.3K⭐）|
 | [AIGC-Detector-Pro](https://github.com/free-revalution/AIGC-Detector-Pro) | AIGC 检测论文 AI 降率工具（13⭐）|
-| [wx-favorites-report](https://github.com/zhuyansen/wx-favorites-report) | 微信收藏可视化：加密 DB → 交互式 HTML 报告（279⭐）|
 
 ---
 
@@ -197,11 +203,11 @@ description: 技能的一句话描述
 - [awesome-chatgpt-prompts-zh](https://github.com/PlexPt/awesome-chatgpt-prompts-zh) — 59K ⭐
 - [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) — 55K ⭐
 - [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) — 39K ⭐
-- [awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) — 18K ⭐
+- [awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) — 17K ⭐
 - [awesome-claude-skills-vn](https://github.com/travisvn/awesome-claude-skills) — 11K ⭐
 - [awesome-openclaw-skills](https://github.com/VoltAgent/awesome-openclaw-skills) — 46K ⭐
 - [awesome-claude-code-toolkit](https://github.com/rohitg00/awesome-claude-code-toolkit) — 1.3K ⭐
-- [playwright-skill](https://github.com/lackeyjb/playwright-skill) — 2.5K ⭐
+- [playwright-skill](https://github.com/lackeyjb/playwright-skill) — 2.4K ⭐
 
 ---
 
