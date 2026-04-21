@@ -125,9 +125,13 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 
 | 技能 | 说明 |
 |------|------|
-| [godogen](https://github.com/htdt/godogen) | 从游戏描述构建完整 Godot 4 项目（2.9K⭐）|
-| [awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) | 100+ 子代理合集，覆盖各类开发场景（18K⭐）|
-| [videocut-skills](https://github.com/Ceeon/videocut-skills) | 视频剪辑 Agent，Claude Code 驱动（1.4K⭐）|
+| [wshobson/agents](https://github.com/wshobson/agents) | 🧠 智能自动化 & 多 Agent 编排，Claude Code 核心工作流（34K⭐）|
+| [oh-my-claudecode](https://github.com/Yeachan-Heo/oh-my-claudecode) | 🏢 Teams-first 多 Agent 编排，团队协作场景（30K⭐）|
+| [refly](https://github.com/refly-ai/refly) | 🔧 首个开源 Agent Skills 构建器，vibe workflow 定义技能（7.2K⭐）|
+| [raptor](https://github.com/gadievron/raptor) | ⚔️ 攻防安全 Agent：SAST/DAST 扫描 + OWASP + CVE 检测（2.3K⭐）|
+| [godogen](https://github.com/htdt/godogen) | 🎮 从游戏描述构建完整 Godot 4 项目（2.9K⭐）|
+| [awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) | 📚 100+ 子代理合集，覆盖各类开发场景（18K⭐）|
+| [videocut-skills](https://github.com/Ceeon/videocut-skills) | 🎬 视频剪辑 Agent，Claude Code 驱动（1.4K⭐）|
 | [ARIS](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep) | ⚔️ 自主 ML 研究：跨模型审查 + 想法发现 + 实验自动化（7.1K⭐）|
 
 ### 💰 金融/商业
