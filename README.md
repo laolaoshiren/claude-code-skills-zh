@@ -5,7 +5,7 @@
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 |[![Skills](https://img.shields.io/badge/skills-100%2B-green.svg)](#-原创技能)
-|[![Updated](https://img.shields.io/badge/updated-2026--04--23-brightgreen.svg)](#)
+|[![Updated](https://img.shields.io/badge/updated-2026--04--22-brightgreen.svg)](#)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
 
@@ -43,7 +43,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 |------|------|-----|
 | [everything-claude-code](https://github.com/affaan-m/everything-claude-code) | 🧠 Claude Code 全栈技能系统：Skills + 记忆 + 安全 + 研究驱动开发 | 162K+ |
 | [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) | 📚 1,400+ 可安装技能库，覆盖 Claude Code / Cursor / Codex / Gemini CLI | 34K+ |
-| [caveman](https://github.com/JuliusBrussee/caveman) | 🪨 用最少的 token 说最短的话，节省 65% token | 41K+ |
+| [caveman](https://github.com/JuliusBrussee/caveman) | 🪨 用最少的 token 说最短的话，节省 65% token | 42K+ |
 | [career-ops](https://github.com/santifer/career-ops) | 💼 AI 求职系统：14 种技能模式 + Go 仪表盘 + PDF 生成 | 38K+ |
 | [graphify](https://github.com/safishamsi/graphify) | 🕸️ 将代码/文档/论文转为可查询知识图谱 | 32K+ |
 | [marketingskills](https://github.com/coreyhaines31/marketingskills) | 📈 营销技能包：CRO、文案、SEO、数据分析、增长工程 | 23K+ |
@@ -60,7 +60,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [gstack](https://github.com/garrytan/gstack) | 🧑‍💼 Garry Tan 的 Claude Code 全套配置：23 个工具覆盖 CEO/设计/工程/QA | 79K+ |
 | [get-shit-done](https://github.com/gsd-build/get-shit-done) | ⚡ 轻量级元提示 + 上下文工程 + 规格驱动开发系统 | 56K+ |
 | [superpowers-zh](https://github.com/jnMetaCode/superpowers-zh) | 🇨🇳 superpowers 完整汉化 + 6 个中国原创 skills，支持 16 款 AI 工具 | 1.1K+ |
-| [claude-mem](https://github.com/thedotmack/claude-mem) | 🧠 自动捕获会话上下文，AI 压缩后注入未来会话，告别遗忘 | 64K+ |
+| [claude-mem](https://github.com/thedotmack/claude-mem) | 🧠 自动捕获会话上下文，AI 压缩后注入未来会话，告别遗忘 | 65K+ |
 | [claude-hud](https://github.com/jarrodwatts/claude-hud) | 📊 实时显示上下文用量、活跃工具、运行中 Agent 和 TODO 进度 | 20K+ |
 | [claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | 🏛️ Anthropic 官方高质量 Claude Code 插件目录 | 17K+ |
 | [agent-skills](https://github.com/addyosmani/agent-skills) | ⚙️ Google 总监出品：生产级工程技能集，覆盖前端/后端/DevOps | 19K+ |
@@ -104,7 +104,10 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [fireworks-tech-graph](https://github.com/yizhiyanhua-ai/fireworks-tech-graph) | 生成生产级 SVG+PNG 技术架构图，支持 8 种图表类型（3.8K⭐）|
 | [claude-octopus](https://github.com/nyldn/claude-octopus) | 每个编码任务最多用 8 个 AI 模型并行审查（2.7K⭐）|
 | [nothing-design-skill](https://github.com/dominikmartn/nothing-design-skill) | Nothing 设计语言 UI 生成：极简单色、排版、工业风（2K⭐）|
+| [huashu-design](https://github.com/alchaincyf/huashu-design) | 🇨🇳 HTML 原生设计 Skill：高保真原型 + 设计系统 + 动效，Claude Code 专属（2.8K⭐）|
+| [darwin-skill](https://github.com/alchaincyf/darwin-skill) | 🧬 技能进化系统：评估→改进→测试→保留或回滚，让 Skill 无限自优化（1.5K⭐）|
 | [claude-forge](https://github.com/sangrokjung/claude-forge) | 11 个 AI Agent + 36 命令 + 15 技能，类 oh-my-zsh 插件框架（659⭐）|
+| [agentic-stack](https://github.com/codejunkie99/agentic-stack) | 🧠 One brain, many harnesses：可移植 .agent/ 文件夹，跨 Claude/Cursor/Codex 共享（1.2K⭐）|
 || [cartographer](https://github.com/kingbootoshi/cartographer) | 用并行子 Agent 映射和文档化任意规模代码库（545⭐）|
 || [agent-skill-creator](https://github.com/FrancyJGLisboa/agent-skill-creator) | 将任意工作流转化为可复用的 AI Agent 技能，支持 14+ 工具（743⭐）|
 || [drawio-skill](https://github.com/Agents365-ai/drawio-skill) | 从文本生成专业 draw.io 图表的 Agent Skill（365⭐）|
@@ -152,6 +155,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [financial-report-minesweeper](https://github.com/terancejiang/financial-report-minesweeper) | A 股财报排雷（唐朝方法论）（77⭐）|
 | [web-access](https://github.com/eze-is/web-access) | 给 Claude Code 装上完整联网能力：三层通道调度 + 浏览器 CDP（5.4K⭐）|
 | [awesome-agent-skills](https://github.com/JackyST0/awesome-agent-skills) | 🇨🇳 精选 AI Agent Skills 列表，适配 Cursor / Claude Code / GitHub Copilot（459⭐）|
+| [wx-favorites-report](https://github.com/zhuyansen/wx-favorites-report) | 微信收藏可视化 Skill：从加密 DB 到交互式 HTML 报告的端到端管线（531⭐）|
 
 ---
 
@@ -258,7 +262,7 @@ description: 技能的一句话描述
 - [awesome-llm-skills](https://github.com/Prat011/awesome-llm-skills) — 1.1K ⭐
 - [awesome-claude-code-plugins](https://github.com/ccplugins/awesome-claude-code-plugins) — 697 ⭐
 - [cc-marketplace](https://github.com/ananddtyagi/cc-marketplace) — 677 ⭐
-- [claude-mem](https://github.com/thedotmack/claude-mem) — 64K ⭐
+- [claude-mem](https://github.com/thedotmack/claude-mem) — 65K ⭐
 - [claude-hud](https://github.com/jarrodwatts/claude-hud) — 20K ⭐
 
 ---
