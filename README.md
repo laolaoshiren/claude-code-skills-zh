@@ -247,8 +247,6 @@ description: 技能的一句话描述
 
 [![Star History Chart](https://api.star-history.com/svg?repos=laolaoshiren/claude-code-skills-zh&type=Date)](https://star-history.com/#laolaoshiren/claude-code-skills-zh&Date)
 
-![Visitor Count](https://profile-counter.glitch.me/claude-code-skills-zh/count.svg)
-
 ---
 
 ## 🤝 贡献
