@@ -4,7 +4,7 @@
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-|[![Skills](https://img.shields.io/badge/skills-精选 90+-green.svg)](#-原创技能)
+|[![Skills](https://img.shields.io/badge/skills-100%2B-green.svg)](#-原创技能)
 |[![Updated](https://img.shields.io/badge/updated-2026--04--21-brightgreen.svg)](#)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
