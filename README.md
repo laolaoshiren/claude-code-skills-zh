@@ -5,7 +5,7 @@
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 |[![Skills](https://img.shields.io/badge/skills-100%2B-green.svg)](#-原创技能)
-|[![Updated](https://img.shields.io/badge/updated-2026--04--21-brightgreen.svg)](#)
+|[![Updated](https://img.shields.io/badge/updated-2026--04--22-brightgreen.svg)](#)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
 
@@ -54,8 +54,8 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [notebooklm-py](https://github.com/teng-lin/notebooklm-py) | 📓 Google NotebookLM 非官方 Python API + Agent 技能 | 11K+ |
 | [Humanizer-zh](https://github.com/op7418/Humanizer-zh) | ✍️ Humanizer 中文版，消除中文 AI 写作痕迹 | 6K+ |
 | [superpowers](https://github.com/obra/superpowers) | 🦸 agentic 技能框架 + 软件开发方法论，161K 认证 | 162K+ |
-| [anthropic-skills](https://github.com/anthropics/skills) | 🏛️ Anthropic 官方 Agent Skills 公开仓库 | 120K+ |
-| [gstack](https://github.com/garrytan/gstack) | 🧑‍💼 Garry Tan 的 Claude Code 全套配置：23 个工具覆盖 CEO/设计/工程/QA | 78K+ |
+| [anthropic-skills](https://github.com/anthropics/skills) | 🏛️ Anthropic 官方 Agent Skills 公开仓库 | 121K+ |
+| [gstack](https://github.com/garrytan/gstack) | 🧑‍💼 Garry Tan 的 Claude Code 全套配置：23 个工具覆盖 CEO/设计/工程/QA | 79K+ |
 | [get-shit-done](https://github.com/gsd-build/get-shit-done) | ⚡ 轻量级元提示 + 上下文工程 + 规格驱动开发系统 | 55K+ |
 | [superpowers-zh](https://github.com/jnMetaCode/superpowers-zh) | 🇨🇳 superpowers 完整汉化 + 6 个中国原创 skills，支持 16 款 AI 工具 | 1.1K+ |
 | [claude-mem](https://github.com/thedotmack/claude-mem) | 🧠 自动捕获会话上下文，AI 压缩后注入未来会话，告别遗忘 | 64K+ |
@@ -68,6 +68,9 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 
 | 技能 | 说明 |
 |------|------|
+| [spec-driven-develop](https://github.com/zhu1090093659/spec_driven_develop) | 📋 规格驱动开发：7 阶段预开发流水线，架构优先，纯 Markdown（698⭐）|
+| [robotics-agent-skills](https://github.com/arpitg1304/robotics-agent-skills) | 🤖 机器人开发技能集：ROS1/ROS2、设计模式、感知系统、Docker（180⭐）|
+| [skill-optimizer](https://github.com/hqhq1025/skill-optimizer) | 🔧 Skill 诊断优化工具：基于真实会话数据的静态分析（53⭐）|
 | [github-tech-scanner](https://github.com/claude-access/github-tech-scanner) | 扫描 GitHub 仓库的语言和框架 |
 | [review-checkpoint](https://github.com/Atharva-Kanherkar/review-checkpoint) | 结构化自审查工作流：先契约后代码 |
 | [archflow](https://github.com/rafaelolsr/archflow) | 将代码库转为动画 HTML 架构图（15⭐）|
