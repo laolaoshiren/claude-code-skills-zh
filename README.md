@@ -9,6 +9,8 @@
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
 
+🔗 **官网**：[claude-skills.bt199.com](https://claude-skills.bt199.com)
+
 ---
 
 ## 📖 什么是 Claude Code Skills？
