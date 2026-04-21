@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+
+# Environment & Secrets
+.env
+*.cookie
+.juejin_cookie
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
