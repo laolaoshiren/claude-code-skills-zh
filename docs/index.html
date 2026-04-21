@@ -66,8 +66,11 @@ section{padding:5rem 2rem}
 .install-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1.5rem}
 .install-card{background:var(--bg3);border:1px solid var(--border);border-radius:16px;overflow:hidden}
 .install-card-header{padding:1.2rem 1.5rem;background:rgba(108,92,231,0.1);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;font-weight:700}
-.install-card pre{padding:1.5rem;font-size:.85rem;overflow-x:auto;line-height:1.8;color:var(--text2)}
+.install-card pre{padding:1.5rem;font-size:.85rem;overflow-x:auto;line-height:1.8;color:var(--text2);white-space:pre-wrap;word-break:break-all}
 .install-card .comment{color:var(--text3)}
+.copy-btn{background:rgba(255,255,255,0.1);border:1px solid var(--border);color:var(--text2);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:.75rem;font-weight:600;transition:.2s;white-space:nowrap}
+.copy-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.copy-btn.copied{background:var(--green);color:#fff;border-color:var(--green)}
 .install-card .cmd{color:var(--green)}
 .install-card .path{color:var(--orange)}
 
@@ -225,31 +228,40 @@ footer .footer-links a{color:var(--text2);font-size:.9rem}
     </div>
     <div class="install-cards">
       <div class="install-card fade-in">
-        <div class="install-card-header">⚡ 一键安装（GitHub 原生）</div>
-        <pre><span class="comment"># 克隆仓库</span>
-<span class="cmd">git clone</span> https://github.com/laolaoshiren/claude-code-skills-zh.git
+        <div class="install-card-header">
+          <span>⚡ 一键安装（GitHub 原生）</span>
+          <button class="copy-btn" onclick="copyCode(this)">📋 复制</button>
+        </div>
+        <pre class="install-code"><span class="comment"># 克隆仓库</span>
+git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
 
 <span class="comment"># 复制全部技能</span>
-<span class="cmd">cp -r</span> claude-code-skills-zh/skills/* <span class="path">~/.claude/skills/</span></pre>
+cp -r claude-code-skills-zh/skills/* ~/.claude/skills/</pre>
       </div>
       <div class="install-card fade-in">
-        <div class="install-card-header">🇨🇳 国内镜像加速（GitHub 访问困难）</div>
-        <pre><span class="comment"># 使用 gh-proxy 镜像克隆</span>
-<span class="cmd">git clone</span> https://gh-proxy.com/https://github.com/laolaoshiren/claude-code-skills-zh.git
+        <div class="install-card-header">
+          <span>🇨🇳 国内镜像加速（GitHub 访问困难）</span>
+          <button class="copy-btn" onclick="copyCode(this)">📋 复制</button>
+        </div>
+        <pre class="install-code"><span class="comment"># 使用 gh-proxy 镜像克隆</span>
+git clone https://gh-proxy.com/https://github.com/laolaoshiren/claude-code-skills-zh.git
 
 <span class="comment"># 复制全部技能</span>
-<span class="cmd">cp -r</span> claude-code-skills-zh/skills/* <span class="path">~/.claude/skills/</span></pre>
+cp -r claude-code-skills-zh/skills/* ~/.claude/skills/</pre>
       </div>
       <div class="install-card fade-in">
-        <div class="install-card-header">📦 下载 ZIP（无需 Git）</div>
-        <pre><span class="comment"># GitHub 原生地址</span>
+        <div class="install-card-header">
+          <span>📦 下载 ZIP（无需 Git）</span>
+          <button class="copy-btn" onclick="copyCode(this)">📋 复制</button>
+        </div>
+        <pre class="install-code"><span class="comment"># GitHub 原生地址</span>
 https://github.com/laolaoshiren/claude-code-skills-zh/archive/main.zip
 
 <span class="comment"># 国内镜像加速</span>
 https://gh-proxy.com/https://github.com/laolaoshiren/claude-code-skills-zh/archive/main.zip
 
 <span class="comment"># 解压后复制技能</span>
-<span class="cmd">cp -r</span> claude-code-skills-zh/skills/* <span class="path">~/.claude/skills/</span></pre>
+cp -r claude-code-skills-zh/skills/* ~/.claude/skills/</pre>
       </div>
     </div>
   </div>
@@ -541,6 +553,20 @@ for(let i=0;i<30;i++){
   p.style.animationDelay = Math.random()*10+'s';
   p.style.width = p.style.height = (1+Math.random()*2)+'px';
   pc.appendChild(p);
+}
+
+// Copy code function
+function copyCode(btn) {
+  const pre = btn.closest('.install-card').querySelector('.install-code');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.classList.add('copied');
+    btn.textContent = '✅ 已复制';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.textContent = '📋 复制';
+    }, 2000);
+  });
 }
 
 // Scroll animation
