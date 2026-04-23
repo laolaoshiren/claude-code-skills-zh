@@ -114,10 +114,13 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | 技能 | 说明 |
 |------|------|
 | [XiaohongshuSkills](https://github.com/white0dew/XiaohongshuSkills) | 小红书自动化运营 Skill：自动发布、评论、检索，支持 OpenClaw / Codex / Claude Code（2.6K⭐）|
+| [ai-trend-publish](https://github.com/liyown/ai-trend-publish) | 公众号自动化运营系统：多源抓取 + AI 写作 + 智能排序 + 定时发布（2.9K⭐）|
 | [wx-favorites-report](https://github.com/zhuyansen/wx-favorites-report) | 微信收藏可视化 Skill：从加密 DB 到交互式 HTML 报告的端到端管线（537⭐）|
-| [different-ai/notion-crm-enrichment](https://github.com/different-ai/notion-crm-enrichment) | Notion 里的 AI 线索运营 CRM：线索补全、草稿生成、复盘学习（18⭐）|
-| [BCS1037/awesome-obsidian-skills](https://github.com/BCS1037/awesome-obsidian-skills) | Obsidian 方向的 Claude Code Skills 资源集合（5⭐）|
-| [jidechao/Wechat-ClaudeCode-Skill](https://github.com/jidechao/Wechat-ClaudeCode-Skill) | 微信场景的 Claude Code Skill（2⭐）|
+| [feishu-openclaw](https://github.com/AlexAnys/feishu-openclaw) | 飞书 / Lark 连接 OpenClaw：免公网、免域名、稳定接入机器人（321⭐）|
+| [easy-wx/wecom-bot-svr](https://github.com/easy-wx/wecom-bot-svr) | 企业微信机器人回调服务框架：pip 安装、开箱即用、快速部署（174⭐）|
+| [Long-louis/AIFeedTracker](https://github.com/Long-louis/AIFeedTracker) | AI 内容追踪 + 视频总结 + 飞书机器人集成（161⭐）|
+| [rawchen/feishu-bot](https://github.com/rawchen/feishu-bot) | 飞书群聊 / 私聊机器人，Spring Boot 实现（158⭐）|
+| [loonghao/wecom-bot-mcp-server](https://github.com/loonghao/wecom-bot-mcp-server) | 企业微信机器人 MCP Server，支持上下文感知自动消息处理（85⭐）|
 
 ### 💻 开发效率
 
