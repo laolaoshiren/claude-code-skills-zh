@@ -1,6 +1,6 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 100+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 101+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -80,6 +80,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [autoresearch](https://github.com/uditgoenka/autoresearch) | 自主迭代研究：修改→验证→保留/丢弃→循环（3.9K⭐）|
 | [SwiftUI-Agent-Skill](https://github.com/twostraws/SwiftUI-Agent-Skill) | iOS/macOS SwiftUI 开发专用技能（3.7K⭐）|
 | [plugins-plus-skills](https://github.com/jeremylongshore/claude-code-plugins-plus-skills) | 423 插件 + 2,849 技能 + 177 代理，超大合集（1.9K⭐）|
+| [XiaohongshuSkills](https://github.com/white0dew/XiaohongshuSkills) | 小红书自动化运营 Skill：自动发布、评论、检索，支持 OpenClaw / Codex / Claude Code（2.6K⭐）|
 | [slavingia-skills](https://github.com/slavingia/skills) | 基于《极简创业者》理念的实用技能集（8.1K⭐）|
 | [trailofbits-skills](https://github.com/trailofbits/skills) | Trail of Bits 安全研究与审计技能（4.7K⭐）|
 | [skill-factory](https://github.com/alirezarezvani/claude-code-skill-factory) | 技能工厂：一键生成、测试、发布 Claude Code 技能（711⭐）|
