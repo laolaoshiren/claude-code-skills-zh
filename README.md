@@ -4,19 +4,61 @@
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-100%2B-green.svg)](#-原创技能)
+[![Skills](https://img.shields.io/badge/skills-101%2B-green.svg)](#-原创技能)
 [![Updated](https://img.shields.io/badge/updated-2026--04--23-brightgreen.svg)](#)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
 
+适合这几类人直接拿去用：
+- 想给 Claude Code **快速补齐专业能力** 的开发者
+- 想找 **中文可读、复制即装** skills 的个人开发者 / 团队
+- 想用现成技能解决 **代码审查、README、API 测试、性能分析、重构建议** 等高频场景的人
+
+**如果你是第一次接触这个仓库，建议先看这 5 个最值得马上装的原创技能：**
+- [zh-code-reviewer](skills/zh-code-reviewer/) — 中文代码审查，直接输出中文审查报告
+- [zh-readme](skills/zh-readme/) — 先分析项目，再写更像人写的中文 README
+- [api-tester](skills/api-tester/) — 自动解析 OpenAPI，快速生成接口测试思路
+- [refactor-advisor](skills/refactor-advisor/) — 找坏味道，给出可执行重构建议
+- [perf-profiler](skills/perf-profiler/) — 定位性能瓶颈，优先级明确
+
 🔗 **官网**：[claude-skills.bt199.com](https://claude-skills.bt199.com)
+
+---
+
+## 🚀 为什么这个仓库值得现在就收藏
+
+- **不是只做导航**：既有高质量第三方精选，也有能直接安装的原创技能
+- **中文友好**：很多说明直接面向中文开发者，不用自己二次理解
+- **高频场景覆盖全**：代码审查、文档、测试、安全、性能、重构、CI/CD 都覆盖
+- **持续维护**：定期补新技能、更新 README、官网和分类结构
+
+---
+
+## 🔥 热门原创技能（优先看这几个）
+
+| 技能 | 为什么值得先看 |
+|------|----------------|
+| [zh-code-reviewer](skills/zh-code-reviewer/) | 当前最受关注的原创技能之一，适合几乎所有代码仓库 |
+| [refactor-advisor](skills/refactor-advisor/) | 很适合老项目和屎山项目，容易形成强感知价值 |
+| [zh-readme](skills/zh-readme/) | 对开源项目、作品集、内部工具都很实用 |
+| [api-tester](skills/api-tester/) | 后端、全栈、集成场景都高频需要 |
+| [perf-profiler](skills/perf-profiler/) | 适合排查慢接口、慢任务、慢页面 |
 
 ---
 
 ## 📖 什么是 Claude Code Skills？
 
 Claude Code Skills 是可复用的指令模块，让 Claude Code 拥有特定领域的专业能力。只需一个 `SKILL.md` 文件，就能让 Claude 变成代码审查专家、安全审计师、文档写手…
+
+### ⚡ 30 秒上手建议
+
+如果你不想挑，第一次可以先装这 5 个：
+- `zh-code-reviewer`
+- `zh-readme`
+- `api-tester`
+- `refactor-advisor`
+- `perf-profiler`
 
 **安装方式：** 将 skill 目录复制到 `~/.claude/skills/` 即可。
 

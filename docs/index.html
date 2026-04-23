@@ -45,6 +45,10 @@ a:hover{color:var(--accent3)}
 .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(108,92,231,0.4);color:#fff}
 .btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border)}
 .btn-secondary:hover{border-color:var(--accent);color:var(--text);transform:translateY(-2px)}
+.hero-recommend{margin-top:2rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;text-align:left}
+.hero-recommend .rec-card{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:14px;padding:1rem 1rem 1.1rem;backdrop-filter:blur(10px)}
+.hero-recommend .rec-card strong{display:block;color:var(--text);margin-bottom:.35rem;font-size:.95rem}
+.hero-recommend .rec-card span{color:var(--text2);font-size:.82rem;line-height:1.5}
 
 /* Sections */
 section{padding:5rem 2rem}
@@ -174,16 +178,24 @@ footer .footer-links a{color:var(--text2);font-size:.9rem}
   <div class="hero-bg"></div>
   <div class="hero-content">
     <h1>Claude Code Skills<br><span class="gradient">中文精选集</span></h1>
-    <p class="hero-sub">最实用的 Claude Code Skills / Agents / Plugins 合集。不只是列表，更包含可直接安装的原创技能包。</p>
+    <p class="hero-sub">最实用的 Claude Code Skills / Agents / Plugins 合集。不只是列表，更包含可直接安装的原创技能包。适合想快速补齐代码审查、README、API 测试、重构和性能分析能力的中文开发者。</p>
     <div class="hero-badges">
       <span class="badge green">✅ 101+ 精选技能</span>
       <span class="badge purple">🎁 19 个原创技能</span>
-      <span class="badge orange">⭐ 19 Stars</span>
+      <span class="badge orange">⭐ 20 Stars</span>
       <span class="badge orange">🔄 更新于 2026-04-23</span>
     </div>
     <div class="hero-actions">
-      <a href="#install" class="btn btn-primary">🚀 一键安装</a>
+      <a href="#install" class="btn btn-primary">🚀 先安装再说</a>
+      <a href="#original" class="btn btn-secondary">🔥 先看热门原创技能</a>
       <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-secondary">⭐ 给个 Star</a>
+    </div>
+    <div class="hero-recommend">
+      <div class="rec-card"><strong>zh-code-reviewer</strong><span>中文代码审查，适合几乎所有仓库</span></div>
+      <div class="rec-card"><strong>zh-readme</strong><span>先分析项目，再写更像人写的中文 README</span></div>
+      <div class="rec-card"><strong>api-tester</strong><span>OpenAPI → 测试思路，后端高频刚需</span></div>
+      <div class="rec-card"><strong>refactor-advisor</strong><span>识别坏味道，给出可执行重构建议</span></div>
+      <div class="rec-card"><strong>perf-profiler</strong><span>定位性能瓶颈，适合排查慢接口和慢任务</span></div>
     </div>
   </div>
 </section>
@@ -407,7 +419,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/</pre>
         <p>原创技能</p>
       </div>
       <div class="stat-item">
-        <h3>18</h3>
+        <h3>20</h3>
         <p>GitHub Stars</p>
       </div>
       <div class="stat-item">
