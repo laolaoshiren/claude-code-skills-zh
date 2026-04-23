@@ -11,16 +11,16 @@
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
 
 适合这几类人直接拿去用：
-- 想给 Claude Code **快速补齐专业能力** 的开发者
-- 想找 **中文可读、复制即装** skills 的个人开发者 / 团队
-- 想用现成技能解决 **代码审查、README、API 测试、性能分析、重构建议** 等高频场景的人
+- 👨‍💻 想给 Claude Code **快速补齐专业能力** 的开发者
+- 📦 想找 **中文可读、复制即装** skills 的个人开发者 / 团队
+- 🎯 想用现成技能解决 **代码审查、README、API 测试、性能分析、重构建议** 等高频场景的人
 
-**如果你是第一次接触这个仓库，建议先看这 5 个最值得马上装的原创技能：**
-- [zh-code-reviewer](skills/zh-code-reviewer/) — 中文代码审查，直接输出中文审查报告
-- [zh-readme](skills/zh-readme/) — 先分析项目，再写更像人写的中文 README
-- [api-tester](skills/api-tester/) — 自动解析 OpenAPI，快速生成接口测试思路
-- [refactor-advisor](skills/refactor-advisor/) — 找坏味道，给出可执行重构建议
-- [perf-profiler](skills/perf-profiler/) — 定位性能瓶颈，优先级明确
+**✨ 如果你是第一次接触这个仓库，建议先看这 5 个最值得马上装的原创技能：**
+- 🔍 [zh-code-reviewer](skills/zh-code-reviewer/) — 中文代码审查，直接输出中文审查报告
+- 📝 [zh-readme](skills/zh-readme/) — 先分析项目，再写更像人写的中文 README
+- 🧪 [api-tester](skills/api-tester/) — 自动解析 OpenAPI，快速生成接口测试思路
+- ♻️ [refactor-advisor](skills/refactor-advisor/) — 找坏味道，给出可执行重构建议
+- ⚡ [perf-profiler](skills/perf-profiler/) — 定位性能瓶颈，优先级明确
 
 🔗 **官网**：[claude-skills.bt199.com](https://claude-skills.bt199.com)
 
