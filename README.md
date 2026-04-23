@@ -109,6 +109,16 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [agent-skills](https://github.com/addyosmani/agent-skills) | ⚙️ Google 总监出品：生产级工程技能集，覆盖前端/后端/DevOps | 20K+ |
 | [last30days-skill](https://github.com/mvanhorn/last30days-skill) | 📅 近 30 天事件追踪：跨 Reddit / X / YouTube / HN / Polymarket 检索 | 23K+ |
 
+### 📣 平台运营 / 自媒体 / 办公流量
+
+| 技能 | 说明 |
+|------|------|
+| [XiaohongshuSkills](https://github.com/white0dew/XiaohongshuSkills) | 小红书自动化运营 Skill：自动发布、评论、检索，支持 OpenClaw / Codex / Claude Code（2.6K⭐）|
+| [wx-favorites-report](https://github.com/zhuyansen/wx-favorites-report) | 微信收藏可视化 Skill：从加密 DB 到交互式 HTML 报告的端到端管线（537⭐）|
+| [different-ai/notion-crm-enrichment](https://github.com/different-ai/notion-crm-enrichment) | Notion 里的 AI 线索运营 CRM：线索补全、草稿生成、复盘学习（18⭐）|
+| [BCS1037/awesome-obsidian-skills](https://github.com/BCS1037/awesome-obsidian-skills) | Obsidian 方向的 Claude Code Skills 资源集合（5⭐）|
+| [jidechao/Wechat-ClaudeCode-Skill](https://github.com/jidechao/Wechat-ClaudeCode-Skill) | 微信场景的 Claude Code Skill（2⭐）|
+
 ### 💻 开发效率
 
 | 技能 | 说明 |
@@ -122,7 +132,6 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [autoresearch](https://github.com/uditgoenka/autoresearch) | 自主迭代研究：修改→验证→保留/丢弃→循环（3.9K⭐）|
 | [SwiftUI-Agent-Skill](https://github.com/twostraws/SwiftUI-Agent-Skill) | iOS/macOS SwiftUI 开发专用技能（3.7K⭐）|
 | [plugins-plus-skills](https://github.com/jeremylongshore/claude-code-plugins-plus-skills) | 423 插件 + 2,849 技能 + 177 代理，超大合集（1.9K⭐）|
-| [XiaohongshuSkills](https://github.com/white0dew/XiaohongshuSkills) | 小红书自动化运营 Skill：自动发布、评论、检索，支持 OpenClaw / Codex / Claude Code（2.6K⭐）|
 | [slavingia-skills](https://github.com/slavingia/skills) | 基于《极简创业者》理念的实用技能集（8.1K⭐）|
 | [trailofbits-skills](https://github.com/trailofbits/skills) | Trail of Bits 安全研究与审计技能（4.7K⭐）|
 | [skill-factory](https://github.com/alirezarezvani/claude-code-skill-factory) | 技能工厂：一键生成、测试、发布 Claude Code 技能（711⭐）|
