@@ -4,7 +4,7 @@
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-108%2B-green.svg)](#-原创技能)
+[![Skills](https://img.shields.io/badge/skills-109%2B-green.svg)](#-原创技能)
 [![Updated](https://img.shields.io/badge/updated-2026--04--24-brightgreen.svg)](#)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
@@ -129,6 +129,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [freestylefly/openclaw-wechat](https://github.com/freestylefly/openclaw-wechat) | OpenClaw 个人微信通道插件：真实微信账号接入、扫码登录、群聊/私聊收发与多账号支持（1.6K⭐）|
 | [autoclaw-cc/xiaohongshu-skills](https://github.com/autoclaw-cc/xiaohongshu-skills) | 小红书自动化 Skills：真实浏览器 + 真实账号环境，覆盖发布、评论、检索、批量运营与 CLI 调用（1.1K⭐）|
 | [IanShaw027/wemp-operator](https://github.com/IanShaw027/wemp-operator) | 微信公众号自动化运营 OpenClaw Skill：内容采集、数据分析、互动管理，内置 70 个 API、20+ 数据源，支持直接安装（81⭐）|
+| [geekjourneyx/md2wechat-skill](https://github.com/geekjourneyx/md2wechat-skill) | 公众号 Markdown 排版与草稿箱上传 Skill：支持 Claude Code / Codex / OpenClaw 安装，适合内容运营批量发布（1.5K⭐）|
 
 ### 💻 开发效率
 
