@@ -1,10 +1,10 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 105+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 106+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-105%2B-green.svg)](#-原创技能)
+[![Skills](https://img.shields.io/badge/skills-106%2B-green.svg)](#-原创技能)
 [![Updated](https://img.shields.io/badge/updated-2026--04--24-brightgreen.svg)](#)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
@@ -180,6 +180,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [agnix](https://github.com/agent-sh/agnix) | AI 编程助手的 Linter + LSP：校验 CLAUDE.md / AGENTS.md / SKILL.md / Hooks（195⭐）|
 | [writing-style-skill](https://github.com/jzOcb/writing-style-skill) | 写作风格技能模板，AI 写作→你编辑→自动学习→规则迭代（199⭐）|
 | [cursor-rules-java](https://github.com/jabrena/cursor-rules-java) | Java 企业开发技能与 Agents 合集：覆盖规划、架构、Maven、测试、性能、文档与流水线（360⭐）|
+| [Dimillian/Skills](https://github.com/Dimillian/Skills) | 高质量 Codex Skills 集合：GitHub 工作流、Diff Review Swarm、Bug Hunt Swarm、React 性能与 SwiftUI/iOS/macOS 专项开发（3.3K⭐）|
 
 ### 🎨 内容创作
 
