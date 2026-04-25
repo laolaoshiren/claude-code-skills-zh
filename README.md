@@ -1,10 +1,10 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 114+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 115+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-114%2B-green.svg)](#-原创技能)
+[![Skills](https://img.shields.io/badge/skills-115%2B-green.svg)](#-原创技能)
 [![Updated](https://img.shields.io/badge/updated-2026--04--25-brightgreen.svg)](#)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
@@ -133,6 +133,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [googleworkspace/cli](https://github.com/googleworkspace/cli) | Google Workspace 全能 CLI：统一操作 Gmail / Drive / Docs / Sheets / Calendar，并内置 40+ agent skills，适合办公自动化与 AI 助手集成（25K⭐）|
 | [ythx-101/x-tweet-fetcher](https://github.com/ythx-101/x-tweet-fetcher) | X / 微信文章抓取 Skill：三后端智能回退，支持推文、列表、长文与微信内容检索，适合热点跟踪和自媒体选题（796⭐）|
 | [qiaomu-anything-to-notebooklm](https://github.com/joeseesun/qiaomu-anything-to-notebooklm) | 多源内容处理 Claude Skill：支持微信文章 / 网页 / YouTube / PDF / 播客 / Office 文档，并可一键生成播客、PPT、脑图、Quiz，适合内容运营与知识整理（1.4K⭐）|
+| [tuya-openclaw-skills](https://github.com/tuya/tuya-openclaw-skills) | 涂鸦官方 OpenClaw 智能家居技能库：接入 3000+ 设备品类，支持设备控制、天气、通知、摄像头抓拍与事件订阅，安装门槛清晰（562⭐）|
 
 ### 💻 开发效率
 
