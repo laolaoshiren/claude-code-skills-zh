@@ -1,10 +1,10 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 111+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 113+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-112%2B-green.svg)](#-原创技能)
+[![Skills](https://img.shields.io/badge/skills-113%2B-green.svg)](#-原创技能)
 [![Updated](https://img.shields.io/badge/updated-2026--04--25-brightgreen.svg)](#)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
@@ -187,6 +187,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [cursor-rules-java](https://github.com/jabrena/cursor-rules-java) | Java 企业开发技能与 Agents 合集：覆盖规划、架构、Maven、测试、性能、文档与流水线（360⭐）|
 | [Dimillian/Skills](https://github.com/Dimillian/Skills) | 高质量 Codex Skills 集合：GitHub 工作流、Diff Review Swarm、Bug Hunt Swarm、React 性能与 SwiftUI/iOS/macOS 专项开发（3.3K⭐）|
 | [openai/skills](https://github.com/openai/skills) | OpenAI 官方 Codex Skills Catalog：内置 system / curated / experimental 技能目录，支持 `$skill-installer` 按名称或 GitHub 目录安装（17K⭐）|
+| [awesome-codex-skills](https://github.com/ComposioHQ/awesome-codex-skills) | Codex 实用技能精选清单：覆盖开发、协作、沟通、数据分析等多类可安装 skills，并提供 GitHub 路径安装器（1.1K⭐）|
 
 ### 🎨 内容创作
 
