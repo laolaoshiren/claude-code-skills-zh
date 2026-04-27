@@ -1,10 +1,10 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 133+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 134+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-133%2B-green.svg)](#-原创技能)
+[![Skills](https://img.shields.io/badge/skills-134%2B-green.svg)](#-原创技能)
 [![Updated](https://img.shields.io/badge/updated-2026--04--27-brightgreen.svg)](#)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
@@ -122,6 +122,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [rawchen/feishu-bot](https://github.com/rawchen/feishu-bot) | 飞书群聊 / 私聊机器人，Spring Boot 实现（158⭐）|
 | [loonghao/wecom-bot-mcp-server](https://github.com/loonghao/wecom-bot-mcp-server) | 企业微信机器人 MCP Server，支持上下文感知自动消息处理（85⭐）|
 | [openclaw-china](https://github.com/BytePioneer-AI/openclaw-china) | OpenClaw 中国 IM 渠道插件：飞书 / 钉钉 / QQ / 企业微信 / 微信公众号 一站式接入（3.8K⭐）|
+| [Claude-to-IM-skill](https://github.com/op7418/Claude-to-IM-skill) | Claude Code / Codex IM 桥接 Skill：把 Telegram / Discord / 飞书 / QQ / 微信接到 AI 编码代理，支持后台守护进程、权限审批、流式预览与会话持久化，安装与更新说明完整（2.3K⭐）|
 | [makenotion/notion-mcp-server](https://github.com/makenotion/notion-mcp-server) | Notion 官方 MCP Server：OAuth 接入 + Markdown 页面编辑 + AI Agent 低 token 工具集（4.2K⭐）|
 | [cyanheads/obsidian-mcp-server](https://github.com/cyanheads/obsidian-mcp-server) | Obsidian 知识库 MCP Server：读写笔记、全文检索、Frontmatter/Tag 管理（463⭐）|
 | [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills) | Obsidian 官方生态技能包：Markdown / Bases / JSON Canvas / CLI / Defuddle，兼容 Claude Code / Codex / OpenCode（26K⭐）|
