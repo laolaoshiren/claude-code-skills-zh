@@ -86,6 +86,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 |------|------|-----|
 | [everything-claude-code](https://github.com/affaan-m/everything-claude-code) | 🧠 Claude Code 全栈技能系统：Skills + 记忆 + 安全 + 研究驱动开发 | 163K+ |
 | [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) | 📚 1,400+ 可安装技能库，覆盖 Claude Code / Cursor / Codex / Gemini CLI | 34K+ |
+| [obsidian-skills](https://github.com/kepano/obsidian-skills) | 🧠 Obsidian 官方生态技能包：Markdown / Bases / JSON Canvas / CLI / Defuddle，兼容 Claude Code / Codex / OpenCode | 26K+ |
 | [caveman](https://github.com/JuliusBrussee/caveman) | 🪨 用最少的 token 说最短的话，节省 65% token | 42K+ |
 | [career-ops](https://github.com/santifer/career-ops) | 💼 AI 求职系统：14 种技能模式 + Go 仪表盘 + PDF 生成 | 38K+ |
 | [graphify](https://github.com/safishamsi/graphify) | 🕸️ 将代码/文档/论文转为可查询知识图谱 | 32K+ |
@@ -125,7 +126,6 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [Claude-to-IM-skill](https://github.com/op7418/Claude-to-IM-skill) | Claude Code / Codex IM 桥接 Skill：把 Telegram / Discord / 飞书 / QQ / 微信接到 AI 编码代理，支持后台守护进程、权限审批、流式预览与会话持久化，安装与更新说明完整（2.3K⭐）|
 | [makenotion/notion-mcp-server](https://github.com/makenotion/notion-mcp-server) | Notion 官方 MCP Server：OAuth 接入 + Markdown 页面编辑 + AI Agent 低 token 工具集（4.2K⭐）|
 | [cyanheads/obsidian-mcp-server](https://github.com/cyanheads/obsidian-mcp-server) | Obsidian 知识库 MCP Server：读写笔记、全文检索、Frontmatter/Tag 管理（463⭐）|
-| [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills) | Obsidian 官方生态技能包：Markdown / Bases / JSON Canvas / CLI / Defuddle，兼容 Claude Code / Codex / OpenCode（26K⭐）|
 | [YishenTu/claudian](https://github.com/YishenTu/claudian) | Obsidian 内嵌 Claude Code / Codex 协作插件：让知识库直接成为 Agent 工作目录，支持 Skills、MCP、计划模式（9.0K⭐）|
 | [freestylefly/openclaw-wechat](https://github.com/freestylefly/openclaw-wechat) | OpenClaw 个人微信通道插件：真实微信账号接入、扫码登录、群聊/私聊收发与多账号支持（1.6K⭐）|
 | [autoclaw-cc/xiaohongshu-skills](https://github.com/autoclaw-cc/xiaohongshu-skills) | 小红书自动化 Skills：真实浏览器 + 真实账号环境，覆盖发布、评论、检索、批量运营与 CLI 调用（1.1K⭐）|
