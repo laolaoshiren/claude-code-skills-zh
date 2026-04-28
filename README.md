@@ -1,10 +1,10 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 137+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 138+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-137%2B-green.svg)](#-原创技能)
+[![Skills](https://img.shields.io/badge/skills-138%2B-green.svg)](#-原创技能)
 [![Updated](https://img.shields.io/badge/updated-2026--04--28-brightgreen.svg)](#)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
@@ -232,6 +232,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [browser-use](https://github.com/browser-use/browser-use) | 🌐 AI 浏览器自动化基础设施：提供开源库 + Cloud stealth 浏览器 + 文档化 LLM 接入方式，适合为 Claude Code / Cursor / 自定义 agent 增强网页操作能力（90K⭐）|
 | [iflytek/skillhub](https://github.com/iflytek/skillhub) | 企业级自托管 Agent Skill Registry：支持技能发布、版本管理、RBAC 权限、审计日志，以及 Docker / Kubernetes 私有化部署，适合团队内部沉淀与分发 Skills（2.6K⭐）|
 | [tech-leads-club/agent-skills](https://github.com/tech-leads-club/agent-skills) | 安全优先的专业 Agent Skills Registry：提供校验过的技能目录、CLI 安装/更新/移除、多 Agent 兼容与 Snyk 扫描，适合团队级技能治理与分发（2.2K⭐）|
+| [openclaw/clawhub](https://github.com/openclaw/clawhub) | OpenClaw 官方技能注册中心：支持 Skill/Plugin/SOUL.md 发布、版本管理、向量搜索、CLI 安装与 OpenClaw 包目录，适合发现、分发和治理 agent skills（8.3K⭐）|
 
 ### 💰 金融/商业
 
