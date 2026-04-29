@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://claude-skills.bt199.com/sitemap.xml
