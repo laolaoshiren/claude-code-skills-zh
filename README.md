@@ -1,10 +1,10 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 162+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 166+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-162%2B-green.svg)](#-原创技能)
+[![Skills](https://img.shields.io/badge/skills-166%2B-green.svg)](#-原创技能)
 [![Updated](https://img.shields.io/badge/updated-2026--05--03-brightgreen.svg)](#)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
@@ -163,6 +163,9 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [Wechat-ggGitHub/wechat-claude-code](https://github.com/Wechat-ggGitHub/wechat-claude-code) | 个人微信接入 Claude Code Skill：手机端远程对话、图片识别、权限审批、Slash Commands 与实时工具进度预览，中文 README 完整，适合移动端调度本地编码代理（264⭐）|
 | [OrangeViolin/content-pipeline](https://github.com/OrangeViolin/content-pipeline) | 中文创作者内容生产线 Skill：一个提示词完成选题、写作、改写、排版和多平台发布准备，面向公众号 / 小红书 / 知乎等内容运营场景（153⭐）|
 | [chenxiachan/xhs-claude-skills](https://github.com/chenxiachan/xhs-claude-skills) | 小红书转 Obsidian Claude Code 插件：图文/视频帖子采集、视频转录、Markdown 笔记沉淀，无需 MCP 或浏览器后端，安装前置清晰（237⭐）|
+| [czlonkowski/n8n-skills](https://github.com/czlonkowski/n8n-skills) | n8n 工作流 Claude Code Skill：把节点配置、表达式、凭证检查和最佳实践固化为可复用技能，README 安装步骤清晰，适合低代码自动化与运营流程编排（4.8K⭐）|
+| [langbot-app/LangBot](https://github.com/langbot-app/LangBot) | 生产级多平台智能机器人开发平台：支持微信、企微、公众号、飞书、钉钉、QQ、Slack、Discord 等渠道，内置 Agent、知识库编排和插件系统，适合企业 IM 助手与私有化运营（16K⭐）|
+| [iniwap/AIWriteX](https://github.com/iniwap/AIWriteX) | 微信公众号全自动 AI 运营工具：热点聚合、趋势分析、爆款选题、文章采集、生成、排版发布与多平台分发，覆盖小红书 / 百家号 / 抖音等创作者场景（952⭐）|
 
 ### 💻 开发效率
 
@@ -257,6 +260,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [openclaw/clawhub](https://github.com/openclaw/clawhub) | OpenClaw 官方技能注册中心：支持 Skill/Plugin/SOUL.md 发布、版本管理、向量搜索、CLI 安装与 OpenClaw 包目录，适合发现、分发和治理 agent skills（8.3K⭐）|
 | [phuryn/pm-skills](https://github.com/phuryn/pm-skills) | 产品经理 Skills Marketplace：65+ PM Skills 与 36 个链式工作流，覆盖用户发现、战略、执行、发布和增长，适合产品/运营团队把方法论固化为可复用 Agent 技能（10.8K⭐）|
 | [davepoon/buildwithclaude](https://github.com/davepoon/buildwithclaude) | Claude 生态发现平台：聚合 Skills、Agents、Commands、Hooks、Plugins 与 Marketplace 集合，帮助快速发现可安装 Claude Code 扩展（2.8K⭐）|
+| [numman-ali/n-skills](https://github.com/numman-ali/n-skills) | AI Agent 插件市场：兼容 Claude Code、Codex 和 openskills，提供 curated marketplace 与安装入口，适合发现、分发和治理可复用插件/技能（976⭐）|
 
 ### 💰 金融/商业
 
