@@ -1,10 +1,10 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 154+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 157+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-154%2B-green.svg)](#-原创技能)
+[![Skills](https://img.shields.io/badge/skills-157%2B-green.svg)](#-原创技能)
 [![Updated](https://img.shields.io/badge/updated-2026--05--03-brightgreen.svg)](#)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
@@ -157,6 +157,9 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [wechatDownload](https://github.com/qiye45/wechatDownload) | 微信公众号文章批量下载工具：支持合集、评论、HTML / Markdown / PDF / DOCX 导出，并提供 MCP / Skill 调用能力，适合内容沉淀与选题分析（7.4K⭐）|
 | [wenyan-mcp](https://github.com/caol64/wenyan-mcp) | 文颜 MCP Server：让 AI 自动完成 Markdown 排版并发布到微信公众号，适合公众号运营与内容发布自动化（1.2K⭐）|
 | [open-cowork](https://github.com/OpenCoworkAI/open-cowork) | 开源 AI Agent 桌面应用：一键安装 Claude Code、MCP 工具和 Skills，支持沙箱隔离、多模型与飞书 / Slack 集成（1.1K⭐）|
+| [Xiangyu-CAS/xiaohongshu-ops-skill](https://github.com/Xiangyu-CAS/xiaohongshu-ops-skill) | 小红书运营 OpenClaw Skill：基于浏览器自动化，覆盖推荐流分析、账号分析、选题灵感、知识库沉淀、自动发布与评论回复，README 有完整示例和安装说明（1.6K⭐）|
+| [MarkusPfundstein/mcp-obsidian](https://github.com/MarkusPfundstein/mcp-obsidian) | Obsidian MCP Server：通过 Obsidian REST API 插件让 Claude Code / Cursor 等 Agent 读写知识库、搜索笔记和管理内容，活跃度高、社区采用广（3.6K⭐）|
+| [leemysw/feishu-docx](https://github.com/leemysw/feishu-docx) | 飞书 / Lark 文档 Markdown 导出与写入工具：支持 Docs / Sheet / Bitable、OAuth 2.0、CLI/TUI、公众号导入与 Claude Skills，适合团队知识库和内容流转自动化（191⭐）|
 
 ### 💻 开发效率
 
