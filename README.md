@@ -1,10 +1,10 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 174+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 181+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-174%2B-green.svg)](#-原创技能)
+[![Skills](https://img.shields.io/badge/skills-181%2B-green.svg)](#-原创技能)
 [![Updated](https://img.shields.io/badge/updated-2026--05--03-brightgreen.svg)](#)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
@@ -171,6 +171,13 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [minhnv0807/fullstack-mkt-skills](https://github.com/minhnv0807/fullstack-mkt-skills) | 全栈营销技能包：20 个生产级 Skills 生成内容日历、TikTok/Meta 广告文案、UGC Brief、KPI 计算器、A/B 测试与定价策略，可作为 Claude Code 插件或独立提示词使用（211⭐）|
 | [liangdabiao/tikhub_api_skill](https://github.com/liangdabiao/tikhub_api_skill) | TikHub API Claude Code Skill：封装抖音 / TikTok / 小红书 / Instagram / YouTube / X / Reddit 等多平台数据 API 搜索、发现与调用说明，适合社媒数据分析和选题监控（77⭐）|
 | [joewongjc/feishu-claude-code](https://github.com/joewongjc/feishu-claude-code) | 飞书 × Claude Code WebSocket 桥接：让团队在飞书中实时调度 Claude Code CLI，对话链路清晰，适合企业内协作和移动端远程操作（108⭐）|
+| [xhs_content_agent](https://github.com/hl897tech/xhs_content_agent) | 小红书内容运营 Agent：用 Playwright 抓取热门笔记、分析爆款规律、生成选题/文案/配图，并支持 API/MCP 一键发布，适合小红书矩阵号与自媒体自动化（165⭐）|
+| [xhs-mcp-server](https://github.com/aicu-icu/xhs-mcp-server) | 小红书 MCP Server：覆盖笔记/用户搜索、通知消息监控等高频工具调用，README 有配置与调用示例，适合给 Claude Code / Cursor 接入小红书数据源（162⭐）|
+| [yzfly/douyin-mcp-server](https://github.com/yzfly/douyin-mcp-server) | 抖音 MCP Server：提取无水印视频链接、视频文案与基础元数据，明确标注 Claude Skill / OpenClaw 适配，适合短视频素材整理与竞品监控（967⭐）|
+| [douyin-upload-mcp-skill](https://github.com/WJZ-P/douyin-upload-mcp-skill) | 抖音视频/图文上传 MCP 与 Skill：基于浏览器自动化发布内容，适配 OpenClaw 与任意支持 Skill/MCP 的 Agent，适合短视频运营发布链路补齐（55⭐）|
+| [ai-marketing-claude](https://github.com/zubair-trabzada/ai-marketing-claude) | Claude Code AI Marketing Suite：15 个营销技能加并行子代理，覆盖网站审计、文案、邮件序列、广告活动、内容日历、竞品情报与客户级 PDF 报告（1.5K⭐）|
+| [seo-geo-claude-skills](https://github.com/aaron-he-zhu/seo-geo-claude-skills) | SEO/GEO Claude Skills：20 个关键词研究、内容写作、技术审计、排名追踪技能，支持 Claude Code / Cursor / Codex 等 35+ Agent，适合增长和内容团队（1.4K⭐）|
+| [openclaudia-skills](https://github.com/OpenClaudia/openclaudia-skills) | OpenClaudia 营销技能库：34 个开源 Claude Code 营销 skills，覆盖 SEO、内容、邮件、广告、分析和增长，安装方式直接，适合作为运营团队基础技能包（411⭐）|
 
 ### 💻 开发效率
 
