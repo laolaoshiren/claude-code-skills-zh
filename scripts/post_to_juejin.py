@@ -11,7 +11,20 @@ import tempfile
 from datetime import datetime
 
 COOKIE_FILE = os.path.expanduser("~/.hermes/projects/claude-code-skills-zh/.juejin_cookie")
-COOKIE_FULL = 's_v_web_id=verify_mnyghpv1_2nb3ituQ_Qu90_4aKY_86Ix_VKyTjxNrYjIU;_tea_utm_cache_2608=undefined;__tea_cookie_tokens_2608=%257B%2522web_id%2522%253A%25227628554038237218339%2522%252C%2522user_unique_id%2522%253A%25227628554038237218339%2522%252C%2522timestamp%2522%253A1776161154712%257D;passport_csrf_token=dc2c4740f403fd1bf4fede7d5d447888;passport_csrf_token_default=dc2c4740f403fd1bf4fede7d5d447888;odin_tt=4d5fd13504789f72028b22e1934879897c39b23ddca230f2ce510f1b8966a35f59698e6d4c34655068ae7fd040f4caaf3b7dd9da812c55202e43af250c96dd9a;n_mh=YWU8yCoGLpZjom3SqQ1Ylh7b87QnMl2ZnsghqSBcj44;passport_auth_status=8618318468ea7a9de4390b92eb104670%2C;passport_auth_status_ss=8618318468ea7a9de4390b92eb104670%2C;sid_guard=bc0ee3eed82ba004bec74f38e9be1717%7C1776161184%7C31536000%7CWed%2C+14-Apr-2027+10%3A06%3A24+GMT;uid_tt=26bb4609cb393e9932c7866da91058db;uid_tt_ss=26bb4609cb393e9932c7866da91058db;sid_tt=bc0ee3eed82ba004bec74f38e9be1717;sessionid=bc0ee3eed82ba004bec74f38e9be1717;sessionid_ss=bc0ee3eed82ba004bec74f38e9be1717;session_tlb_tag=sttt%7C10%7CvA7j7tgroAS-x0846b4XF__________J9YGaDxtrJdQfckj62q5Zs1qboODOjsTl-Stfiwtfmn4%3D;is_staff_user=false;has_biz_token=false;sid_ucp_v1=1.0.0-KGIzZDVkMzc4ZDU5MjFhYzgxN2I5YThiOTU3MWE5MGJjZGJlYWRiM2MKFgjK9sCI3q1GEKCj-M4GGLAUOAJA7AcaAmxmIiBiYzBlZTNlZWQ4MmJhMDA0YmVjNzRmMzhlOWJlMTcxNw;ssid_ucp_v1=1.0.0-KGIzZDVkMzc4ZDU5MjFhYzgxN2I5YThiOTU3MWE5MGJjZGJlYWRiM2MKFgjK9sCI3q1GEKCj-M4GGLAUOAJA7AcaAmxmIiBiYzBlZTNlZWQ4MmJhMDA0YmVjNzRmMzhlOWJlMTcxNw;_tea_utm_cache_576092=undefined'
+
+
+def load_cookie():
+    """从环境变量或本地未跟踪文件读取 Cookie，避免把敏感信息提交到仓库。"""
+    cookie = os.environ.get("JUEJIN_COOKIE")
+    if cookie:
+        return cookie.strip()
+    if os.path.exists(COOKIE_FILE):
+        with open(COOKIE_FILE, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    raise RuntimeError("缺少掘金 Cookie：请设置 JUEJIN_COOKIE 或写入 .juejin_cookie（不要提交 Cookie 到仓库）")
+
+
+COOKIE_FULL = load_cookie()
 
 
 def create_draft_via_api(title, content, category_id="6809640410229036040"):
