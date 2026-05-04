@@ -186,6 +186,9 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [aitytech/agentkits-marketing](https://github.com/aitytech/agentkits-marketing) | 企业级 AI 营销自动化 AgentKit：18 个 Agents、93 条 Commands、28 个 Skills，覆盖 SaaS 增长、内容、SEO、营销活动、报告与数据分析，兼容 Claude Code / Cursor / Copilot（483⭐）|
 | [kostja94/marketing-skills](https://github.com/kostja94/marketing-skills) | Marketing & SEO Skills for AI Agents：160+ Markdown 技能覆盖 SEO、页面类型、付费广告、渠道和策略，支持 npx skills 安装，兼容 Claude Code / OpenClaw / Cursor（418⭐）|
 | [BrianRWagner/ai-marketing-claude-code-skills](https://github.com/BrianRWagner/ai-marketing-claude-code-skills) | Claude Code 营销框架技能集：23 个免费 + 10 个 Pro skills，支持 quick/standard/deep 执行模式，覆盖转化、定位、文案、渠道和增长审计（268⭐）|
+| [AgriciDaniel/claude-youtube](https://github.com/AgriciDaniel/claude-youtube) | YouTube 创作者 Claude Code Skill：14 个子技能覆盖频道审计、视频 SEO、留存脚本、标题缩略图、Shorts、内容日历、变现和竞品分析，README 文档完整且仍活跃（80⭐）|
+| [sergebulaev/linkedin-skills](https://github.com/sergebulaev/linkedin-skills) | LinkedIn 增长 Claude Code Skills：面向创作者、Founder 和营销团队，覆盖自然帖、评论、信息流分析与发布节奏，适合 B2B 自媒体运营（51⭐）|
+| [ijerryhuang/xiaohongshu-auto-operation](https://github.com/ijerryhuang/xiaohongshu-auto-operation) | 小红书账号全自动运营 OpenClaw Skill：选题、内容生成、封面、定时发布和数据报告全流程自动化，安装依赖与 MCP 配置说明清晰（65⭐）|
 
 ### 💻 开发效率
 
