@@ -1,10 +1,10 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 189+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 195+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-189%2B-green.svg)](#-原创技能)
+[![Skills](https://img.shields.io/badge/skills-195%2B-green.svg)](#-原创技能)
 [![Updated](https://img.shields.io/badge/updated-2026--05--04-brightgreen.svg)](#)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
@@ -189,6 +189,9 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [AgriciDaniel/claude-youtube](https://github.com/AgriciDaniel/claude-youtube) | YouTube 创作者 Claude Code Skill：14 个子技能覆盖频道审计、视频 SEO、留存脚本、标题缩略图、Shorts、内容日历、变现和竞品分析，README 文档完整且仍活跃（80⭐）|
 | [sergebulaev/linkedin-skills](https://github.com/sergebulaev/linkedin-skills) | LinkedIn 增长 Claude Code Skills：面向创作者、Founder 和营销团队，覆盖自然帖、评论、信息流分析与发布节奏，适合 B2B 自媒体运营（51⭐）|
 | [ijerryhuang/xiaohongshu-auto-operation](https://github.com/ijerryhuang/xiaohongshu-auto-operation) | 小红书账号全自动运营 OpenClaw Skill：选题、内容生成、封面、定时发布和数据报告全流程自动化，安装依赖与 MCP 配置说明清晰（65⭐）|
+| [Panniantong/Agent-Reach](https://github.com/Panniantong/Agent-Reach) | 多平台内容检索 CLI/MCP：无需官方 API 即可读搜 X / Reddit / YouTube / GitHub / B 站 / 小红书，中文 README、安装和 Agent 接入说明完整，适合热点追踪、自媒体选题与竞品情报（18.7K⭐）|
+| [xpzouying/xiaohongshu-mcp](https://github.com/xpzouying/xiaohongshu-mcp) | 小红书 MCP Server：支持搜索、笔记/用户数据读取与 Agent 工具调用，README 详尽、仍活跃，适合给 Claude Code / Cursor 接入小红书内容调研能力（13.2K⭐）|
+| [BiboyQG/WeChat-MCP](https://github.com/BiboyQG/WeChat-MCP) | WeChat MCP Server：让 OpenClaw / Claude / ChatGPT 等助手读取和回复微信消息，提供 PyPI 安装、配置和文档站，适合个人微信 Agent 助理（172⭐）|
 
 ### 💻 开发效率
 
