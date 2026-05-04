@@ -1,10 +1,10 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 195+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 200+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-195%2B-green.svg)](#-原创技能)
+[![Skills](https://img.shields.io/badge/skills-200%2B-green.svg)](#-原创技能)
 [![Updated](https://img.shields.io/badge/updated-2026--05--04-brightgreen.svg)](#)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
@@ -192,6 +192,10 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [Panniantong/Agent-Reach](https://github.com/Panniantong/Agent-Reach) | 多平台内容检索 CLI/MCP：无需官方 API 即可读搜 X / Reddit / YouTube / GitHub / B 站 / 小红书，中文 README、安装和 Agent 接入说明完整，适合热点追踪、自媒体选题与竞品情报（18.7K⭐）|
 | [xpzouying/xiaohongshu-mcp](https://github.com/xpzouying/xiaohongshu-mcp) | 小红书 MCP Server：支持搜索、笔记/用户数据读取与 Agent 工具调用，README 详尽、仍活跃，适合给 Claude Code / Cursor 接入小红书内容调研能力（13.2K⭐）|
 | [BiboyQG/WeChat-MCP](https://github.com/BiboyQG/WeChat-MCP) | WeChat MCP Server：让 OpenClaw / Claude / ChatGPT 等助手读取和回复微信消息，提供 PyPI 安装、配置和文档站，适合个人微信 Agent 助理（172⭐）|
+| [iFurySt/RedNote-MCP](https://github.com/iFurySt/RedNote-MCP) | 小红书 / RedNote MCP Server：npm 包安装，提供内容访问、检索与 Agent 工具接入说明，适合把 Claude Code / Cursor 接入小红书内容调研（1.0K⭐）|
+| [autoclaw-cc/xiaohongshu-mcp-skills](https://github.com/autoclaw-cc/xiaohongshu-mcp-skills) | 基于 xiaohongshu-mcp 的 Agent Skills 集合：覆盖安装部署、扫码登录、发布图文、搜索笔记与数据抓取，兼容 OpenClaw / Claude Code（206⭐）|
+| [agenmod/immortal-skill](https://github.com/agenmod/immortal-skill) | 开源数字分身 / 记忆蒸馏 Agent Skill：支持微信、飞书、iMessage、Telegram 等聊天记录采集，按 OpenClaw Soul Spec 蒸馏人格画像，中文 README 和安装说明完整（677⭐）|
+| [aiworkskills/wechat-article-skills](https://github.com/aiworkskills/wechat-article-skills) | 微信公众号 AI 运营 Skills：选题、写稿、审稿、排版、配图、发布全流程，支持 OpenClaw / Claude Code / Cursor / Codex，中文文档完善（26⭐）|
 
 ### 💻 开发效率
 
