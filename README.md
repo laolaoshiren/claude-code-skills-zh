@@ -119,8 +119,10 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [awesome-copilot](https://github.com/github/awesome-copilot) | 🐙 GitHub Copilot 官方社区 instructions / agents / skills / 配置合集，可迁移到多 Agent 工作流 | 32K+ |
 | [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) | 📚 Composio 维护的 Awesome Claude Skills 导航：按 Research、Design、Productivity、Toolkits 等分类收录高质量 Claude Skills，README 目录完整、持续活跃 | 58K+ |
 | [mattpocock/skills](https://github.com/mattpocock/skills) | 🧑‍💻 Total TypeScript 作者 Matt Pocock 的真实工程 Skills：覆盖代码审查、类型安全、测试、重构与工程节奏，适合严肃工程项目复用 | 59K+ |
-| [open-design](https://github.com/nexu-io/open-design) | 🎨 开源 Claude Design 替代方案：31 个设计 Skills + 72 套品牌级设计系统，支持 Claude Code / Codex / Cursor / Gemini / Hermes 等 13 种 coding-agent CLI，本地优先、BYOK、Quickstart 清晰 | 24K+ |
+| [open-design](https://github.com/nexu-io/open-design) | 🎨 开源 Claude Design 替代方案：19 个设计 Skills + 71 套品牌级设计系统，支持 Claude Code / Codex / Cursor / Gemini / Hermes 等多种 coding-agent CLI，本地优先、BYOK、Quickstart 清晰 | 27.3K+ |
 | [OpenViking](https://github.com/volcengine/OpenViking) | 🧠 火山引擎开源的 Agent Context Database：用文件系统范式统一管理 memory / resources / skills，支持 OpenClaw 等 Agent 分层投递上下文和自演化，文档与多语言 README 完整 | 23.4K+ |
+| [cherry-studio](https://github.com/CherryHQ/cherry-studio) | 🍒 高星 AI 生产力桌面工作台：统一对接主流模型、智能助手和 300+ assistants，可作为 Claude Code / OpenClaw / MCP 工作流的桌面入口，中文用户基础大、文档与发布节奏活跃 | 45K+ |
+| [memU](https://github.com/NevaMind-AI/memU) | 🧠 面向 24/7 主动 Agent 的长期记忆层：为 OpenClaw 类常驻助手提供可持续上下文沉淀，适合个人助理、知识工作流和企业 Agent 记忆治理 | 13.5K+ |
 
 ### 📣 平台运营 / 自媒体 / 办公流量
 
@@ -151,7 +153,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [vivy-yi/xiaohongshu-skills](https://github.com/vivy-yi/xiaohongshu-skills) | 小红书完整运营技能库：139 个 SKILL.md 覆盖内容创作、账号运营、互动运营、数据分析、电商转化、平台规则、工具生态、营销推广、增长策略 9 大分类，安装步骤清晰，适合中文运营场景（135⭐）|
 | [skillx](https://github.com/nextlevelbuilder/skillx) | AI Agent 技能市场：集 Web Marketplace、CLI、语义搜索、排行榜、评分与 Claude Code 插件市场于一体，适合多技能发现与安装（110⭐）|
 | [content-collector-skill](https://github.com/vigorX777/content-collector-skill) | 社交内容收藏助手：自动抓取 X / 微信公众号 / 即刻 / Reddit / 知乎 / B 站等内容，经 AI 整理后写入飞书多维表格，README 完整、安装前置清晰，适合内容运营与知识沉淀（227⭐）|
-| [farion1231/cc-switch](https://github.com/farion1231/cc-switch) | 跨平台代理桌面管理器：统一管理 Claude Code / Codex / Gemini CLI / OpenCode / OpenClaw 的账号、模型、配置与切换，中文文档完善、安装包齐全，适合高频多 Agent 用户（51K⭐）|
+| [farion1231/cc-switch](https://github.com/farion1231/cc-switch) | 跨平台代理桌面管理器：统一管理 Claude Code / Codex / Gemini CLI / OpenCode / OpenClaw 的账号、模型、配置与切换，中文文档完善、安装包齐全，适合高频多 Agent 用户（59.8K⭐）|
 | [Feishu-MCP](https://github.com/cso1z/Feishu-MCP) | 飞书文档与任务管理 MCP/CLI 工具：支持文档读写、任务 CRUD、用户查询，并可配合 Feishu-Skill 让 Claude Code / Cursor / Cline 自动化操作飞书，安装与配置说明完整（616⭐）|
 | [larksuite/cli](https://github.com/larksuite/cli) | 飞书 / Lark 官方 CLI：覆盖消息、文档、Base、表格、日历、邮箱、任务、会议等 14 个业务域，提供 200+ 命令与 20+ AI Agent Skills，安装路径清晰，适合办公自动化与 Agent 集成（9.2K⭐）|
 | [superpowers-marketplace](https://github.com/obra/superpowers-marketplace) | Claude Code 插件市场：聚合 superpowers、写作规范、Claude Code 开发工具与私密日记 MCP 等高质量插件，安装命令简单，适合需要持续扩展插件/技能生态的重度用户（895⭐）|
