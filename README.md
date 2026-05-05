@@ -276,6 +276,9 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [Rito-w/skills-manager](https://github.com/Rito-w/skills-manager) | 跨平台 AI Skills Manager：聚合 Claude Plugins / SkillsLLM / SkillsMP 等市场，支持搜索、下载、本地仓库和一键安装到 Claude / Cursor / Windsurf（162⭐）|
 | [osovv/grace-marketplace](https://github.com/osovv/grace-marketplace) | GRACE contract-first 工程技能市场：提供 Graph-RAG Anchored Code Engineering skills 与 CLI，支持 Claude Code / Codex / Kilo Code 的语义契约、知识图谱和自主校验流程（157⭐）|
 | [borghei/Claude-Skills](https://github.com/borghei/Claude-Skills) | 266 个跨部门 AI skills 与 67 个 cs-* agents，覆盖工程、营销、合规、C-level 与垂直行业，支持 Claude Code / Codex / Gemini CLI / Cursor 等 11 种助手（106⭐）|
+| [NeoLabHQ/context-engineering-kit](https://github.com/NeoLabHQ/context-engineering-kit) | 手工打磨的上下文工程 Skills Kit：聚焦提升 Agent 输出质量，兼容 Claude Code / OpenCode / Cursor / Antigravity / Gemini CLI，文档站与快速开始完整（955⭐）|
+| [microsoft/power-platform-skills](https://github.com/microsoft/power-platform-skills) | Microsoft Power Platform 官方插件市场：为 Claude Code / GitHub Copilot 提供可复用 skills、agents、commands，适合企业低代码与办公自动化开发（252⭐）|
+| [LerianStudio/ring](https://github.com/LerianStudio/ring) | Claude Code 插件市场：89 个 skills + 38 个专业 agents，覆盖 TDD、系统化调试、并行代码审查和 10-gate 开发流程（182⭐）|
 
 ### 🎨 内容创作
 
