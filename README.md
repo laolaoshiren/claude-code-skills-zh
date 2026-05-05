@@ -120,6 +120,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) | 📚 Composio 维护的 Awesome Claude Skills 导航：按 Research、Design、Productivity、Toolkits 等分类收录高质量 Claude Skills，README 目录完整、持续活跃 | 58K+ |
 | [mattpocock/skills](https://github.com/mattpocock/skills) | 🧑‍💻 Total TypeScript 作者 Matt Pocock 的真实工程 Skills：覆盖代码审查、类型安全、测试、重构与工程节奏，适合严肃工程项目复用 | 59K+ |
 | [open-design](https://github.com/nexu-io/open-design) | 🎨 开源 Claude Design 替代方案：31 个设计 Skills + 72 套品牌级设计系统，支持 Claude Code / Codex / Cursor / Gemini / Hermes 等 13 种 coding-agent CLI，本地优先、BYOK、Quickstart 清晰 | 24K+ |
+| [OpenViking](https://github.com/volcengine/OpenViking) | 🧠 火山引擎开源的 Agent Context Database：用文件系统范式统一管理 memory / resources / skills，支持 OpenClaw 等 Agent 分层投递上下文和自演化，文档与多语言 README 完整 | 23.4K+ |
 
 ### 📣 平台运营 / 自媒体 / 办公流量
 
@@ -270,6 +271,11 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [openskills](https://github.com/numman-ali/openskills) | 通用 Skills 安装器：把 Claude Code 的 SKILL.md 体系带到 Cursor / Windsurf / Aider / Codex 等多 Agent 环境，支持 GitHub、本地路径、私有仓库安装与 AGENTS.md 同步（10K⭐）|
 | [AionUi](https://github.com/iOfficeAI/AionUi) | 本地开源 24/7 Cowork / OpenClaw 桌面应用：支持 Gemini CLI、Claude Code、Codex、OpenCode、Qwen Code 等多代理工具协作（23.7K⭐）|
 | [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | 跨平台 UI/UX 设计智能 Skill：为产品界面生成提供专业设计判断、布局策略与视觉规范（73K⭐）|
+| [aiskillstore/marketplace](https://github.com/aiskillstore/marketplace) | 安全审计型 Agent Skills 市场：面向 Claude / Codex / Claude Code 提供一键安装与质量校验，README 明确列出 Claude Code 和 Codex 安装方式（263⭐）|
+| [bencium/bencium-marketplace](https://github.com/bencium/bencium-marketplace) | 设计、架构与生产力 Claude Code 插件市场：13 个技能，可用 `npx skills` 或 Claude Code `/plugin marketplace` 安装，适合 UI/UX 与产品工程团队（206⭐）|
+| [Rito-w/skills-manager](https://github.com/Rito-w/skills-manager) | 跨平台 AI Skills Manager：聚合 Claude Plugins / SkillsLLM / SkillsMP 等市场，支持搜索、下载、本地仓库和一键安装到 Claude / Cursor / Windsurf（162⭐）|
+| [osovv/grace-marketplace](https://github.com/osovv/grace-marketplace) | GRACE contract-first 工程技能市场：提供 Graph-RAG Anchored Code Engineering skills 与 CLI，支持 Claude Code / Codex / Kilo Code 的语义契约、知识图谱和自主校验流程（157⭐）|
+| [borghei/Claude-Skills](https://github.com/borghei/Claude-Skills) | 266 个跨部门 AI skills 与 67 个 cs-* agents，覆盖工程、营销、合规、C-level 与垂直行业，支持 Claude Code / Codex / Gemini CLI / Cursor 等 11 种助手（106⭐）|
 
 ### 🎨 内容创作
 
