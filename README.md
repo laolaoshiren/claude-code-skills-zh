@@ -155,7 +155,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [content-collector-skill](https://github.com/vigorX777/content-collector-skill) | 社交内容收藏助手：自动抓取 X / 微信公众号 / 即刻 / Reddit / 知乎 / B 站等内容，经 AI 整理后写入飞书多维表格，README 完整、安装前置清晰，适合内容运营与知识沉淀（227⭐）|
 | [farion1231/cc-switch](https://github.com/farion1231/cc-switch) | 跨平台代理桌面管理器：统一管理 Claude Code / Codex / Gemini CLI / OpenCode / OpenClaw 的账号、模型、配置与切换，中文文档完善、安装包齐全，适合高频多 Agent 用户（59.8K⭐）|
 | [Feishu-MCP](https://github.com/cso1z/Feishu-MCP) | 飞书文档与任务管理 MCP/CLI 工具：支持文档读写、任务 CRUD、用户查询，并可配合 Feishu-Skill 让 Claude Code / Cursor / Cline 自动化操作飞书，安装与配置说明完整（616⭐）|
-| [larksuite/cli](https://github.com/larksuite/cli) | 飞书 / Lark 官方 CLI：覆盖消息、文档、Base、表格、日历、邮箱、任务、会议等 14 个业务域，提供 200+ 命令与 20+ AI Agent Skills，安装路径清晰，适合办公自动化与 Agent 集成（9.2K⭐）|
+| [larksuite/cli](https://github.com/larksuite/cli) | 飞书 / Lark 官方 CLI：覆盖消息、文档、Base、表格、日历、邮箱、任务、会议等 14 个业务域，提供 200+ 命令与 20+ AI Agent Skills，安装路径清晰，适合办公自动化与 Agent 集成（9.3K⭐）|
 | [superpowers-marketplace](https://github.com/obra/superpowers-marketplace) | Claude Code 插件市场：聚合 superpowers、写作规范、Claude Code 开发工具与私密日记 MCP 等高质量插件，安装命令简单，适合需要持续扩展插件/技能生态的重度用户（895⭐）|
 | [CowAgent](https://github.com/zhayujie/CowAgent) | 微信 / 飞书 / 钉钉 / 企微 / QQ / 公众号 / 网页多渠道 AI 助理与 Agent 框架：内置 Skills 引擎、长期记忆、知识库、任务规划和工具调用，支持从 Skill Hub / GitHub 一键安装技能，适合个人助理与企业数字员工（44K⭐）|
 | [nexu](https://github.com/nexu-io/nexu) | OpenClaw 桌面客户端与多 IM 连接器：一键把本地 AI Agent 接入微信、飞书、Slack、Discord，支持 Claude Code / Codex / 任意 LLM，BYOK、本地优先、移动端随时调度（2.7K⭐）|
@@ -215,6 +215,12 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [viktorxhzj/feishu-webhook-skill](https://github.com/viktorxhzj/feishu-webhook-skill) | 飞书 / Lark Webhook 通知 Claude Code Skill：让本地 Agent 把任务进度、日报和自动化结果推送到飞书群，安装与调用方式简单（30⭐）|
 | [Varnan-Tech/opendirectory](https://github.com/Varnan-Tech/opendirectory) | GTM / 技术营销 / 增长自动化 Agent Skills 目录：51 个预置技能，支持 Claude、Codex、Gemini CLI，通过 npm 一键安装，README 展示完整分类与安装路径（162⭐）|
 | [nicepkg/ai-workflow](https://github.com/nicepkg/ai-workflow) | 跨平台 AI Workflow 技能集合：170+ 预置技能覆盖内容创作、营销增长、视频、交易、产品管理与演示，支持 Claude Code / Cursor / Codex / OpenCode 等 14+ AI 工具，一条命令安装，中文 README 完整（175⭐）|
+| [yhslgg-arch/url-reader](https://github.com/yhslgg-arch/url-reader) | 智能网页内容读取 Claude Code Skill：自动识别微信公众号 / 小红书 / 今日头条 / 抖音 / 淘宝等平台，Firecrawl → Jina → Playwright 三层降级，输出 Markdown 并可保存图片，适合内容调研与选题归档（169⭐）|
+| [fastclaw-ai/weclaw](https://github.com/fastclaw-ai/weclaw) | 微信 AI Agent Bridge：一行安装把个人微信接入 Claude / Codex / Gemini / Kimi 等 Agent，扫码登录、多账号与 Docker/Go 安装路径清晰，适合移动端调度本地代理（1.4K⭐）|
+| [sunnoy/openclaw-plugin-wecom](https://github.com/sunnoy/openclaw-plugin-wecom) | OpenClaw 企业微信增强插件：基于 WebSocket 长连接，支持多账号、动态 Agent 隔离、Webhook 出站、企业微信 MCP 文档/智能表格能力与白名单控制（689⭐）|
+| [zhaoxinyi02/ClawPanel](https://github.com/zhaoxinyi02/ClawPanel) | OpenClaw 智能管理面板：Go 单二进制 + React，可统一管理 20+ 通道、实时日志和外部运行时，适合团队化运维 OpenClaw / IM Agent（825⭐）|
+| [miantiao-me/bm.md](https://github.com/miantiao-me/bm.md) | Markdown 排版助手：一键适配微信公众号、网页与图片，提供 CLI / REST API / MCP 集成和 14 种排版样式，适合公众号发布前排版自动化（573⭐）|
+| [bzd6661/wechat-article-for-ai](https://github.com/bzd6661/wechat-article-for-ai) | 微信公众号文章转 Markdown 工具：面向 AI Agent 的 MCP Server + SKILL.md，支持反检测抓取、批量处理、图片本地化与结构化元数据（61⭐）|
 
 ### 💻 开发效率
 
@@ -274,7 +280,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [huggingface/skills](https://github.com/huggingface/skills) | Hugging Face 官方 Skills 仓库：覆盖模型选择、数据集处理、训练、评测、论文发布与 JS 推理，兼容 Claude Code / Codex / Gemini CLI / Cursor，安装方式清晰（10.4K⭐）|
 | [skills-manage](https://github.com/iamzhihuix/skills-manage) | 跨平台技能管理桌面应用：统一管理 Claude Code / Cursor / Gemini CLI / Codex / Hermes / OpenClaw 等 20+ 平台技能，支持本地发现、集合安装、GitHub 导入与市场浏览（1.1K⭐）|
 | [skills-manager](https://github.com/xingkongliang/skills-manager) | 轻量级跨工具技能管理桌面应用：支持 Claude Code / Cursor / Codex / Copilot 等 15+ 工具的统一安装、同步、场景切换、项目工作区与 Git 备份，中文说明完善、截图清晰，适合重度技能用户集中管理（911⭐）|
-| [vercel-labs/skills](https://github.com/vercel-labs/skills) | Vercel 出品的开放 Agent Skills CLI：支持 OpenCode / Claude Code / Codex / Cursor 等 40+ Agent，提供安装、搜索、更新、初始化全流程（16K⭐）|
+| [vercel-labs/skills](https://github.com/vercel-labs/skills) | Vercel 出品的开放 Agent Skills CLI：支持 OpenCode / Claude Code / Codex / Cursor 等 40+ Agent，提供安装、搜索、更新、初始化全流程（17K⭐）|
 | [Dimillian/CodexSkillManager](https://github.com/Dimillian/CodexSkillManager) | macOS 技能管理器：统一浏览本地 Codex / Claude Code 技能，并可从 Clawdhub 搜索、下载、删除与导入，适合多技能重度用户（1.0K⭐）|
 | [ui-design-brain](https://github.com/carmahhawwari/ui-design-brain) | Cursor UI 设计技能：基于 component.gallery 沉淀 60+ 组件最佳实践、布局模式、反模式与设计哲学，安装清晰，适合生成更像资深设计师产出的前端界面（773⭐）|
 | [claude-code-action](https://github.com/anthropics/claude-code-action) | Anthropic 官方 GitHub Action：让 Claude Code 在 PR / Issue 中自动答疑、审查、实现与定时维护，文档完整、支持多认证方式，适合仓库自动化运营（7.3K⭐）|
