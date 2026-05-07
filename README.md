@@ -313,6 +313,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [binance/binance-skills-hub](https://github.com/binance/binance-skills-hub) | Binance 官方开放 Skills Hub：为 AI Agent 提供加密资产查询、交易、钱包追踪、信号监控和 DeFi 交互能力，支持 OpenClaw / Claude Code，`npx skills add` 安装路径清晰（822⭐）|
 | [am-will/codex-skills](https://github.com/am-will/codex-skills) | Codex / Agent Skills 集合：覆盖规划、多 Agent 编排、Context7/OpenAI 文档访问、前端开发和浏览器自动化，README 列出可用技能与安装/复制路径（916⭐）|
 | [vibeforge1111/keep-codex-fast](https://github.com/vibeforge1111/keep-codex-fast) | Codex 本地状态维护 Skill：先报告、再备份归档会话/日志/旧 worktree，帮助重度 Codex 用户保持启动和恢复速度，强调不直接删除上下文（820⭐）|
+| [giuseppe-trisciuoglio/developer-kit](https://github.com/giuseppe-trisciuoglio/developer-kit) | 模块化 Claude Code 插件市场：150+ Skills、45+ Agents，覆盖 Java / TypeScript / Python / PHP / AWS 等工程栈，支持 `/plugin marketplace add`、OpenCode、Codex 和 GitHub Copilot CLI，并提供中文 README（239⭐）|
 
 ### 🎨 内容创作
 
@@ -350,6 +351,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [screenpipe](https://github.com/screenpipe/screenpipe) | 24/7 本地屏幕与麦克风上下文记录基础设施：让 Agent 基于真实工作流自动触发与复盘，适合个人知识捕获和运营分析（18.6K⭐）|
 | [eugeniughelbur/obsidian-second-brain](https://github.com/eugeniughelbur/obsidian-second-brain) | Obsidian 第二大脑 Claude Code Skill：31 个命令覆盖 vault-first research、定时 Agent 与长期知识维护，让知识库成为可持续演化的 Agent 工作台（896⭐）|
 | [Karanjot786/agent-skills-cli](https://github.com/Karanjot786/agent-skills-cli) | 通用 Agent Skills CLI：从 SkillsMP 同步 40,000+ 技能到 Cursor、Claude Code、GitHub Copilot、OpenAI Codex 与 Antigravity，适合多工具技能市场接入（138⭐）|
+| [Leon-Drq/openagentskill](https://github.com/Leon-Drq/openagentskill) | 开放 Agent Skills 市场：提供技能发现、提交、API 文档和基于真实 Agent 使用反馈的排行，适合寻找可复用 MCP / Web 自动化 / 生产力技能（166⭐）|
 
 ### 💰 金融/商业
 
