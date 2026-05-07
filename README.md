@@ -178,8 +178,8 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [langbot-app/LangBot](https://github.com/langbot-app/LangBot) | 生产级多平台智能机器人开发平台：支持微信、企微、公众号、飞书、钉钉、QQ、Slack、Discord 等渠道，内置 Agent、知识库编排和插件系统，适合企业 IM 助手与私有化运营（16K⭐）|
 | [iniwap/AIWriteX](https://github.com/iniwap/AIWriteX) | 微信公众号全自动 AI 运营工具：热点聚合、趋势分析、爆款选题、文章采集、生成、排版发布与多平台分发，覆盖小红书 / 百家号 / 抖音等创作者场景（971⭐）|
 | [AgriciDaniel/claude-ads](https://github.com/AgriciDaniel/claude-ads) | Claude Code 广告投放审计 Skill：250+ 检查项覆盖 Google / Meta / YouTube / LinkedIn / TikTok 等平台，支持加权评分、并行 Agent、行业模板与 AI 创意生成，适合投放优化和营销复盘（4.4K⭐）|
-| [Affitor/affiliate-skills](https://github.com/Affitor/affiliate-skills) | 联盟营销 Agent Skills：50 个技能覆盖趋势研究、数据化文章、信息图、落地页、部署与社媒情报飞轮，兼容 Claude Code / Gemini / Cursor / Windsurf（374⭐）|
-| [minhnv0807/fullstack-mkt-skills](https://github.com/minhnv0807/fullstack-mkt-skills) | 全栈营销技能包：20 个生产级 Skills 生成内容日历、TikTok/Meta 广告文案、UGC Brief、KPI 计算器、A/B 测试与定价策略，可作为 Claude Code 插件或独立提示词使用（262⭐）|
+| [Affitor/affiliate-skills](https://github.com/Affitor/affiliate-skills) | 联盟营销 Agent Skills：50 个技能覆盖趋势研究、数据化文章、信息图、落地页、部署与社媒情报飞轮，兼容 Claude Code / Gemini / Cursor / Windsurf（384⭐）|
+| [minhnv0807/fullstack-mkt-skills](https://github.com/minhnv0807/fullstack-mkt-skills) | 全栈营销技能包：20 个生产级 Skills 生成内容日历、TikTok/Meta 广告文案、UGC Brief、KPI 计算器、A/B 测试与定价策略，可作为 Claude Code 插件或独立提示词使用（271⭐）|
 | [zubair-trabzada/ai-agency-claude](https://github.com/zubair-trabzada/ai-agency-claude) | AI Agency Command Center for Claude Code：用 5 个并行团队把营销、销售、法务、声誉和 GEO/SEO 审计编排成统一客户报告，提供一行安装、9 个 skills、5 个 agents 和 PDF 交付链路，适合咨询顾问与运营服务商（54⭐）|
 | [liangdabiao/tikhub_api_skill](https://github.com/liangdabiao/tikhub_api_skill) | TikHub API Claude Code Skill：封装抖音 / TikTok / 小红书 / Instagram / YouTube / X / Reddit 等多平台数据 API 搜索、发现与调用说明，适合社媒数据分析和选题监控（78⭐）|
 | [joewongjc/feishu-claude-code](https://github.com/joewongjc/feishu-claude-code) | 飞书 × Claude Code WebSocket 桥接：让团队在飞书中实时调度 Claude Code CLI，对话链路清晰，适合企业内协作和移动端远程操作（108⭐）|
@@ -191,48 +191,51 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [seo-geo-claude-skills](https://github.com/aaron-he-zhu/seo-geo-claude-skills) | SEO/GEO Claude Skills：20 个关键词研究、内容写作、技术审计、排名追踪技能，支持 Claude Code / Cursor / Codex 等 35+ Agent，适合增长和内容团队（1.4K⭐）|
 | [openclaudia-skills](https://github.com/OpenClaudia/openclaudia-skills) | OpenClaudia 营销技能库：34 个开源 Claude Code 营销 skills，覆盖 SEO、内容、邮件、广告、分析和增长，安装方式直接，适合作为运营团队基础技能包（413⭐）|
 | [Eronred/aso-skills](https://github.com/Eronred/aso-skills) | App Store Optimization 营销 Agent Skills：关键词研究、元数据优化、竞品分析和 App 增长策略，兼容 Claude Code / Cursor 等 Agent，适合独立开发者和增长团队（1.1K⭐）|
-| [zubair-trabzada/ai-ads-claude](https://github.com/zubair-trabzada/ai-ads-claude) | Claude Code 广告策略 Skill：生成 Google / Meta / LinkedIn / TikTok / YouTube / Pinterest 广告文案、漏斗、预算分配与 PDF 策略报告（115⭐）|
+| [zubair-trabzada/ai-ads-claude](https://github.com/zubair-trabzada/ai-ads-claude) | Claude Code 广告策略 Skill：生成 Google / Meta / LinkedIn / TikTok / YouTube / Pinterest 广告文案、漏斗、预算分配与 PDF 策略报告（123⭐）|
 | [Bwkyd/wexin-read-mcp](https://github.com/Bwkyd/wexin-read-mcp) | 微信公众号文章阅读 MCP：用浏览器模拟让大模型读取公众号文章内容，适合内容调研、素材整理与选题分析（363⭐）|
 | [LAVARONG/wechat-automation-api](https://github.com/LAVARONG/wechat-automation-api) | 微信 Windows 自动化发送 Agent Skill / HTTP API：基于 UI 自动化支持文本、图片、批量发送和队列管理，非 Hook/非协议（110⭐）|
 | [zhimaAi/ChatClaw](https://github.com/zhimaAi/ChatClaw) | 轻量 OpenClaw-like 个人 AI Agent：内置 Skill Market、知识库、记忆、MCP、定时任务，并连接微信企微、飞书、钉钉、QQ、Slack 等渠道（280⭐）|
-| [aitytech/agentkits-marketing](https://github.com/aitytech/agentkits-marketing) | 企业级 AI 营销自动化 AgentKit：18 个 Agents、93 条 Commands、28 个 Skills，覆盖 SaaS 增长、内容、SEO、营销活动、报告与数据分析，兼容 Claude Code / Cursor / Copilot（484⭐）|
-| [kostja94/marketing-skills](https://github.com/kostja94/marketing-skills) | Marketing & SEO Skills for AI Agents：160+ Markdown 技能覆盖 SEO、页面类型、付费广告、渠道和策略，支持 npx skills 安装，兼容 Claude Code / OpenClaw / Cursor（418⭐）|
-| [BrianRWagner/ai-marketing-claude-code-skills](https://github.com/BrianRWagner/ai-marketing-claude-code-skills) | Claude Code 营销框架技能集：23 个免费 + 10 个 Pro skills，支持 quick/standard/deep 执行模式，覆盖转化、定位、文案、渠道和增长审计（272⭐）|
-| [AgriciDaniel/claude-youtube](https://github.com/AgriciDaniel/claude-youtube) | YouTube 创作者 Claude Code Skill：14 个子技能覆盖频道审计、视频 SEO、留存脚本、标题缩略图、Shorts、内容日历、变现和竞品分析，README 文档完整且仍活跃（92⭐）|
-| [sergebulaev/linkedin-skills](https://github.com/sergebulaev/linkedin-skills) | LinkedIn 增长 Claude Code Skills：面向创作者、Founder 和营销团队，覆盖自然帖、评论、信息流分析与发布节奏，适合 B2B 自媒体运营（59⭐）|
-| [ijerryhuang/xiaohongshu-auto-operation](https://github.com/ijerryhuang/xiaohongshu-auto-operation) | 小红书账号全自动运营 OpenClaw Skill：选题、内容生成、封面、定时发布和数据报告全流程自动化，安装依赖与 MCP 配置说明清晰（65⭐）|
+| [aitytech/agentkits-marketing](https://github.com/aitytech/agentkits-marketing) | 企业级 AI 营销自动化 AgentKit：18 个 Agents、93 条 Commands、28 个 Skills，覆盖 SaaS 增长、内容、SEO、营销活动、报告与数据分析，兼容 Claude Code / Cursor / Copilot（490⭐）|
+| [kostja94/marketing-skills](https://github.com/kostja94/marketing-skills) | Marketing & SEO Skills for AI Agents：160+ Markdown 技能覆盖 SEO、页面类型、付费广告、渠道和策略，支持 npx skills 安装，兼容 Claude Code / OpenClaw / Cursor（437⭐）|
+| [BrianRWagner/ai-marketing-claude-code-skills](https://github.com/BrianRWagner/ai-marketing-claude-code-skills) | Claude Code 营销框架技能集：23 个免费 + 10 个 Pro skills，支持 quick/standard/deep 执行模式，覆盖转化、定位、文案、渠道和增长审计（273⭐）|
+| [AgriciDaniel/claude-youtube](https://github.com/AgriciDaniel/claude-youtube) | YouTube 创作者 Claude Code Skill：14 个子技能覆盖频道审计、视频 SEO、留存脚本、标题缩略图、Shorts、内容日历、变现和竞品分析，README 文档完整且仍活跃（93⭐）|
+| [sergebulaev/linkedin-skills](https://github.com/sergebulaev/linkedin-skills) | LinkedIn 增长 Claude Code Skills：面向创作者、Founder 和营销团队，覆盖自然帖、评论、信息流分析与发布节奏，适合 B2B 自媒体运营（60⭐）|
+| [ijerryhuang/xiaohongshu-auto-operation](https://github.com/ijerryhuang/xiaohongshu-auto-operation) | 小红书账号全自动运营 OpenClaw Skill：选题、内容生成、封面、定时发布和数据报告全流程自动化，安装依赖与 MCP 配置说明清晰（67⭐）|
 | [Panniantong/Agent-Reach](https://github.com/Panniantong/Agent-Reach) | 多平台内容检索 CLI/MCP：无需官方 API 即可读搜 X / Reddit / YouTube / GitHub / B 站 / 小红书，中文 README、安装和 Agent 接入说明完整，适合热点追踪、自媒体选题与竞品情报（18.8K⭐）|
 | [xpzouying/xiaohongshu-mcp](https://github.com/xpzouying/xiaohongshu-mcp) | 小红书 MCP Server：支持搜索、笔记/用户数据读取与 Agent 工具调用，README 详尽、仍活跃，适合给 Claude Code / Cursor 接入小红书内容调研能力（13.3K⭐）|
 | [BiboyQG/WeChat-MCP](https://github.com/BiboyQG/WeChat-MCP) | WeChat MCP Server：让 OpenClaw / Claude / ChatGPT 等助手读取和回复微信消息，提供 PyPI 安装、配置和文档站，适合个人微信 Agent 助理（172⭐）|
 | [iFurySt/RedNote-MCP](https://github.com/iFurySt/RedNote-MCP) | 小红书 / RedNote MCP Server：npm 包安装，提供内容访问、检索与 Agent 工具接入说明，适合把 Claude Code / Cursor 接入小红书内容调研（1.0K⭐）|
 | [autoclaw-cc/xiaohongshu-mcp-skills](https://github.com/autoclaw-cc/xiaohongshu-mcp-skills) | 基于 xiaohongshu-mcp 的 Agent Skills 集合：覆盖安装部署、扫码登录、发布图文、搜索笔记与数据抓取，兼容 OpenClaw / Claude Code（206⭐）|
-| [agenmod/immortal-skill](https://github.com/agenmod/immortal-skill) | 开源数字分身 / 记忆蒸馏 Agent Skill：支持微信、飞书、iMessage、Telegram 等聊天记录采集，按 OpenClaw Soul Spec 蒸馏人格画像，中文 README 和安装说明完整（682⭐）|
+| [agenmod/immortal-skill](https://github.com/agenmod/immortal-skill) | 开源数字分身 / 记忆蒸馏 Agent Skill：支持微信、飞书、iMessage、Telegram 等聊天记录采集，按 OpenClaw Soul Spec 蒸馏人格画像，中文 README 和安装说明完整（692⭐）|
 | [aiworkskills/wechat-article-skills](https://github.com/aiworkskills/wechat-article-skills) | 微信公众号 AI 运营 Skills：选题、写稿、审稿、排版、配图、发布全流程，支持 OpenClaw / Claude Code / Cursor / Codex，中文文档完善（29⭐）|
 | [KroMiose/nekro-agent](https://github.com/KroMiose/nekro-agent) | 跨平台多人互动 Agent 框架：集 Claude Code 沙盒执行、MCP 管理、长期记忆和可视化控制台于一体，支持 QQ / Discord / Telegram / BilibiliLive / WeChat / Email 等渠道，中文文档与 Docker/PyPI 安装完善（825⭐）|
 | [Dcatfly/weixin_claude_code](https://github.com/Dcatfly/weixin_claude_code) | 微信 Channel 插件 for Claude Code：通过微信双向通信、远程审批工具调用，支持文本/图片/语音/视频/文件，安装流程清晰，适合手机端远程调度本地 Claude Code（53⭐）|
-| [nexscope-ai/eCommerce-Skills](https://github.com/nexscope-ai/eCommerce-Skills) | 电商运营 Agent Skills：142 个免费技能覆盖 Amazon / Shopify / eBay / Etsy / TikTok Shop / Walmart 的选品、营销自动化、供应链与数据分析，支持 OpenClaw / Claude Code / Cursor / Codex（137⭐）|
-| [pawbytes/skill-suites](https://github.com/pawbytes/skill-suites) | 59 个 AI Agent Skill Suites：包含 23 个营销自动化技能、创意代理流程、产品开发与开发者效率模块，支持 npx skills 安装，适合运营流程编排参考（25⭐）|
-| [gtmagents/gtm-agents](https://github.com/gtmagents/gtm-agents) | GTM / Revenue Ops Agent Skills：覆盖销售、市场、客户成功和增长运营工作流，面向 Claude Code 的生产级 go-to-market 技能集合，适合 SaaS 团队搭建获客与转化自动化（184⭐）|
-| [ArtemXTech/personal-os-skills](https://github.com/ArtemXTech/personal-os-skills) | Obsidian × Claude Code 个人操作系统 Skills：把项目、日记、任务和知识库组织成 AI-first 工作台，适合创作者、研究者和知识工作者长期沉淀上下文（460⭐）|
-| [huytieu/COG-second-brain](https://github.com/huytieu/COG-second-brain) | 自演化第二大脑：17 个 AI skills + 6 个 worker agents + People CRM，兼容 Claude Code / Cursor / Kiro / Gemini CLI / Codex，适合个人知识管理与关系运营（398⭐）|
+| [nexscope-ai/eCommerce-Skills](https://github.com/nexscope-ai/eCommerce-Skills) | 电商运营 Agent Skills：142 个免费技能覆盖 Amazon / Shopify / eBay / Etsy / TikTok Shop / Walmart 的选品、营销自动化、供应链与数据分析，支持 OpenClaw / Claude Code / Cursor / Codex（143⭐）|
+| [pawbytes/skill-suites](https://github.com/pawbytes/skill-suites) | 59 个 AI Agent Skill Suites：包含 23 个营销自动化技能、创意代理流程、产品开发与开发者效率模块，支持 npx skills 安装，适合运营流程编排参考（28⭐）|
+| [gtmagents/gtm-agents](https://github.com/gtmagents/gtm-agents) | GTM / Revenue Ops Agent Skills：覆盖销售、市场、客户成功和增长运营工作流，面向 Claude Code 的生产级 go-to-market 技能集合，适合 SaaS 团队搭建获客与转化自动化（187⭐）|
+| [ArtemXTech/personal-os-skills](https://github.com/ArtemXTech/personal-os-skills) | Obsidian × Claude Code 个人操作系统 Skills：把项目、日记、任务和知识库组织成 AI-first 工作台，适合创作者、研究者和知识工作者长期沉淀上下文（465⭐）|
+| [huytieu/COG-second-brain](https://github.com/huytieu/COG-second-brain) | 自演化第二大脑：17 个 AI skills + 6 个 worker agents + People CRM，兼容 Claude Code / Cursor / Kiro / Gemini CLI / Codex，适合个人知识管理与关系运营（405⭐）|
 | [laborany/laborany](https://github.com/laborany/laborany) | 基于 Claude Code 的桌面 AI 工作力平台：支持飞书 / QQ 远程调度、技能创建和定时任务，定位 OpenClaw 桌面实现，适合非开发者低门槛养成 AI 助手（65⭐）|
-| [yaoleifly/wechat-writing-style](https://github.com/yaoleifly/wechat-writing-style) | 微信公众号中文写作风格 Claude Code Skill：沉淀账号语气、标题和排版偏好，适合公号作者把个人风格复用到选题、改稿与发布准备（50⭐）|
-| [Jane-xiaoer/feishu-portfolio-launch](https://github.com/Jane-xiaoer/feishu-portfolio-launch) | 飞书多维表格 → GitHub Pages 作品集网站 Claude Code Skill：把内容表格、静态站点生成和上线流程串起来，适合运营作品集与个人品牌展示（63⭐）|
+| [yaoleifly/wechat-writing-style](https://github.com/yaoleifly/wechat-writing-style) | 微信公众号中文写作风格 Claude Code Skill：沉淀账号语气、标题和排版偏好，适合公号作者把个人风格复用到选题、改稿与发布准备（51⭐）|
+| [Jane-xiaoer/feishu-portfolio-launch](https://github.com/Jane-xiaoer/feishu-portfolio-launch) | 飞书多维表格 → GitHub Pages 作品集网站 Claude Code Skill：把内容表格、静态站点生成和上线流程串起来，适合运营作品集与个人品牌展示（64⭐）|
 | [viktorxhzj/feishu-webhook-skill](https://github.com/viktorxhzj/feishu-webhook-skill) | 飞书 / Lark Webhook 通知 Claude Code Skill：让本地 Agent 把任务进度、日报和自动化结果推送到飞书群，安装与调用方式简单（30⭐）|
-| [Varnan-Tech/opendirectory](https://github.com/Varnan-Tech/opendirectory) | GTM / 技术营销 / 增长自动化 Agent Skills 目录：51 个预置技能，支持 Claude、Codex、Gemini CLI，通过 npm 一键安装，README 展示完整分类与安装路径（162⭐）|
-| [nicepkg/ai-workflow](https://github.com/nicepkg/ai-workflow) | 跨平台 AI Workflow 技能集合：170+ 预置技能覆盖内容创作、营销增长、视频、交易、产品管理与演示，支持 Claude Code / Cursor / Codex / OpenCode 等 14+ AI 工具，一条命令安装，中文 README 完整（175⭐）|
-| [yhslgg-arch/url-reader](https://github.com/yhslgg-arch/url-reader) | 智能网页内容读取 Claude Code Skill：自动识别微信公众号 / 小红书 / 今日头条 / 抖音 / 淘宝等平台，Firecrawl → Jina → Playwright 三层降级，输出 Markdown 并可保存图片，适合内容调研与选题归档（169⭐）|
+| [Varnan-Tech/opendirectory](https://github.com/Varnan-Tech/opendirectory) | GTM / 技术营销 / 增长自动化 Agent Skills 目录：51 个预置技能，支持 Claude、Codex、Gemini CLI，通过 npm 一键安装，README 展示完整分类与安装路径（184⭐）|
+| [nicepkg/ai-workflow](https://github.com/nicepkg/ai-workflow) | 跨平台 AI Workflow 技能集合：170+ 预置技能覆盖内容创作、营销增长、视频、交易、产品管理与演示，支持 Claude Code / Cursor / Codex / OpenCode 等 14+ AI 工具，一条命令安装，中文 README 完整（176⭐）|
+| [yhslgg-arch/url-reader](https://github.com/yhslgg-arch/url-reader) | 智能网页内容读取 Claude Code Skill：自动识别微信公众号 / 小红书 / 今日头条 / 抖音 / 淘宝等平台，Firecrawl → Jina → Playwright 三层降级，输出 Markdown 并可保存图片，适合内容调研与选题归档（170⭐）|
+| [AbsolutelySkilled/AbsolutelySkilled](https://github.com/AbsolutelySkilled/AbsolutelySkilled) | 生产级 AI Agent Skills 注册表：覆盖框架 API、营销策略等领域，兼容 Claude Code / Gemini CLI / Codex / Cursor 与 40+ Agent，提供网站与 skills.sh 安装入口（142⭐）|
+| [ParthJadhav/ios-marketing-capture](https://github.com/ParthJadhav/ios-marketing-capture) | iOS App 营销截图采集 Skill：为 SwiftUI 应用自动植入 DEBUG 截图系统、填充演示数据并按多语言批量导出素材，适合独立开发者做 App Store 上架与本地化营销（236⭐）|
+| [degausai/wonda](https://github.com/degausai/wonda) | 终端内容生成 CLI：统一生成图片、视频、音乐、音频、编辑与社交发布流程，npm 安装清晰，适合创作者把多模态内容生产纳入 Agent 工作流（78⭐）|
 | [fastclaw-ai/weclaw](https://github.com/fastclaw-ai/weclaw) | 微信 AI Agent Bridge：一行安装把个人微信接入 Claude / Codex / Gemini / Kimi 等 Agent，扫码登录、多账号与 Docker/Go 安装路径清晰，适合移动端调度本地代理（1.4K⭐）|
-| [sunnoy/openclaw-plugin-wecom](https://github.com/sunnoy/openclaw-plugin-wecom) | OpenClaw 企业微信增强插件：基于 WebSocket 长连接，支持多账号、动态 Agent 隔离、Webhook 出站、企业微信 MCP 文档/智能表格能力与白名单控制（689⭐）|
-| [zhaoxinyi02/ClawPanel](https://github.com/zhaoxinyi02/ClawPanel) | OpenClaw 智能管理面板：Go 单二进制 + React，可统一管理 20+ 通道、实时日志和外部运行时，适合团队化运维 OpenClaw / IM Agent（825⭐）|
+| [sunnoy/openclaw-plugin-wecom](https://github.com/sunnoy/openclaw-plugin-wecom) | OpenClaw 企业微信增强插件：基于 WebSocket 长连接，支持多账号、动态 Agent 隔离、Webhook 出站、企业微信 MCP 文档/智能表格能力与白名单控制（692⭐）|
+| [zhaoxinyi02/ClawPanel](https://github.com/zhaoxinyi02/ClawPanel) | OpenClaw 智能管理面板：Go 单二进制 + React，可统一管理 20+ 通道、实时日志和外部运行时，适合团队化运维 OpenClaw / IM Agent（822⭐）|
 | [miantiao-me/bm.md](https://github.com/miantiao-me/bm.md) | Markdown 排版助手：一键适配微信公众号、网页与图片，提供 CLI / REST API / MCP 集成和 14 种排版样式，适合公众号发布前排版自动化（573⭐）|
 | [bzd6661/wechat-article-for-ai](https://github.com/bzd6661/wechat-article-for-ai) | 微信公众号文章转 Markdown 工具：面向 AI Agent 的 MCP Server + SKILL.md，支持反检测抓取、批量处理、图片本地化与结构化元数据（61⭐）|
 | [wechatsync/Wechatsync](https://github.com/wechatsync/Wechatsync) | 多平台文章同步发布工具：一键把内容分发到公众号生态相关的今日头条、知乎、简书、掘金、CSDN、WordPress 等平台，TypeScript 实现、插件生态成熟，适合内容运营分发链路（5.4K⭐）|
-| [iBigQiang/feedgrab](https://github.com/iBigQiang/feedgrab) | 多平台内容抓取与摘要工具：统一抓取微信、小红书、X/Twitter、YouTube、B 站、Telegram、RSS 等来源，输出规范化内容与摘要，适合自媒体选题监控和知识沉淀（342⭐）|
+| [iBigQiang/feedgrab](https://github.com/iBigQiang/feedgrab) | 多平台内容抓取与摘要工具：统一抓取微信、小红书、X/Twitter、YouTube、B 站、Telegram、RSS 等来源，输出规范化内容与摘要，适合自媒体选题监控和知识沉淀（347⭐）|
 | [zhylq/yuan-skills](https://github.com/zhylq/yuan-skills) | 公众号写作 Agent Skills：主写作 + 配图 + Markdown 转微信 HTML + 草稿箱发布 4 个技能，支持 `npx skills add` 安装，适合中文创作者把选题、证据池、润色和发布前处理串成闭环（35⭐）|
 | [next-open-ai/openclawx](https://github.com/next-open-ai/openclawx) | 国产桌面级 AI Agent 平台：CLI / Web / Desktop 多端，已接入飞书、钉钉、Telegram、微信，支持 Claude Code / OpenCode 代理、MCP、Skills、插件和本地推理 0 Token，中文文档体系完整（53⭐）|
-| [YYH211/xiaohongshu](https://github.com/YYH211/xiaohongshu) | 小红书内容自动生成与发布 MCP 应用：从主题输入到文案/图片生成再到自动发布，适合验证小红书运营工作流的端到端自动化（139⭐）|
-| [luyike221/xiaohongshu-mcp-python](https://github.com/luyike221/xiaohongshu-mcp-python) | 小红书 MCP Python 服务：支持登录管理、图文/视频发布、内容搜索、帖子详情和评论互动，格式与配置说明完整，适合创作者和营销团队接入 AI 工作流（103⭐）|
+| [YYH211/xiaohongshu](https://github.com/YYH211/xiaohongshu) | 小红书内容自动生成与发布 MCP 应用：从主题输入到文案/图片生成再到自动发布，适合验证小红书运营工作流的端到端自动化（140⭐）|
+| [luyike221/xiaohongshu-mcp-python](https://github.com/luyike221/xiaohongshu-mcp-python) | 小红书 MCP Python 服务：支持登录管理、图文/视频发布、内容搜索、帖子详情和评论互动，格式与配置说明完整，适合创作者和营销团队接入 AI 工作流（104⭐）|
 
 ### 💻 开发效率
 
