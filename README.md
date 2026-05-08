@@ -217,6 +217,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [huytieu/COG-second-brain](https://github.com/huytieu/COG-second-brain) | 自演化第二大脑：17 个 AI skills + 6 个 worker agents + People CRM，兼容 Claude Code / Cursor / Kiro / Gemini CLI / Codex，适合个人知识管理与关系运营（405⭐）|
 | [laborany/laborany](https://github.com/laborany/laborany) | 基于 Claude Code 的桌面 AI 工作力平台：支持飞书 / QQ 远程调度、技能创建和定时任务，定位 OpenClaw 桌面实现，适合非开发者低门槛养成 AI 助手（65⭐）|
 | [yaoleifly/wechat-writing-style](https://github.com/yaoleifly/wechat-writing-style) | 微信公众号中文写作风格 Claude Code Skill：沉淀账号语气、标题和排版偏好，适合公号作者把个人风格复用到选题、改稿与发布准备（51⭐）|
+| [oaker-io/wewrite](https://github.com/oaker-io/wewrite) | 公众号文章全流程 AI Skill：热点抓取、选题评分、素材采集、SEO 优化、AI 配图、微信排版与草稿箱推送，兼容 Claude Code / OpenClaw，安装和首次风格引导清晰（1.8K⭐）|
 | [Jane-xiaoer/feishu-portfolio-launch](https://github.com/Jane-xiaoer/feishu-portfolio-launch) | 飞书多维表格 → GitHub Pages 作品集网站 Claude Code Skill：把内容表格、静态站点生成和上线流程串起来，适合运营作品集与个人品牌展示（64⭐）|
 | [viktorxhzj/feishu-webhook-skill](https://github.com/viktorxhzj/feishu-webhook-skill) | 飞书 / Lark Webhook 通知 Claude Code Skill：让本地 Agent 把任务进度、日报和自动化结果推送到飞书群，安装与调用方式简单（30⭐）|
 | [Varnan-Tech/opendirectory](https://github.com/Varnan-Tech/opendirectory) | GTM / 技术营销 / 增长自动化 Agent Skills 目录：51 个预置技能，支持 Claude、Codex、Gemini CLI，通过 npm 一键安装，README 展示完整分类与安装路径（184⭐）|
@@ -238,6 +239,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [luyike221/xiaohongshu-mcp-python](https://github.com/luyike221/xiaohongshu-mcp-python) | 小红书 MCP Python 服务：支持登录管理、图文/视频发布、内容搜索、帖子详情和评论互动，格式与配置说明完整，适合创作者和营销团队接入 AI 工作流（104⭐）|
 | [adennng/wechat-query-skill](https://github.com/adennng/wechat-query-skill) | OpenClaw 微信公众号订阅/查询/推送 Skill：内置本地 wechat-download-api、SQLite 缓存、订阅轮询、文章查询、每日汇总和登录巡检流程，中文 README 有部署链路与场景说明（31⭐）|
 | [rediumvex/viral-hooks-skill](https://github.com/rediumvex/viral-hooks-skill) | 短视频爆款开头 Claude Code Skill：内置 100 个 hook 公式与 10 类心理触发器，为 TikTok / Reels / YouTube Shorts / LinkedIn / X 生成 3 个可测试开头，适合内容运营脚本优化（33⭐）|
+| [bi-boo/claude-model-fingerprint](https://github.com/bi-boo/claude-model-fingerprint) | 个人 Claude Code Skills 合集：覆盖公众号文章、多视角对话素材、会议方法论提炼、文字稿润色、小宇宙播客下载与模型指纹检测，适合内容团队沉淀日常工作流（58⭐）|
 
 ### 💻 开发效率
 
