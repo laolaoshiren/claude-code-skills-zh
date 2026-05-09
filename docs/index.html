@@ -447,7 +447,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/</pre>
         <p>原创技能</p>
       </div>
       <div class="stat-item">
-        <h3>62</h3>
+        <h3>65</h3>
         <p>GitHub Stars</p>
       </div>
       <div class="stat-item">
@@ -508,6 +508,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/</pre>
 // Skills data
 const skillsData = {
   star: [
+    {name:'ClawX',stars:'7.1K+',desc:'OpenClaw 桌面图形界面：把 CLI Agent 编排变成可视化桌面体验，中文官网与快速开始完整',tag:'star',url:'https://github.com/ValueCell-ai/ClawX'},
     {name:'obsidian-skills',stars:'29.9K+',desc:'Obsidian 官方生态技能包：Markdown / Bases / JSON Canvas / CLI / Defuddle，兼容 Claude Code / Codex / OpenCode',tag:'star',url:'https://github.com/kepano/obsidian-skills'},
     {name:'caveman',stars:'56.8K+',desc:'用最少的 token 说最短的话，节省 65% token',tag:'star',url:'https://github.com/JuliusBrussee/caveman'},
     {name:'planning-with-files',stars:'20K+',desc:'Manus 风格的持久化 Markdown 规划工作流',tag:'dev',url:'https://github.com/OthmanAdi/planning-with-files'},
@@ -515,8 +516,8 @@ const skillsData = {
     {name:'Humanizer-zh',stars:'7.0K+',desc:'Humanizer 中文版，消除中文 AI 写作痕迹',tag:'star',url:'https://github.com/op7418/Humanizer-zh'},
     {name:'awesome-claude-code-subagents',stars:'18K+',desc:'100+ 子代理合集，覆盖各类开发场景',tag:'star',url:'https://github.com/VoltAgent/awesome-claude-code-subagents'},
     {name:'claude-skills',stars:'14.1K+',desc:'232+ 技能包，支持 Claude Code / Codex / Gemini CLI / Cursor',tag:'star',url:'https://github.com/alirezarezvani/claude-skills'},
-    {name:'slavingia-skills',stars:'8K+',desc:'基于《极简创业者》理念的实用技能集',tag:'star',url:'https://github.com/slavingia/skills'},
-    {name:'trailofbits-skills',stars:'5K+',desc:'Trail of Bits 安全研究与审计技能',tag:'security',url:'https://github.com/trailofbits/skills'},
+    {name:'slavingia-skills',stars:'8.5K+',desc:'基于《极简创业者》理念的实用技能集',tag:'star',url:'https://github.com/slavingia/skills'},
+    {name:'trailofbits-skills',stars:'5.1K+',desc:'Trail of Bits 安全研究与审计技能',tag:'security',url:'https://github.com/trailofbits/skills'},
     {name:'openclaw',stars:'369K+',desc:'OpenClaw 官方个人 AI 助手：跨 OS / 跨平台调度 Skills、插件与本地工具',tag:'star',url:'https://github.com/openclaw/openclaw'},
     {name:'hermes-agent',stars:'135K+',desc:'NousResearch 的可成长 Agent：Skills / 记忆 / 工具链一体化，兼容 Claude Code / OpenClaw 生态',tag:'star',url:'https://github.com/NousResearch/hermes-agent'},
     {name:'andrej-karpathy-skills',stars:'114K+',desc:'Karpathy 编码观察提炼的 CLAUDE.md 行为技能，减少常见 LLM 编程误区',tag:'star',url:'https://github.com/forrestchang/andrej-karpathy-skills'},
@@ -525,7 +526,7 @@ const skillsData = {
     {name:'awesome-agent-skills',stars:'20.4K+',desc:'1,000+ Agent Skills 精选，兼容 Claude Code / Codex / Gemini CLI / Cursor',tag:'star',url:'https://github.com/VoltAgent/awesome-agent-skills'},
     {name:'vercel-agent-skills',stars:'26K+',desc:'Vercel 官方 Agent Skills 集合，适合前端、部署与现代 Web 工程工作流',tag:'star',url:'https://github.com/vercel-labs/agent-skills'},
     {name:'awesome-copilot',stars:'32K+',desc:'GitHub Copilot 官方社区 instructions / agents / skills / 配置合集，可迁移到多 Agent 工作流',tag:'star',url:'https://github.com/github/awesome-copilot'},
-    {name:'awesome-claude-skills',stars:'58.3K+',desc:'Composio 维护的 Awesome Claude Skills 导航：按场景分类收录高质量 Claude Skills，README 目录完整、持续活跃',tag:'star',url:'https://github.com/ComposioHQ/awesome-claude-skills'},
+    {name:'awesome-claude-skills',stars:'58.9K+',desc:'Composio 维护的 Awesome Claude Skills 导航：按场景分类收录高质量 Claude Skills，README 目录完整、持续活跃',tag:'star',url:'https://github.com/ComposioHQ/awesome-claude-skills'},
     {name:'mattpocock/skills',stars:'63.8K+',desc:'Total TypeScript 作者 Matt Pocock 的真实工程 Skills：覆盖代码审查、类型安全、测试、重构与工程节奏',tag:'star',url:'https://github.com/mattpocock/skills'},
     {name:'open-design',stars:'31.3K+',desc:'开源 Claude Design 替代方案：19 个设计 Skills + 71 套品牌级设计系统，支持 Claude Code / Codex / Cursor / Gemini / Hermes 等多种 coding-agent CLI，本地优先、BYOK、Quickstart 清晰',tag:'star',url:'https://github.com/nexu-io/open-design'},
     {name:'OpenViking',stars:'23.4K+',desc:'火山引擎开源 Agent Context Database：用文件系统范式统一管理 memory / resources / skills，支持 OpenClaw 等 Agent 分层投递上下文和自演化',tag:'star',url:'https://github.com/volcengine/OpenViking'},
@@ -656,7 +657,7 @@ const skillsData = {
   ],
   dev: [
     {name:'plugins-plus-skills',stars:'2.1K',desc:'Claude Code 插件市场：425 插件 + 2,810 技能 + 200 代理，提供 ccpi CLI 与网站检索，适合批量发现、安装和治理团队技能',url:'https://github.com/jeremylongshore/claude-code-plugins-plus-skills'},
-    {name:'skill-factory',stars:'706',desc:'技能工厂：一键生成、测试、发布 Claude Code 技能',url:'https://github.com/alirezarezvani/claude-code-skill-factory'},
+    {name:'skill-factory',stars:'759',desc:'技能工厂：一键生成、测试、发布 Claude Code 技能',url:'https://github.com/alirezarezvani/claude-code-skill-factory'},
     {name:'daymade-skills',stars:'876',desc:'专业技能市场，生产就绪的高质量技能集',url:'https://github.com/daymade/claude-code-skills'},
     {name:'pinme',stars:'3.2K',desc:'前端一键部署，Claude Code 技能驱动',url:'https://github.com/glitternetwork/pinme'},
     {name:'playwright-skill',stars:'2.5K',desc:'Playwright 浏览器自动化，Claude 自主编写+执行测试',url:'https://github.com/lackeyjb/playwright-skill'},
@@ -692,7 +693,7 @@ const skillsData = {
     {name:'osovv/grace-marketplace',stars:'160',desc:'GRACE contract-first 工程技能市场：Graph-RAG Anchored Code Engineering skills 与 CLI，支持 Claude Code / Codex / Kilo Code',url:'https://github.com/osovv/grace-marketplace'},
     {name:'borghei/Claude-Skills',stars:'111',desc:'266 个跨部门 AI skills 与 67 个 cs-* agents，覆盖工程、营销、合规、C-level 与垂直行业，支持 11 种助手',url:'https://github.com/borghei/Claude-Skills'},
     {name:'context-engineering-kit',stars:'978',desc:'手工打磨的上下文工程 Skills Kit：聚焦提升 Agent 输出质量，兼容 Claude Code / OpenCode / Cursor / Antigravity / Gemini CLI',url:'https://github.com/NeoLabHQ/context-engineering-kit'},
-    {name:'power-platform-skills',stars:'266',desc:'Microsoft Power Platform 官方插件市场：为 Claude Code / GitHub Copilot 提供可复用 skills、agents、commands，适合企业低代码与办公自动化开发',url:'https://github.com/microsoft/power-platform-skills'},
+    {name:'power-platform-skills',stars:'269',desc:'Microsoft Power Platform 官方插件市场：为 Claude Code / GitHub Copilot 提供可复用 skills、agents、commands，适合企业低代码与办公自动化开发',url:'https://github.com/microsoft/power-platform-skills'},
     {name:'LerianStudio/ring',stars:'182',desc:'Claude Code 插件市场：89 个 skills + 38 个专业 agents，覆盖 TDD、系统化调试、并行代码审查和 10-gate 开发流程',url:'https://github.com/LerianStudio/ring'},
     {name:'binance-skills-hub',stars:'823',desc:'Binance 官方开放 Skills Hub：为 AI Agent 提供加密资产查询、交易、钱包追踪、信号监控和 DeFi 交互能力，支持 OpenClaw / Claude Code，npx skills add 安装路径清晰',url:'https://github.com/binance/binance-skills-hub'},
     {name:'developer-kit',stars:'239',desc:'模块化 Claude Code 插件市场：150+ Skills、45+ Agents，覆盖 Java / TypeScript / Python / PHP / AWS 等工程栈，支持 /plugin marketplace add、OpenCode、Codex 和 GitHub Copilot CLI，并提供中文 README',url:'https://github.com/giuseppe-trisciuoglio/developer-kit'},
