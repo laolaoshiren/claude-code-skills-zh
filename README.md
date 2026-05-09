@@ -243,6 +243,11 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [rediumvex/viral-hooks-skill](https://github.com/rediumvex/viral-hooks-skill) | 短视频爆款开头 Claude Code Skill：内置 100 个 hook 公式与 10 类心理触发器，为 TikTok / Reels / YouTube Shorts / LinkedIn / X 生成 3 个可测试开头，适合内容运营脚本优化（33⭐）|
 | [bi-boo/claude-model-fingerprint](https://github.com/bi-boo/claude-model-fingerprint) | 个人 Claude Code Skills 合集：覆盖公众号文章、多视角对话素材、会议方法论提炼、文字稿润色、小宇宙播客下载与模型指纹检测，适合内容团队沉淀日常工作流（58⭐）|
 | [CosmoBlk/email-marketing-bible](https://github.com/CosmoBlk/email-marketing-bible) | Email Marketing Bible Claude Code Skill：68,000 词、908 个来源、19 个行业 playbook 和 57 个邮件设计案例，覆盖邮件审计、自动化流程、冷邮件、合规与投放文案，一行 git clone 安装，适合跨境电商 / SaaS 增长团队（172⭐）|
+| [geo-seo-claude](https://github.com/zubair-trabzada/geo-seo-claude) | GEO-first SEO Claude Code Skill：面向 ChatGPT / Claude / Perplexity / Gemini / Google AI Overviews 做 AI 搜索优化，提供 citability 评分、AI crawler 分析、品牌权威、Schema 标记和 PDF 报告，一行 curl 安装，适合企业官网与内容团队做 GEO/SEO 审计（7.1K⭐）|
+| [Generative-Media-Skills](https://github.com/SamurAIGPT/Generative-Media-Skills) | 多模态内容生成 Agent Skills：用 muapi-cli 让 Claude Code / Cursor / Gemini CLI 生成、编辑并展示图片/视频/音频，内置 100+ 模型与 MCP Server，适合品牌视觉、短视频和创意素材生产（3.2K⭐）|
+| [n8n-claw](https://github.com/freddy-schuetz/n8n-claw) | 基于 n8n 的自托管 OpenClaw-like AI Agent：PostgreSQL 记忆、MCP Skills Library、专家代理、Telegram/HTTP 接入和定时任务，安装文档完整，适合无代码团队把运营自动化部署到私有基础设施（427⭐）|
+| [social-media-skills](https://github.com/blacktwist/social-media-skills) | 社媒策略与内容 Agent Skills：覆盖平台上下文、内容策略、发布日历、平台策略、创作与分析，适合把 LinkedIn / X / Instagram / TikTok 等账号运营方法论沉淀成可复用技能（156⭐）|
+| [skilless.ai](https://github.com/BrikerMan/skilless.ai) | 给 Agent 增强真实数据能力的一键安装工具：提供网页搜索、网页读取、YouTube 字幕/视频处理、RSS 等数据技能，支持 Claude Code / Cursor / OpenCode 和中文文档，适合热点调研与内容素材采集（149⭐）|
 
 ### 💻 开发效率
 
