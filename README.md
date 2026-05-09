@@ -86,8 +86,8 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 |------|------|-----|
 | [everything-claude-code](https://github.com/affaan-m/everything-claude-code) | 🧠 Claude Code 全栈技能系统：Skills + 记忆 + 安全 + 研究驱动开发 | 175K+ |
 | [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) | 📚 1,400+ 可安装技能库，覆盖 Claude Code / Cursor / Codex / Gemini CLI | 36K+ |
-| [obsidian-skills](https://github.com/kepano/obsidian-skills) | 🧠 Obsidian 官方生态技能包：Markdown / Bases / JSON Canvas / CLI / Defuddle，兼容 Claude Code / Codex / OpenCode | 28K+ |
-| [caveman](https://github.com/JuliusBrussee/caveman) | 🪨 用最少的 token 说最短的话，节省 65% token | 55.6K+ |
+| [obsidian-skills](https://github.com/kepano/obsidian-skills) | 🧠 Obsidian 官方生态技能包：Markdown / Bases / JSON Canvas / CLI / Defuddle，兼容 Claude Code / Codex / OpenCode | 29.9K+ |
+| [caveman](https://github.com/JuliusBrussee/caveman) | 🪨 用最少的 token 说最短的话，节省 65% token | 56.8K+ |
 | [career-ops](https://github.com/santifer/career-ops) | 💼 AI 求职系统：14 种技能模式 + Go 仪表盘 + PDF 生成 | 42K+ |
 | [graphify](https://github.com/safishamsi/graphify) | 🕸️ 将代码/文档/论文转为可查询知识图谱 | 43K+ |
 | [marketingskills](https://github.com/coreyhaines31/marketingskills) | 📈 营销技能包：CRO、文案、SEO、数据分析、增长工程 | 27.4K+ |
@@ -96,7 +96,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [Claude-Code-Game-Studios](https://github.com/Donchitos/Claude-Code-Game-Studios) | 🎮 49 个 AI 代理 + 72 个工作流，完整游戏开发工作室 | 17K+ |
 | [open-saas](https://github.com/wasp-lang/open-saas) | 🔥 100% 免费 SaaS 模板，React + Node + Prisma，AI-ready | 14K+ |
 | [ai-guide](https://github.com/liyupi/ai-guide) | 🇨🇳 程序员鱼皮 AI 资源大全：Claude Code / Cursor / DeepSeek 全攻略 | 12K+ |
-| [claude-skills](https://github.com/alirezarezvani/claude-skills) | 📦 232+ 技能包，支持 Claude Code / Codex / Gemini CLI / Cursor | 14.2K+ |
+| [claude-skills](https://github.com/alirezarezvani/claude-skills) | 📦 232+ 技能包，支持 Claude Code / Codex / Gemini CLI / Cursor | 14.1K+ |
 | [notebooklm-py](https://github.com/teng-lin/notebooklm-py) | 📓 Google NotebookLM 非官方 Python API + Agent 技能 | 11K+ |
 | [Humanizer-zh](https://github.com/op7418/Humanizer-zh) | ✍️ Humanizer 中文版，消除中文 AI 写作痕迹 | 7.0K+ |
 | [superpowers](https://github.com/obra/superpowers) | 🦸 agentic 技能框架 + 软件开发方法论，163K 认证 | 163K+ |
@@ -117,7 +117,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) | 🧩 1,000+ Agent Skills 精选，兼容 Claude Code / Codex / Gemini CLI / Cursor | 20.4K+ |
 | [vercel-agent-skills](https://github.com/vercel-labs/agent-skills) | ▲ Vercel 官方 Agent Skills 集合，适合前端、部署与现代 Web 工程工作流 | 26K+ |
 | [awesome-copilot](https://github.com/github/awesome-copilot) | 🐙 GitHub Copilot 官方社区 instructions / agents / skills / 配置合集，可迁移到多 Agent 工作流 | 32K+ |
-| [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) | 📚 Composio 维护的 Awesome Claude Skills 导航：按 Research、Design、Productivity、Toolkits 等分类收录高质量 Claude Skills，README 目录完整、持续活跃 | 58.3K+ |
+| [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) | 📚 Composio 维护的 Awesome Claude Skills 导航：按 Research、Design、Productivity、Toolkits 等分类收录高质量 Claude Skills，README 目录完整、持续活跃 | 58.8K+ |
 | [mattpocock/skills](https://github.com/mattpocock/skills) | 🧑‍💻 Total TypeScript 作者 Matt Pocock 的真实工程 Skills：覆盖代码审查、类型安全、测试、重构与工程节奏，适合严肃工程项目复用 | 63.8K+ |
 | [open-design](https://github.com/nexu-io/open-design) | 🎨 开源 Claude Design 替代方案：19 个设计 Skills + 71 套品牌级设计系统，支持 Claude Code / Codex / Cursor / Gemini / Hermes 等多种 coding-agent CLI，本地优先、BYOK、Quickstart 清晰 | 31.3K+ |
 | [OpenViking](https://github.com/volcengine/OpenViking) | 🧠 火山引擎开源的 Agent Context Database：用文件系统范式统一管理 memory / resources / skills，支持 OpenClaw 等 Agent 分层投递上下文和自演化，文档与多语言 README 完整 | 23.4K+ |
@@ -312,9 +312,9 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [ui-design-brain](https://github.com/carmahhawwari/ui-design-brain) | Cursor UI 设计技能：基于 component.gallery 沉淀 60+ 组件最佳实践、布局模式、反模式与设计哲学，安装清晰，适合生成更像资深设计师产出的前端界面（773⭐）|
 | [claude-code-action](https://github.com/anthropics/claude-code-action) | Anthropic 官方 GitHub Action：让 Claude Code 在 PR / Issue 中自动答疑、审查、实现与定时维护，文档完整、支持多认证方式，适合仓库自动化运营（7.3K⭐）|
 | [openskills](https://github.com/numman-ali/openskills) | 通用 Skills 安装器：把 Claude Code 的 SKILL.md 体系带到 Cursor / Windsurf / Aider / Codex 等多 Agent 环境，支持 GitHub、本地路径、私有仓库安装与 AGENTS.md 同步（10.4K⭐）|
-| [AionUi](https://github.com/iOfficeAI/AionUi) | 本地开源 24/7 Cowork / OpenClaw 桌面应用：内置 Agent 与 Office/PPT/Excel/Word skills，支持 Claude Code、Codex、Hermes、OpenClaw 等 20+ CLI 自动检测、WebUI 远程访问和定时任务，适合办公自动化与多代理协作（24.1K⭐）|
+| [AionUi](https://github.com/iOfficeAI/AionUi) | 本地开源 24/7 Cowork / OpenClaw 桌面应用：内置 Agent 与 Office/PPT/Excel/Word skills，支持 Claude Code、Codex、Hermes、OpenClaw 等 20+ CLI 自动检测、WebUI 远程访问和定时任务，适合办公自动化与多代理协作（24.2K⭐）|
 | [mcp-use](https://github.com/mcp-use/mcp-use) | 全栈 MCP 框架：同时提供 TypeScript / Python SDK、MCP Inspector、云端部署与 MCP App/Server 构建链路，适合把 Claude / ChatGPT / Claude Code 的工具能力产品化（9.9K⭐）|
-| [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | 跨平台 UI/UX 设计智能 Skill：为产品界面生成提供专业设计判断、布局策略与视觉规范（73K⭐）|
+| [ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | 跨平台 UI/UX 设计智能 Skill：沉淀 161 条推理规则、67 种 UI 风格与多平台设计规范，安装说明完整，适合产品界面、落地页和 App 原型生成（75.8K⭐）|
 | [aiskillstore/marketplace](https://github.com/aiskillstore/marketplace) | 安全审计型 Agent Skills 市场：面向 Claude / Codex / Claude Code 提供一键安装与质量校验，README 明确列出 Claude Code 和 Codex 安装方式（263⭐）|
 | [bencium/bencium-marketplace](https://github.com/bencium/bencium-marketplace) | 设计、架构与生产力 Claude Code 插件市场：13 个技能，可用 `npx skills` 或 Claude Code `/plugin marketplace` 安装，适合 UI/UX 与产品工程团队（206⭐）|
 | [Rito-w/skills-manager](https://github.com/Rito-w/skills-manager) | 跨平台 AI Skills Manager：聚合 Claude Plugins / SkillsLLM / SkillsMP 等市场，支持搜索、下载、本地仓库和一键安装到 Claude / Cursor / Windsurf（167⭐）|
@@ -483,14 +483,14 @@ description: 技能的一句话描述
 - [Claude Code 官方文档](https://docs.anthropic.com/en/docs/claude-code)
 - [OpenClaw Skills Registry](https://registry.openclaw.ai)
 - [awesome-chatgpt-prompts-zh](https://github.com/PlexPt/awesome-chatgpt-prompts-zh) — 59K ⭐
-- [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) — 58.3K ⭐
+- [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) — 58.8K ⭐
 - [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) — 42K ⭐
 - [awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents) — 18K ⭐
 - [awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) — 20.4K ⭐
 - [awesome-claude-skills-vn](https://github.com/travisvn/awesome-claude-skills) — 11K ⭐
 - [awesome-openclaw-skills](https://github.com/VoltAgent/awesome-openclaw-skills) — 48K ⭐
-- [everything-claude-code](https://github.com/affaan-m/everything-claude-code) — 175K ⭐
-- [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) — 36K ⭐
+- [everything-claude-code](https://github.com/affaan-m/everything-claude-code) — 176K ⭐
+- [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) — 36.9K ⭐
 - [awesome-claude-code-toolkit](https://github.com/rohitg00/awesome-claude-code-toolkit) — 1.3K ⭐
 - [playwright-skill](https://github.com/lackeyjb/playwright-skill) — 2.5K ⭐
 - [awesome-llm-skills](https://github.com/Prat011/awesome-llm-skills) — 1.1K ⭐
