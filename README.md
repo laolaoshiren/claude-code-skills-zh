@@ -5,7 +5,7 @@
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Skills](https://img.shields.io/badge/skills-200%2B-green.svg)](#-原创技能)
-[![Updated](https://img.shields.io/badge/updated-2026--05--09-brightgreen.svg)](#)
+[![Updated](https://img.shields.io/badge/updated-2026--05--10-brightgreen.svg)](#)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -84,11 +84,11 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 
 | 技能 | 说明 | ⭐ |
 |------|------|-----|
-| [everything-claude-code](https://github.com/affaan-m/everything-claude-code) | 🧠 Claude Code 全栈技能系统：Skills + 记忆 + 安全 + 研究驱动开发 | 176.7K+ |
-| [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) | 📚 1,400+ 可安装技能库，覆盖 Claude Code / Cursor / Codex / Gemini CLI | 36.9K+ |
+| [everything-claude-code](https://github.com/affaan-m/everything-claude-code) | 🧠 Claude Code 全栈技能系统：Skills + 记忆 + 安全 + 研究驱动开发 | 176.8K+ |
+| [antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) | 📚 1,400+ 可安装技能库，覆盖 Claude Code / Cursor / Codex / Gemini CLI | 37.0K+ |
 | [ClawX](https://github.com/ValueCell-ai/ClawX) | 🖥️ OpenClaw 桌面图形界面：把 CLI Agent 编排变成可视化桌面体验，中文官网与快速开始完整 | 7.1K+ |
-| [obsidian-skills](https://github.com/kepano/obsidian-skills) | 🧠 Obsidian 官方生态技能包：Markdown / Bases / JSON Canvas / CLI / Defuddle，兼容 Claude Code / Codex / OpenCode | 29.9K+ |
-| [caveman](https://github.com/JuliusBrussee/caveman) | 🪨 用最少的 token 说最短的话，节省 65% token | 56.8K+ |
+| [obsidian-skills](https://github.com/kepano/obsidian-skills) | 🧠 Obsidian 官方生态技能包：Markdown / Bases / JSON Canvas / CLI / Defuddle，兼容 Claude Code / Codex / OpenCode | 30.0K+ |
+| [caveman](https://github.com/JuliusBrussee/caveman) | 🪨 用最少的 token 说最短的话，节省 65% token | 57.0K+ |
 | [career-ops](https://github.com/santifer/career-ops) | 💼 AI 求职系统：14 种技能模式 + Go 仪表盘 + PDF 生成 | 42K+ |
 | [graphify](https://github.com/safishamsi/graphify) | 🕸️ 将代码/文档/论文转为可查询知识图谱 | 43K+ |
 | [marketingskills](https://github.com/coreyhaines31/marketingskills) | 📈 营销技能包：CRO、文案、SEO、数据分析、增长工程 | 27.5K+ |
@@ -97,7 +97,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [Claude-Code-Game-Studios](https://github.com/Donchitos/Claude-Code-Game-Studios) | 🎮 49 个 AI 代理 + 72 个工作流，完整游戏开发工作室 | 17K+ |
 | [open-saas](https://github.com/wasp-lang/open-saas) | 🔥 100% 免费 SaaS 模板，React + Node + Prisma，AI-ready | 14K+ |
 | [ai-guide](https://github.com/liyupi/ai-guide) | 🇨🇳 程序员鱼皮 AI 资源大全：Claude Code / Cursor / DeepSeek 全攻略 | 12K+ |
-| [claude-skills](https://github.com/alirezarezvani/claude-skills) | 📦 232+ 技能包，支持 Claude Code / Codex / Gemini CLI / Cursor | 14.1K+ |
+| [claude-skills](https://github.com/alirezarezvani/claude-skills) | 📦 232+ 技能包，支持 Claude Code / Codex / Gemini CLI / Cursor | 14.3K+ |
 | [notebooklm-py](https://github.com/teng-lin/notebooklm-py) | 📓 Google NotebookLM 非官方 Python API + Agent 技能 | 11K+ |
 | [Humanizer-zh](https://github.com/op7418/Humanizer-zh) | ✍️ Humanizer 中文版，消除中文 AI 写作痕迹 | 7.0K+ |
 | [superpowers](https://github.com/obra/superpowers) | 🦸 agentic 技能框架 + 软件开发方法论，163K 认证 | 163K+ |
@@ -119,8 +119,8 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [vercel-agent-skills](https://github.com/vercel-labs/agent-skills) | ▲ Vercel 官方 Agent Skills 集合，适合前端、部署与现代 Web 工程工作流 | 26K+ |
 | [awesome-copilot](https://github.com/github/awesome-copilot) | 🐙 GitHub Copilot 官方社区 instructions / agents / skills / 配置合集，可迁移到多 Agent 工作流 | 32K+ |
 | [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) | 📚 Composio 维护的 Awesome Claude Skills 导航：按 Research、Design、Productivity、Toolkits 等分类收录高质量 Claude Skills，README 目录完整、持续活跃 | 58.9K+ |
-| [mattpocock/skills](https://github.com/mattpocock/skills) | 🧑‍💻 Total TypeScript 作者 Matt Pocock 的真实工程 Skills：覆盖代码审查、类型安全、测试、重构与工程节奏，适合严肃工程项目复用 | 63.8K+ |
-| [open-design](https://github.com/nexu-io/open-design) | 🎨 开源 Claude Design 替代方案：19 个设计 Skills + 71 套品牌级设计系统，支持 Claude Code / Codex / Cursor / Gemini / Hermes 等多种 coding-agent CLI，本地优先、BYOK、Quickstart 清晰 | 31.3K+ |
+| [mattpocock/skills](https://github.com/mattpocock/skills) | 🧑‍💻 Total TypeScript 作者 Matt Pocock 的真实工程 Skills：覆盖代码审查、类型安全、测试、重构与工程节奏，适合严肃工程项目复用 | 68.0K+ |
+| [open-design](https://github.com/nexu-io/open-design) | 🎨 开源 Claude Design 替代方案：19 个设计 Skills + 71 套品牌级设计系统，支持 Claude Code / Codex / Cursor / Gemini / Hermes 等多种 coding-agent CLI，本地优先、BYOK、Quickstart 清晰 | 35.3K+ |
 | [OpenViking](https://github.com/volcengine/OpenViking) | 🧠 火山引擎开源的 Agent Context Database：用文件系统范式统一管理 memory / resources / skills，支持 OpenClaw 等 Agent 分层投递上下文和自演化，文档与多语言 README 完整 | 23.4K+ |
 | [cherry-studio](https://github.com/CherryHQ/cherry-studio) | 🍒 高星 AI 生产力桌面工作台：统一对接主流模型、智能助手和 300+ assistants，可作为 Claude Code / OpenClaw / MCP 工作流的桌面入口，中文用户基础大、文档与发布节奏活跃 | 45K+ |
 | [memU](https://github.com/NevaMind-AI/memU) | 🧠 面向 24/7 主动 Agent 的长期记忆层：为 OpenClaw 类常驻助手提供可持续上下文沉淀，适合个人助理、知识工作流和企业 Agent 记忆治理 | 13.5K+ |
