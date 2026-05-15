@@ -344,6 +344,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [trailofbits/skills-curated](https://github.com/trailofbits/skills-curated) | Trail of Bits 维护的社区验证 Claude Code 插件市场：强调安全审计与质量筛选，适合团队优先选择可信 Skills（392⭐）|
 | [gupsammy/Claudest](https://github.com/gupsammy/Claudest) | 面向 Claude Code 的高质量插件市场：收录经过实战筛选的 skills / tools，Python 项目、近期仍活跃，适合发现可安装扩展（247⭐）|
 | [23blocks-OS/ai-maestro](https://github.com/23blocks-OS/ai-maestro) | 多 Agent 编排 OS：支持 Claude Code / Codex / Aider / OpenClaw / Hermes 等终端代理，内置持久记忆、Agent-to-Agent 消息、多机器协作，并附 Claude Code 插件、5 个 skills 和 32 个 CLI 脚本（664⭐）|
+| [recsys-pipeline-architect](https://github.com/mturac/recsys-pipeline-architect) | 推荐/排序/Feed 流水线架构师：基于 xAI 开源 X For You 算法推广的六阶段 Source→Hydrator→Filter→Scorer→Selector→SideEffect 框架，含 Strapi v5 (TypeScript)、Go (generics)、Python/FastAPI 三套可运行脚手架（9/9 测试通过），独立 MIT 重新实现 |
 
 ### 🎨 内容创作
 
