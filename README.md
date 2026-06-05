@@ -404,6 +404,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [awesome-agent-skills](https://github.com/JackyST0/awesome-agent-skills) | 🇨🇳 精选 AI Agent Skills 列表，适配 Cursor / Claude Code / GitHub Copilot（463⭐）|
 | [wx-favorites-report](https://github.com/zhuyansen/wx-favorites-report) | 微信收藏可视化 Skill：从加密 DB 到交互式 HTML 报告的端到端管线（537⭐）|
 | [awesome-openclaw-skills-zh](https://github.com/clawdbot-ai/awesome-openclaw-skills-zh) | OpenClaw 中文官方技能库：按办公自动化、系统工具、开发运维等场景整理官方技能，适合中文用户快速发现与调用（4.0K⭐）|
+| [offer-helper](https://github.com/dominciyue/resume_skill) | 💼 中文求职助手：摄入简历/GitHub 仓库/文档建可持久化经历库，按 JD 生成 STAR 量化简历（严格防虚构），并做大厂式由浅及深的深挖面试 |
 
 ---
 
