@@ -403,6 +403,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [awesome-agent-skills](https://github.com/JackyST0/awesome-agent-skills) | 🇨🇳 精选 AI Agent Skills 列表，适配 Cursor / Claude Code / GitHub Copilot（463⭐）|
 | [wx-favorites-report](https://github.com/zhuyansen/wx-favorites-report) | 微信收藏可视化 Skill：从加密 DB 到交互式 HTML 报告的端到端管线（537⭐）|
 | [awesome-openclaw-skills-zh](https://github.com/clawdbot-ai/awesome-openclaw-skills-zh) | OpenClaw 中文官方技能库：按办公自动化、系统工具、开发运维等场景整理官方技能，适合中文用户快速发现与调用（4.0K⭐）|
+| [ziwei-doushu](https://github.com/Linden-TR/ziwei-doushu-skill) | 🔮 紫微斗数命盘排盘与解读：中州派为宗，融合三合/飞星/钦天/河洛四大学派，支持十二宫分析、四化追踪、大限流年、45种格局识别，基于 MCP 的专业命理 Claude Code Skill |
 
 ---
 
