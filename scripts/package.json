@@ -1,0 +1,13 @@
+{
+  "name": "claude-code-skills-zh-scripts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "运营脚本：掘金发文等自动化工具",
+  "scripts": {
+    "post-juejin": "node post_to_juejin.js",
+    "test-juejin": "node test_juejin_post.js"
+  },
+  "dependencies": {
+    "playwright": "^1.40.0"
+  }
+}

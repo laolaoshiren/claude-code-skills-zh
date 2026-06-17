@@ -251,7 +251,6 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [n8n-claw](https://github.com/freddy-schuetz/n8n-claw) | 基于 n8n 的自托管 OpenClaw-like AI Agent：PostgreSQL 记忆、MCP Skills Library、专家代理、Telegram/HTTP 接入和定时任务，安装文档完整，适合无代码团队把运营自动化部署到私有基础设施（427⭐）|
 | [social-media-skills](https://github.com/blacktwist/social-media-skills) | 社媒策略与内容 Agent Skills：覆盖平台上下文、内容策略、发布日历、平台策略、创作与分析，适合把 LinkedIn / X / Instagram / TikTok 等账号运营方法论沉淀成可复用技能（156⭐）|
 | [skilless.ai](https://github.com/BrikerMan/skilless.ai) | 给 Agent 增强真实数据能力的一键安装工具：提供网页搜索、网页读取、YouTube 字幕/视频处理、RSS 等数据技能，支持 Claude Code / Cursor / OpenCode 和中文文档，适合热点调研与内容素材采集（149⭐）|
-| [Larkin0302/feishu-bitable-skill](https://github.com/Larkin0302/feishu-bitable-skill) | 飞书多维表格 OpenClaw Skill：从业务需求自动设计表结构、创建多维表格并执行 CRUD，含一键安装脚本、权限清单和凭据配置说明，适合把运营数据台账交给 Agent 维护（38⭐）|
 | [liangdabiao/lark-workflow-feishu-cli](https://github.com/liangdabiao/lark-workflow-feishu-cli) | 飞书 AI 效率系统：22 大 Claude Code Skill 工作流覆盖个人 CRM、会议待办、知识库、内容创作、晨报、审批催办和团队 CRM，README 详尽、权限和定时自动化说明完整（34⭐）|
 | [iamzifei/wechat-article-publisher-skill](https://github.com/iamzifei/wechat-article-publisher-skill) | 微信公众号草稿箱发布 Claude Code Skill：把 Markdown / HTML 文章通过官方 API 直接转成公众号草稿，自动处理格式与图片上传，README 中英双语、安装路径清晰，适合内容团队减少复制排版成本（134⭐）|
 | [iamzifei/wechat-article-formatter-skill](https://github.com/iamzifei/wechat-article-formatter-skill) | 微信公众号文章排版 Claude Code Skill：将 Markdown 转为适配公众号的精美 HTML，支持本地图片上传、自定义 CSS、脚注链接转换，并可衔接发布 Skill 形成排版到草稿箱闭环（63⭐）|
@@ -495,7 +494,6 @@ description: 技能的一句话描述
 ## 🔗 相关资源
 
 - [Claude Code 官方文档](https://docs.anthropic.com/en/docs/claude-code)
-- [OpenClaw Skills Registry](https://registry.openclaw.ai)
 - [awesome-chatgpt-prompts-zh](https://github.com/PlexPt/awesome-chatgpt-prompts-zh) — 59K ⭐
 - [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) — 58.9K ⭐
 - [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) — 42K ⭐
