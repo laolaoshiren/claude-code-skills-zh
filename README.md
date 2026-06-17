@@ -404,6 +404,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [wx-favorites-report](https://github.com/zhuyansen/wx-favorites-report) | 微信收藏可视化 Skill：从加密 DB 到交互式 HTML 报告的端到端管线（537⭐）|
 | [awesome-openclaw-skills-zh](https://github.com/clawdbot-ai/awesome-openclaw-skills-zh) | OpenClaw 中文官方技能库：按办公自动化、系统工具、开发运维等场景整理官方技能，适合中文用户快速发现与调用（4.0K⭐）|
 | [ziwei-doushu](https://github.com/Linden-TR/ziwei-doushu-skill) | 🔮 紫微斗数命盘排盘与解读：中州派为宗，融合三合/飞星/钦天/河洛四大学派，支持十二宫分析、四化追踪、大限流年、45种格局识别，基于 MCP 的专业命理 Claude Code Skill |
+| [offer-helper](https://github.com/dominciyue/resume_skill) | 💼 中文求职助手：摄入简历/GitHub 仓库/文档建可持久化经历库，按 JD 生成 STAR 量化简历（严格防虚构），并做大厂式由浅及深的深挖面试 |
 
 ---
 
@@ -494,7 +495,7 @@ description: 技能的一句话描述
 
 ## 🔗 相关资源
 
-- [Claude Code 官方文档](https://docs.anthropic.com/en/docs/claude-code)
+- [OpenClaw Skills Registry](https://registry.openclaw.ai)
 - [awesome-chatgpt-prompts-zh](https://github.com/PlexPt/awesome-chatgpt-prompts-zh) — 59K ⭐
 - [awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) — 58.9K ⭐
 - [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) — 42K ⭐
