@@ -304,7 +304,7 @@ def get_repo_stars(repo: str, token: str | None = None) -> int:
         return 0
 
 
-def update_html_stats(html: str, total_skills: int, repo_stars: int) -> str:
+def update_html_stats(html: str, total_skills: int, repo_stars: int, total_original: int = 20) -> str:
     """更新 HTML 中的统计数字"""
     today = datetime.date.today().isoformat()
 
@@ -416,14 +416,18 @@ def main():
             repo_stars = 65
             print(f"⭐ 使用默认 Star 数: {repo_stars}")
 
-    # 4. 生成 JavaScript
+    # 4. 计算原创技能数量
+    original_count = len([d for d in os.listdir(os.path.join(REPO_ROOT, 'skills'))
+                         if os.path.isdir(os.path.join(REPO_ROOT, 'skills', d))])
+
+    # 5. 生成 JavaScript
     print("📝 生成 skillsData JavaScript ...")
     skills_js = generate_skills_js(skills_data)
 
-    # 5. 更新 HTML
+    # 6. 更新 HTML
     print("🔧 更新 docs/index.html ...")
     new_html = replace_skills_data(html_content, skills_js)
-    new_html = update_html_stats(new_html, total_skills, repo_stars)
+    new_html = update_html_stats(new_html, total_skills, repo_stars, original_count)
 
     if dry_run:
         print("\n--- 预览 skillsData ---")
