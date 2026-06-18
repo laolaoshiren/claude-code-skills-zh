@@ -326,6 +326,22 @@ def update_html_stats(html: str, total_skills: int, repo_stars: int) -> str:
     return html
 
 
+
+
+def update_html_badges(html: str, total_skills: int, total_original: int) -> str:
+    """更新 HTML 中 hero 区域的 badge 数字"""
+    html = re.sub(
+        r'(✅ )\d+\+( 精选技能)',
+        rf'\g<1>{total_skills}+',
+        html
+    )
+    html = re.sub(
+        r'(🎁 )\d+( 个原创技能)',
+        rf'\g<1>{total_original}',
+        html
+    )
+    return html
+
 def replace_skills_data(html: str, skills_js: str) -> str:
     """替换 HTML 中的 skillsData 对象"""
     pattern = r"const skillsData = \{.*?\};"
