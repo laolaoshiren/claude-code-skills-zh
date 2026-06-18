@@ -328,7 +328,7 @@ def update_html_stats(html: str, total_skills: int, repo_stars: int, total_origi
 
 
 
-def update_html_badges(html: str, total_skills: int, total_original: int) -> str:
+def update_html_badges(html: str, total_skills: int, total_original: int, repo_stars: int) -> str:
     """更新 HTML 中 hero 区域的 badge 数字"""
     today = datetime.date.today().isoformat()
     html = re.sub(
@@ -344,6 +344,11 @@ def update_html_badges(html: str, total_skills: int, total_original: int) -> str
     html = re.sub(
         r'(🔄 更新于 )\d{4}-\d{2}-\d{2}',
         rf'\g<1>{today}',
+        html
+    )
+    html = re.sub(
+        r'(⭐ )\d+( Stars)',
+        rf'\g<1>{repo_stars}',
         html
     )
     return html
@@ -434,6 +439,7 @@ def main():
     print("🔧 更新 docs/index.html ...")
     new_html = replace_skills_data(html_content, skills_js)
     new_html = update_html_stats(new_html, total_skills, repo_stars, original_count)
+    new_html = update_html_badges(new_html, total_skills, original_count, repo_stars)
 
     if dry_run:
         print("\n--- 预览 skillsData ---")
