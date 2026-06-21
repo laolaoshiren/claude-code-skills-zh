@@ -138,6 +138,12 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [JimLiu/baoyu-design](https://github.com/JimLiu/baoyu-design) | 本地 UI 设计 Agent Skill（1.4K⭐）|
 | [Kaelio/ktx](https://github.com/Kaelio/ktx) | 数据分析 Agent 可执行上下文层（1.2K⭐）|
 
+### 📋 产品 / 交付 / 规格驱动
+
+| 技能 | 说明 |
+|------|------|
+| [ai-delivery-spec](https://github.com/franklinxkk/ai-delivery-spec) | 📋 产品侧规格驱动交付框架：PRD → 原型 → DDD/API/数据契约 → 验收关卡 → AI 运行时治理 → 编码 Agent 交接。4 个行业模块（CRM、交通安全、教育 IT、医疗 IT），L0-L3 交付分级，Apache-2.0，v4.6.2（0⭐，新发布）|
+
 ### 📣 平台运营 / 自媒体 / 办公流量
 
 | 技能 | 说明 |
