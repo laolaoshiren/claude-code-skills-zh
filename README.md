@@ -358,7 +358,6 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [UditAkhourii/adhd](https://github.com/UditAkhourii/adhd) | 思维树 + 剪枝的 Coding Agent Skill（831⭐）|
 | [amElnagdy/guard-skills](https://github.com/amElnagdy/guard-skills) | 代码质量门禁，捕获 AI 生成代码失败模式（794⭐）|
 | [DanMcInerney/architect-loop](https://github.com/DanMcInerney/architect-loop) | 双模型协作：Opus 架构师 + Codex 构建者（490⭐）|
-| [razr001/align-dev](https://github.com/razr001/align-dev) | 前端团队共享编码标准 & SKILL.md 生成器（431⭐）|
 | [proffesor-for-testing/agentic-qe](https://github.com/proffesor-for-testing/agentic-qe) | AI 驱动 QA/QE 平台（390⭐）|
 | [cwinvestments/memstack](https://github.com/cwinvestments/memstack) | 127 个技能的结构化框架 + Dashboard（387⭐）|
 | [coleam00/helpline](https://github.com/coleam00/helpline) | Claude Code 完整 AI 层示范（92⭐）|
