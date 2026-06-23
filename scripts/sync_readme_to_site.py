@@ -286,19 +286,17 @@ def count_total_skills(skills_data: dict[str, list[dict]]) -> int:
 
 
 def get_repo_stars(repo: str, token: str | None = None) -> int:
-    """通过 GitHub API 获取仓库 star 数"""
+    """通过 gh CLI 获取仓库 star 数（已认证，不受限流）"""
     try:
-        import urllib.request
-        url = f"https://api.github.com/repos/{repo}"
-        req = urllib.request.Request(url)
-        req.add_header("Accept", "application/vnd.github.v3+json")
-        if token:
-            req.add_header("Authorization", f"token {token}")
-        req.add_header("User-Agent", "sync-readme-script")
-
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            data = json.loads(resp.read().decode())
-            return data.get("stargazers_count", 0)
+        import subprocess
+        result = subprocess.run(
+            ["gh", "api", f"repos/{repo}", "--jq", ".stargazers_count"],
+            capture_output=True, text=True, timeout=15
+        )
+        if result.returncode == 0 and result.stdout.strip().isdigit():
+            return int(result.stdout.strip())
+        print(f"  ⚠️  gh CLI 获取 star 失败: {result.stderr[:100]}", file=sys.stderr)
+        return 0
     except Exception as e:
         print(f"  ⚠️  获取 star 数失败: {e}", file=sys.stderr)
         return 0
@@ -331,26 +329,18 @@ def update_html_stats(html: str, total_skills: int, repo_stars: int, total_origi
 def update_html_badges(html: str, total_skills: int, total_original: int, repo_stars: int) -> str:
     """更新 HTML 中 hero 区域的 badge 数字"""
     today = datetime.date.today().isoformat()
-    html = re.sub(
-        r'(✅ )\d+\+( 精选技能)',
-        rf'\g<1>{total_skills}+',
-        html
-    )
-    html = re.sub(
-        r'(🎁 )\d+( 个原创技能)',
-        rf'\g<1>{total_original}',
-        html
-    )
-    html = re.sub(
-        r'(🔄 更新于 )\d{4}-\d{2}-\d{2}',
-        rf'\g<1>{today}',
-        html
-    )
-    html = re.sub(
-        r'(⭐ )\d+( Stars)',
-        rf'\g<1>{repo_stars}',
-        html
-    )
+    m = re.search(r'✅ \d+\+ 精选技能', html)
+    if m:
+        html = html.replace(m.group(), f'✅ {total_skills}+ 精选技能')
+    m = re.search(r'🎁 \d+ 个原创技能', html)
+    if m:
+        html = html.replace(m.group(), f'🎁 {total_original} 个原创技能')
+    m = re.search(r'🔄 更新于 \d{{4}}-\d{{2}}-\d{{2}}', html)
+    if m:
+        html = html.replace(m.group(), f'🔄 更新于 {today}')
+    m = re.search(r'⭐ \d+ Stars', html)
+    if m:
+        html = html.replace(m.group(), f'⭐ {repo_stars} Stars')
     return html
 
 def replace_skills_data(html: str, skills_js: str) -> str:
