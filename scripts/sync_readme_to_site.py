@@ -329,18 +329,20 @@ def update_html_stats(html: str, total_skills: int, repo_stars: int, total_origi
 def update_html_badges(html: str, total_skills: int, total_original: int, repo_stars: int) -> str:
     """更新 HTML 中 hero 区域的 badge 数字"""
     today = datetime.date.today().isoformat()
-    m = re.search(r'✅ \d+\+ 精选技能', html)
-    if m:
-        html = html.replace(m.group(), f'✅ {total_skills}+ 精选技能')
-    m = re.search(r'🎁 \d+ 个原创技能', html)
-    if m:
-        html = html.replace(m.group(), f'🎁 {total_original} 个原创技能')
-    m = re.search(r'🔄 更新于 \d{{4}}-\d{{2}}-\d{{2}}', html)
-    if m:
-        html = html.replace(m.group(), f'🔄 更新于 {today}')
-    m = re.search(r'⭐ \d+ Stars', html)
-    if m:
-        html = html.replace(m.group(), f'⭐ {repo_stars} Stars')
+    # 先清理控制字符
+    html = html.replace('', '')
+    # 用字符串替换更新 badge
+    import re
+    patterns = [
+        (r'✅ \d+\+[^<]*', f'✅ {total_skills}+ 精选技能'),
+        (r'🎁 \d+[^<]*个原创技能', f'🎁 {total_original} 个原创技能'),
+        (r'⭐ \d+ Stars', f'⭐ {repo_stars} Stars'),
+        (r'🔄 更新于 \d{{4}}-\d{{2}}-\d{{2}}', f'🔄 更新于 {today}'),
+    ]
+    for pattern, replacement in patterns:
+        m = re.search(pattern, html)
+        if m:
+            html = html.replace(m.group(), replacement)
     return html
 
 def replace_skills_data(html: str, skills_js: str) -> str:
