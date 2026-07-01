@@ -570,6 +570,7 @@ description: 技能的一句话描述
 - [awesome-claude-code-plugins](https://github.com/ccplugins/awesome-claude-code-plugins) — 697 ⭐
 - [cc-marketplace](https://github.com/ananddtyagi/cc-marketplace) — 677 ⭐
 - [claude-mem](https://github.com/thedotmack/claude-mem) — 72K ⭐
+- [Vexilo · Claude Code 工具书](https://vexilo.app/?lang=en) — 31 agents / 99 commands / 123 skills / 13 rules 的可视化工具书，按 5 步工作流组织，一键喂给 Claude。([companion repo](https://github.com/lilhawk7077/claude-code-resources))
 - [claude-hud](https://github.com/jarrodwatts/claude-hud) — 21K ⭐
 - [agency-agents](https://github.com/msitarzewski/agency-agents) — 94.6K ⭐
 - [github/spec-kit](https://github.com/github/spec-kit) — 93.1K ⭐
