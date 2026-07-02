@@ -55,6 +55,16 @@
 - 描述夸张但看不到实际 skill、agent、plugin、workflow 的项目。
 - 涉及恶意攻击、盗号、绕过付费、违法采集或明显侵权的项目。
 
+## 候选验证流程
+
+新增资源不要只看 GitHub Search 摘要或 star 数。合入 README 前至少确认：
+
+- 仓库可访问、未归档、不是空仓库。
+- README 说明清楚，能看出它提供的是 `SKILL.md`、Claude Code plugin、Agent workflow、MCP、CLI 或可迁移的 agent 配置。
+- 顶层或子目录中能找到 `skills/`、`.claude-plugin/`、`SKILL.md`、`plugin.json`、`commands/`、`AGENTS.md` 等实际资产，或 README 给出了明确安装命令。
+- 对 0 star 或刚创建的仓库，只有在作者/组织可信、安装路径清晰、场景价值强时才收录。
+- 对安全、浏览器自动化、爬虫、交易、账号登录等高风险场景，描述里要写清前置条件和适用边界，不夸大“自动赚钱”“绕过限制”等能力。
+
 ## README 更新规则
 
 README 是单一内容源。新增条目后必须运行同步脚本生成官网：
