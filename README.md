@@ -1,11 +1,11 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 339+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 349+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-339%2B-green.svg)](#-原创技能)
-[![Updated](https://img.shields.io/badge/updated-2026--06--23-brightgreen.svg)](#)
+[![Skills](https://img.shields.io/badge/skills-349%2B-green.svg)](#-原创技能)
+[![Updated](https://img.shields.io/badge/updated-2026--07--02-brightgreen.svg)](#)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -32,6 +32,12 @@
 - **中文友好**：很多说明直接面向中文开发者，不用自己二次理解
 - **高频场景覆盖全**：代码审查、文档、测试、安全、性能、重构、CI/CD 都覆盖
 - **持续维护**：定期补新技能、更新 README、官网和分类结构
+
+### 2026-07-02 维护更新
+
+- 新增一批近期活跃或新出现的 Claude Code / Codex / Agent Skills 项目，重点覆盖长期记忆、会话交接、技能生成、学术期刊、视觉设计和中文资源。
+- 同步 README、GitHub Pages 官网和推广文案中的精选数量、原创技能数量、更新时间。
+- 加强站点同步脚本的 Windows 兼容性，避免 PowerShell / GBK 终端下 dry-run 因 emoji 输出失败。
 
 ---
 
@@ -350,6 +356,9 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [binance/binance-skills-hub](https://github.com/binance/binance-skills-hub) | Binance 官方开放 Skills Hub：为 AI Agent 提供加密资产查询、交易、钱包追踪、信号监控和 DeFi 交互能力，支持 OpenClaw / Claude Code，`npx skills add` 安装路径清晰（824⭐）|
 | [am-will/codex-skills](https://github.com/am-will/codex-skills) | Codex / Agent Skills 集合：覆盖规划、多 Agent 编排、Context7/OpenAI 文档访问、前端开发和浏览器自动化，README 列出可用技能与安装/复制路径（916⭐）|
 | [vibeforge1111/keep-codex-fast](https://github.com/vibeforge1111/keep-codex-fast) | Codex 本地状态维护 Skill：先报告、再备份归档会话/日志/旧 worktree，帮助重度 Codex 用户保持启动和恢复速度，强调不直接删除上下文（820⭐）|
+| [x0c/session-continue](https://github.com/x0c/session-continue) | Claude Code / Codex CLI 终端会话选择与交接工具：适合多项目、多终端之间恢复上下文和继续任务（0⭐）|
+| [yotsuda/PowerShell.MCP](https://github.com/yotsuda/PowerShell.MCP) | 通用 PowerShell MCP Server：让 Claude Code 等 MCP 客户端调用 10,000+ PowerShell 模块和任意 CLI，尤其适合 Windows 自动化场景（78⭐）|
+| [GeoLab-org/source-to-skill](https://github.com/GeoLab-org/source-to-skill) | Source-to-Skill 转换工具：分析来源材料并提炼为可复用 agent skills，适合把文档、流程和知识资产沉淀成技能（1⭐）|
 | [giuseppe-trisciuoglio/developer-kit](https://github.com/giuseppe-trisciuoglio/developer-kit) | 模块化 Claude Code 插件市场：150+ Skills、45+ Agents，覆盖 Java / TypeScript / Python / PHP / AWS 等工程栈，支持 `/plugin marketplace add`、OpenCode、Codex 和 GitHub Copilot CLI，并提供中文 README（239⭐）|
 | [trailofbits/skills-curated](https://github.com/trailofbits/skills-curated) | Trail of Bits 维护的社区验证 Claude Code 插件市场：强调安全审计与质量筛选，适合团队优先选择可信 Skills（392⭐）|
 | [gupsammy/Claudest](https://github.com/gupsammy/Claudest) | 面向 Claude Code 的高质量插件市场：收录经过实战筛选的 skills / tools，Python 项目、近期仍活跃，适合发现可安装扩展（247⭐）|
@@ -388,6 +397,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [worldwonderer/video-recap-skills](https://github.com/worldwonderer/video-recap-skills) | 视频→中文解说视频（270⭐）|
 | [aref-vc/tufte-claude-skill](https://github.com/aref-vc/tufte-claude-skill) | Tufte 风格数据图表生成（257⭐）|
 | [Jaderson-bit/mindmap-markmap-viewer](https://github.com/Jaderson-bit/mindmap-markmap-viewer) | Markdown→交互式思维导图（61⭐）|
+| [micheledalsanto/design-from-references](https://github.com/micheledalsanto/design-from-references) | Claude Code 视觉设计参考技能：从优秀站点量测字体、颜色、间距并生成原创可访问的 Figma 设计系统（0⭐）|
 
 ### 🔬 学术科研
 
@@ -398,6 +408,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [xiaofenggan01/aigc-reduce](https://github.com/xiaofenggan01/aigc-reduce) | 降低学术论文 AIGC 查重率（376⭐）|
 | [u7079256/paperjury](https://github.com/u7079256/paperjury) | 论文投稿前 AI 压力测试（254⭐）|
 | [Awesome-Vibe-Research](https://github.com/modelscope/Awesome-Vibe-Research) | 🔬 魔搭社区开源 AI 辅助科研全流程仓库：收集 agents、skills、workflows 与最佳实践（128⭐）|
+| [Awesome-Journal-Skills](https://github.com/brycewang-stanford/Awesome-Journal-Skills) | 面向 Claude Code / Codex 的期刊投稿 Skills 包：覆盖 AER、QJE、Nature、Cell、管理世界、经济研究等 200+ 期刊，支持选题、识别策略、表格规范和审稿回复（584⭐）|
 
 ### 🤖 AI Agent
 
@@ -424,6 +435,9 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [eugeniughelbur/obsidian-second-brain](https://github.com/eugeniughelbur/obsidian-second-brain) | Obsidian 第二大脑 Claude Code Skill：31 个命令覆盖 vault-first research、定时 Agent 与长期知识维护，让知识库成为可持续演化的 Agent 工作台（936⭐）|
 | [Karanjot786/agent-skills-cli](https://github.com/Karanjot786/agent-skills-cli) | 通用 Agent Skills CLI：从 SkillsMP 同步 40,000+ 技能到 Cursor、Claude Code、GitHub Copilot、OpenAI Codex 与 Antigravity，适合多工具技能市场接入（140⭐）|
 | [Leon-Drq/openagentskill](https://github.com/Leon-Drq/openagentskill) | 开放 Agent Skills 市场：提供技能发现、提交、API 文档和基于真实 Agent 使用反馈的排行，适合寻找可复用 MCP / Web 自动化 / 生产力技能（166⭐）|
+| [multi-turn-inc/enacta-plugins](https://github.com/multi-turn-inc/enacta-plugins) | Enacta 官方 Claude Code 插件：为 coding agents 提供长期记忆能力，适合需要跨会话沉淀项目知识的工作流（0⭐）|
+| [ManuelStaggl/keepmind](https://github.com/ManuelStaggl/keepmind) | 面向 Claude Code / Codex / Cursor 的跨会话记忆工具：Node-only、跨平台，自动压缩观察并注入未来会话（0⭐）|
+| [devakchow/parrot](https://github.com/devakchow/parrot) | Claude Code 插件：builder/checker 双代理循环，内置最大轮次、回归中止和防篡改停止规则，适合受控自动实现流程（0⭐）|
 | [berabuddies/Semia](https://github.com/berabuddies/Semia) | AI Agent Skills 安全审计工具（546⭐）|
 | [tuchg/Lucarne](https://github.com/tuchg/Lucarne) | 远程通知/审批/恢复 Codex/Claude Code 会话（293⭐）|
 | [ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd) | ADHD 友好输出（279⭐）|
@@ -464,6 +478,8 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [ziwei-doushu](https://github.com/Linden-TR/ziwei-doushu-skill) | 🔮 紫微斗数命盘排盘与解读：中州派为宗，融合三合/飞星/钦天/河洛四大学派，支持十二宫分析、四化追踪、大限流年、45种格局识别，基于 MCP 的专业命理 Claude Code Skill |
 | [offer-helper](https://github.com/dominciyue/resume_skill) | 💼 中文求职助手：摄入简历/GitHub 仓库/文档建可持久化经历库，按 JD 生成 STAR 量化简历（严格防虚构），并做大厂式由浅及深的深挖面试 |
 | [Bloom](https://github.com/Li-Evan/Bloom) | 🌸 基于 Bloom 2-Sigma 研究的中文苏格拉底式 AI 家教：自适应学习路径、反问引导、中文优先（173⭐）|
+| [yzfly/awesome-skills-zh](https://github.com/yzfly/awesome-skills-zh) | 中文 Skills 精选资源：收录 Claude Skills、LLM Skills、AI Skills，适合中文用户发现可迁移技能素材（15⭐）|
+| [zhuwujing28-del/codex-skills-cn](https://github.com/zhuwujing28-del/codex-skills-cn) | 面向中文用户的 Codex skills 收藏、适配和维护仓库，适合寻找 Codex 侧技能迁移参考（1⭐）|
 
 ---
 
@@ -570,6 +586,7 @@ description: 技能的一句话描述
 - [awesome-claude-code-plugins](https://github.com/ccplugins/awesome-claude-code-plugins) — 697 ⭐
 - [cc-marketplace](https://github.com/ananddtyagi/cc-marketplace) — 677 ⭐
 - [claude-mem](https://github.com/thedotmack/claude-mem) — 72K ⭐
+- [Vexilo · Claude Code 工具书](https://vexilo.app/?lang=en) — 31 agents / 99 commands / 123 skills / 13 rules 的可视化工具书，按 5 步工作流组织，一键喂给 Claude。([companion repo](https://github.com/lilhawk7077/claude-code-resources))
 - [claude-hud](https://github.com/jarrodwatts/claude-hud) — 21K ⭐
 - [agency-agents](https://github.com/msitarzewski/agency-agents) — 94.6K ⭐
 - [github/spec-kit](https://github.com/github/spec-kit) — 93.1K ⭐
@@ -588,6 +605,8 @@ description: 技能的一句话描述
 欢迎提交 PR！请将你的 skill 放入 `skills/` 目录并更新上方列表。
 
 📢 [征集优质 Skills！提交即上榜 →](https://github.com/laolaoshiren/claude-code-skills-zh/issues/1)
+
+维护和收录标准见：[项目维护手册](docs/MAINTENANCE.md)。
 
 ---
 

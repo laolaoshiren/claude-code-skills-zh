@@ -21,6 +21,17 @@ import datetime
 from pathlib import Path
 from collections import OrderedDict
 
+
+def _configure_stdio() -> None:
+    """Avoid UnicodeEncodeError when Windows terminals use GBK/CP936."""
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            reconfigure(errors="replace")
+
+
+_configure_stdio()
+
 # ── 配置 ──────────────────────────────────────────────────────────────────────
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -337,13 +348,30 @@ def update_html_badges(html: str, total_skills: int, total_original: int, repo_s
         (r'✅ \d+\+[^<]*', f'✅ {total_skills}+ 精选技能'),
         (r'🎁 \d+[^<]*个原创技能', f'🎁 {total_original} 个原创技能'),
         (r'⭐ \d+ Stars', f'⭐ {repo_stars} Stars'),
-        (r'🔄 更新于 \d{{4}}-\d{{2}}-\d{{2}}', f'🔄 更新于 {today}'),
+        (r'🔄 更新于 \d{4}-\d{2}-\d{2}', f'🔄 更新于 {today}'),
     ]
     for pattern, replacement in patterns:
         m = re.search(pattern, html)
         if m:
             html = html.replace(m.group(), replacement)
     return html
+
+
+def update_html_meta(html: str, total_skills: int, total_original: int) -> str:
+    """更新 HTML head 中面向搜索和社交分享的描述文案"""
+    replacements = {
+        r'<meta name="description" content="[^"]*">':
+            f'<meta name="description" content="最实用的 Claude Code Skills / Agents / Plugins 中文精选集，收录 {total_skills}+ 高质量技能、Agent 和插件，{total_original} 个原创技能，适合 Claude Code、Codex、Gemini CLI、Cursor 用户复制即装。">',
+        r'<meta property="og:description" content="[^"]*">':
+            f'<meta property="og:description" content="收录 {total_skills}+ Claude Code Skills / Agents / Plugins，按场景分类，中文说明，复制即装，持续更新。">',
+        r'<meta name="twitter:description" content="[^"]*">':
+            f'<meta name="twitter:description" content="{total_skills}+ 高质量 Claude Code 技能、Agent、插件中文精选，复制即装。">',
+    }
+
+    for pattern, replacement in replacements.items():
+        html = re.sub(pattern, replacement, html, count=1)
+    return html
+
 
 def replace_skills_data(html: str, skills_js: str) -> str:
     """替换 HTML 中的 skillsData 对象"""
@@ -432,6 +460,7 @@ def main():
     new_html = replace_skills_data(html_content, skills_js)
     new_html = update_html_stats(new_html, total_skills, repo_stars, original_count)
     new_html = update_html_badges(new_html, total_skills, original_count, repo_stars)
+    new_html = update_html_meta(new_html, total_skills, original_count)
 
     if dry_run:
         print("\n--- 预览 skillsData ---")

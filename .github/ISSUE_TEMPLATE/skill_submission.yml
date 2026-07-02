@@ -1,0 +1,50 @@
+name: 推荐 Skill / Agent / Plugin
+description: 推荐一个值得收录到 Claude Code Skills 中文精选集的项目
+title: "[推荐] "
+labels:
+  - resource
+  - triage
+body:
+  - type: input
+    id: url
+    attributes:
+      label: 项目链接
+      description: 请填写 GitHub 仓库或官方页面链接。
+      placeholder: https://github.com/owner/repo
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: 推荐分类
+      options:
+        - 明星技能
+        - 平台运营 / 自媒体 / 办公流量
+        - 开发效率
+        - 内容创作
+        - 学术科研
+        - AI Agent
+        - 金融 / 商业
+        - 中文专属
+        - 不确定
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: 为什么值得收录
+      description: 请说明它解决什么问题、支持哪些工具、对中文开发者有什么价值。
+      placeholder: 例如：支持 Claude Code / Codex，包含可安装 SKILL.md，适合代码审查场景。
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 基础检查
+      options:
+        - label: 链接可以打开，不是 404 或私有仓库
+          required: true
+        - label: 项目与 Claude Code / Codex / Agent Skills / Plugins / MCP / AI 编程工作流直接相关
+          required: true
+        - label: README 或文档中能看出安装方式、使用方式或实际能力
+          required: true
