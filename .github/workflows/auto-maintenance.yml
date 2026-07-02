@@ -1,0 +1,60 @@
+# 每 3 天自动同步 README / 官网统计并执行质量检查
+name: Auto Maintenance
+
+on:
+  schedule:
+    - cron: '0 2 */3 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auto-maintenance
+  cancel-in-progress: false
+
+jobs:
+  maintain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run sync regression tests
+        run: python scripts/test_sync_readme_to_site.py
+
+      - name: Sync README badges and website data
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/sync_readme_to_site.py --fetch-stars
+
+      - name: Markdown lint
+        run: npx --yes markdownlint-cli2 "**/*.md"
+
+      - name: Check README links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --verbose README.md
+          fail: true
+          jobSummary: true
+
+      - name: Check whitespace
+        run: git diff --check
+
+      - name: Commit automatic maintenance updates
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No automatic maintenance changes."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md docs/index.html
+          git commit -m "docs: auto maintenance sync"
+          git push

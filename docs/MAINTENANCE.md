@@ -22,6 +22,7 @@
 - 搜索近期活跃的 Claude Code / Codex / Agent Skills 项目，补充 5-15 个高相关条目。
 - 运行 `python scripts/sync_readme_to_site.py --fetch-stars` 同步 README、官网数据和 star 数。
 - 跑本地校验，确保 GitHub Actions 不报错。
+- 仓库已配置 `Auto Maintenance` GitHub Actions，每 3 天自动同步 README / 官网统计并执行 lint、链接和脚本回归检查。
 
 每月维护：
 
@@ -116,3 +117,22 @@ git diff --check
 ```
 
 如果改了 README 中的 GitHub 链接，抽样或批量检查仓库是否可访问。外部非 GitHub 链接至少检查新增链接。
+
+## 自动维护任务
+
+`.github/workflows/auto-maintenance.yml` 每 3 天运行一次，也支持在 GitHub Actions 页面手动触发。
+
+自动任务负责：
+
+- 运行 `scripts/test_sync_readme_to_site.py`，避免同步脚本在 Windows/GBK 等环境再次回归。
+- 运行 `scripts/sync_readme_to_site.py --fetch-stars`，同步 README badge、官网统计和站点数据。
+- 运行 markdownlint、README 链接检查和 `git diff --check`。
+- 如果 README 或 `docs/index.html` 有自动同步差异，直接提交 `docs: auto maintenance sync`。
+
+自动任务不负责：
+
+- 自动把搜索到的项目写进 README。
+- 自动接受低质量 PR。
+- 自动修改原创 skills 的行为。
+
+新增精选资源仍然需要遵守本手册的收录原则，由维护者基于相关性、安装清晰度和中文用户价值判断。
