@@ -1,11 +1,11 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 361+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 363+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-361%2B-green.svg)](#original-skills)
-[![Updated](https://img.shields.io/badge/updated-2026--07--02-brightgreen.svg)](#maintenance-update)
+[![Skills](https://img.shields.io/badge/skills-363%2B-green.svg)](#original-skills)
+[![Updated](https://img.shields.io/badge/updated-2026--07--03-brightgreen.svg)](#maintenance-update)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -35,11 +35,11 @@
 
 <a id="maintenance-update"></a>
 
-### 2026-07-02 维护更新
+### 2026-07-03 维护更新
 
-- 新增并核验一批近期活跃或官方/组织级 Claude Code / Codex / Agent Skills 项目，重点覆盖 Google Cloud、科学研究、技能安全扫描、浏览器自动化、HashiCorp、Vue、Stitch、LlamaParse、认证集成和跨模型代码审查。
-- 同步 README、GitHub Pages 官网和推广文案中的精选数量、原创技能数量、更新时间。
-- 加强站点同步脚本的 Windows 兼容性，避免 PowerShell / GBK 终端下 dry-run 因 emoji 输出失败。
+- 核验近期 Claude Code / Codex / OpenClaw / Agent Skills 生态项目，筛选新增微信小程序开发技能集和仓库语义漂移审计插件，避免收录同质化或自动生成感明显的低质项目。
+- 检查开放 PR / Issue、GitHub Actions 和 GitHub Pages 状态；当前无待处理 PR，征集 issue 中的 Bloom 推荐已完成收录。
+- 同步 README、GitHub Pages 官网和推广文案中的精选数量、更新时间。
 
 ---
 
@@ -346,6 +346,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [ui-design-brain](https://github.com/carmahhawwari/ui-design-brain) | Cursor UI 设计技能：基于 component.gallery 沉淀 60+ 组件最佳实践、布局模式、反模式与设计哲学，安装清晰，适合生成更像资深设计师产出的前端界面（773⭐）|
 | [DrCatHicks/learning-opportunities](https://github.com/DrCatHicks/learning-opportunities) | Claude Code / Codex 学习型插件市场：在完成架构、重构、Schema 等代码工作后，自动生成 10-15 分钟刻意练习，内置 repo orientation 技能，适合团队把 AI 辅助编码转化为可复盘的能力成长（907⭐）|
 | [claude-code-action](https://github.com/anthropics/claude-code-action) | Anthropic 官方 GitHub Action：让 Claude Code 在 PR / Issue 中自动答疑、审查、实现与定时维护，文档完整、支持多认证方式，适合仓库自动化运营（7.3K⭐）|
+| [wei18/Upkeep](https://github.com/wei18/Upkeep) | Claude Code 仓库语义漂移审计插件 / Skill：并行检查文档过期、规格与代码不一致、孤立资产和约定偏移，只输出证据报告，可用插件、`npx skills` 或 CI 安装（3⭐）|
 | [openskills](https://github.com/numman-ali/openskills) | 通用 Skills 安装器：把 Claude Code 的 SKILL.md 体系带到 Cursor / Windsurf / Aider / Codex 等多 Agent 环境，支持 GitHub、本地路径、私有仓库安装与 AGENTS.md 同步（10.4K⭐）|
 | [AionUi](https://github.com/iOfficeAI/AionUi) | 本地开源 24/7 Cowork / OpenClaw 桌面应用：内置 Agent 与 Office/PPT/Excel/Word skills，支持 Claude Code、Codex、Hermes、OpenClaw 等 20+ CLI 自动检测、WebUI 远程访问和定时任务，适合办公自动化与多代理协作（24.2K⭐）|
 | [mcp-use](https://github.com/mcp-use/mcp-use) | 全栈 MCP 框架：同时提供 TypeScript / Python SDK、MCP Inspector、云端部署与 MCP App/Server 构建链路，适合把 Claude / ChatGPT / Claude Code 的工具能力产品化（9.9K⭐）|
@@ -494,6 +495,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [Bloom](https://github.com/Li-Evan/Bloom) | 🌸 基于 Bloom 2-Sigma 研究的中文苏格拉底式 AI 家教：自适应学习路径、反问引导、中文优先（173⭐）|
 | [yzfly/awesome-skills-zh](https://github.com/yzfly/awesome-skills-zh) | 中文 Skills 精选资源：收录 Claude Skills、LLM Skills、AI Skills，适合中文用户发现可迁移技能素材（15⭐）|
 | [zhuwujing28-del/codex-skills-cn](https://github.com/zhuwujing28-del/codex-skills-cn) | 面向中文用户的 Codex skills 收藏、适配和维护仓库，适合寻找 Codex 侧技能迁移参考（1⭐）|
+| [miniprogram-skills](https://github.com/Sun-sunshine06/miniprogram-skills) | 微信小程序开发 Codex / Claude Code Skills：6 个可复用技能覆盖 DevTools 诊断、官方脚手架校验、GUI 冒烟、架构重组和 UI 文案精简，中英文文档与验证脚本完整（17⭐）|
 
 ---
 
