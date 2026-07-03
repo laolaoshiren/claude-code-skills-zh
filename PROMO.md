@@ -2,7 +2,7 @@
 
 ## 1️⃣ V2EX 发帖
 
-**标题：** [分享] Claude Code Skills 中文精选集 — 363+ 精选技能 + 19 个原创可安装技能
+**标题：** [分享] Claude Code Skills 中文精选集 — 368+ 精选技能 + 19 个原创可安装技能
 
 **正文：**
 做了个 Claude Code Skills 的中文资源站，不只是 awesome 列表，还包含 19 个可直接安装的原创技能：
@@ -13,7 +13,7 @@
 - 代码重构顾问
 ...
 
-还整理了 363+ 第三方精选技能，按场景分类，一键安装，已同步到官网。
+还整理了 368+ 第三方精选技能，按场景分类，一键安装，已同步到官网。
 
 链接：https://github.com/laolaoshiren/claude-code-skills-zh
 
@@ -46,7 +46,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 
 🛠️ 做了个 Claude Code Skills 中文精选集！
 
-✅ 363+ 精选技能列表
+✅ 368+ 精选技能列表
 ✅ 19 个原创可安装技能
 ✅ 按场景分类，一键安装
 
@@ -64,7 +64,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 
 github.com/laolaoshiren/claude-code-skills-zh
 
-不只列出了 363+ 优质技能，还带了 19 个原创技能可以直接装：
+不只列出了 368+ 优质技能，还带了 19 个原创技能可以直接装：
 - 中文代码审查、安全审计、文档生成、Git 工作流自动化...
 
 对中文开发者很友好，安装也简单。
@@ -75,7 +75,7 @@ github.com/laolaoshiren/claude-code-skills-zh
 
 分享个资源，做了个 Claude Code Skills 的中文精选集 📋
 
-不只列了 363+ 好用的技能，还带了 19 个原创的可以直接装：
+不只列了 368+ 好用的技能，还带了 19 个原创的可以直接装：
 中文代码审查、安全审计、文档生成、API 测试、Git 自动化...
 
 一键安装 👇
