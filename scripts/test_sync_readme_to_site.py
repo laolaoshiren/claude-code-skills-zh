@@ -26,6 +26,8 @@ def test_dry_run_works_with_gbk_stdout() -> None:
         env=env,
         capture_output=True,
         text=True,
+        encoding="gbk",
+        errors="replace",
         timeout=30,
     )
 
