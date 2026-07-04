@@ -48,7 +48,7 @@ jobs:
 
       - name: Commit automatic maintenance updates
         run: |
-          if [ -z "$(git status --porcelain)" ]; then
+          if git diff --quiet -- README.md docs/index.html; then
             echo "No automatic maintenance changes."
             exit 0
           fi

@@ -38,6 +38,7 @@
 ### 2026-07-04 维护更新
 
 - 修复 `Auto Maintenance` 在 Ubuntu Actions 中运行 GBK stdout 回归测试时的解码失败，避免定时维护任务被测试用例自身阻断。
+- 调整自动提交步骤，只检查 `README.md` 和 `docs/index.html` 的实际差异，避免 `lychee-action` 输出目录触发空提交失败。
 - 核验开放 PR / Issue；当前无开放 PR，征集帖 #1 没有新的未处理推荐。
 - 新增 Meta_Kim、learn-skills.dev、agent-install、Wednesday Agent Skills、AlemTuzlak Skills、GTM Engineering Skills 和 Qlik Agentic Skills，均确认有真实技能目录、插件清单、`SKILL.md`、CLI 或安装路径。
 - 过滤掉大批 0 star 自动生成仓库、强个人账号依赖且边界不清的项目，以及只写概念但缺少可安装资产的链接。
