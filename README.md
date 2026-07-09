@@ -283,6 +283,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [wxkingstar/SpecFusion](https://github.com/wxkingstar/SpecFusion) | 中国开放平台 API 文档搜索 MCP/CLI：在 Claude Code / Cursor / Gemini CLI 里直接查询企业微信、飞书、钉钉、小红书、抖音电商、微信支付等 18 个平台文档（28⭐）|
 | [MaxKmet/idea-validation-agents](https://github.com/MaxKmet/idea-validation-agents) | 创业想法验证 Agent Skills：从 idea brainstorming 到市场验证、GTM 策略和机会评估，兼容 Claude Code / Codex / Cursor，适合独立开发者和增长团队快速筛选项目（122⭐）|
 
+| [linkedin-growth](https://github.com/Linked-API/linkedin-skills/tree/main/linkedin-growth) | Import leads from LinkedIn or Sales Navigator searches, qualify them against an ideal-customer profile, schedule safe connection invites across accounts, track acceptances, and withdraw stale pending requests. | — |
 ### 💻 开发效率
 
 | 技能 | 说明 |
