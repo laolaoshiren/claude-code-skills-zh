@@ -5,7 +5,7 @@
   "description": "运营脚本：掘金发文等自动化工具",
   "scripts": {
     "post-juejin": "node post_to_juejin.js",
-    "test-juejin": "node test_juejin_post.js"
+    "live-smoke-juejin": "node test_juejin_post.js --publish"
   },
   "dependencies": {
     "playwright": "^1.40.0"

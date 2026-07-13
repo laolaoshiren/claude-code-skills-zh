@@ -87,9 +87,12 @@ python scripts/sync_readme_to_site.py --fetch-stars
 
 ## 原创 Skills 迭代方向
 
+已落地：
+
+- `skill-curator`：核验 GitHub 候选仓库的真实资产、安装路径、重复项和风险，输出中文收录建议。
+
 优先补这类原创技能：
 
-- `skill-curator`：自动评估一个 GitHub 仓库是否值得收录，输出分类、描述和风险。
 - `repo-maintainer`：面向开源项目的日常维护助手，处理断链、README、release notes、PR triage。
 - `github-pages-sync`：检查 README 与官网是否一致，避免 SEO 和 badge 过期。
 - `awesome-list-auditor`：检查 awesome list 的重复、断链、分类漂移和描述质量。
@@ -136,8 +139,10 @@ git diff --check
 
 - 运行 `scripts/test_sync_readme_to_site.py`，避免同步脚本在 Windows/GBK 等环境再次回归。
 - 运行 `scripts/sync_readme_to_site.py --fetch-stars`，同步 README badge、官网统计和站点数据。
-- 运行 markdownlint、README 链接检查和 `git diff --check`。
-- 如果 README 或 `docs/index.html` 有自动同步差异，直接提交 `docs: auto maintenance sync`。
+- 运行 markdownlint 和 `git diff --check`。
+- 如果 README、`docs/index.html` 或 `docs/sitemap.xml` 有自动同步差异，直接提交 `docs: auto maintenance sync`。
+
+README 外部链接由独立的 `Link Check` workflow 定期检查。链接波动或第三方图片接口故障不应阻断已经完成的统计同步提交。
 
 自动任务不负责：
 

@@ -12,8 +12,9 @@ description: 环境变量管理器：扫描、校验、同步 .env 文件，生�
 
 ### 1. 扫描项目
 - 检测所有 `.env*` 文件（.env / .env.local / .env.development / .env.production）
+- 默认只提取变量名、来源文件和是否为空；真实值必须脱敏，不写入报告或终端输出
 - 扫描代码中引用的环境变量（`process.env.XXX` / `os.environ['XXX']` / `os.getenv('XXX')`）
-- 识别已定义但未使用的变量（死配置）
+- 识别静态扫描中未发现引用的变量（仅作为待人工确认候选）
 - 识别已使用但未定义的变量（缺失配置）
 
 ### 2. 校验分析
@@ -65,18 +66,25 @@ JWT_SECRET=                  # 必填，至少 32 位随机字符串
 🔒 硬编码敏感信息: 1 处（src/auth.js:23）
 
 建议：
-1. 删除 .env 中的 S3_BUCKET 和 OLD_API_KEY
+1. 人工确认 S3_BUCKET 和 OLD_API_KEY 是否被 CI、部署脚本或动态代码引用，再决定是否删除
 2. 在 .env 中添加 SENDGRID_API_KEY
 3. 将 src/auth.js:23 的硬编码 token 迁移到环境变量
 ```
 
 ## 安全检查清单
+- [ ] 扫描和报告只展示变量名及脱敏状态，不回显真实 Secret
 - [ ] `.env` 已添加到 `.gitignore`
 - [ ] `.env.example` 存在且与代码同步
 - [ ] 无硬编码的 API Key / Token / Password
 - [ ] 生产环境使用 Secrets 管理（GitHub Secrets / AWS SSM / Vault）
 - [ ] JWT_SECRET / ENCRYPTION_KEY 足够随机（32+ 字符）
 - [ ] 数据库密码不在日志中输出
+
+## 修改边界
+
+- 不要自动删除或改写真实 `.env`；先展示差异并取得用户确认。
+- “未使用”只代表静态扫描没有发现，仍需检查 CI、容器、部署平台和动态变量访问。
+- 不把生产 Secret 复制到 `.env.example`、Schema、日志、Issue 或聊天输出中。
 
 ## 常见陷阱
 - **Next.js**：只有 `NEXT_PUBLIC_` 前缀的变量会暴露给客户端，后端专用变量不要加此前缀

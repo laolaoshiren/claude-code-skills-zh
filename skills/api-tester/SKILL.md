@@ -24,8 +24,8 @@ npx @apidevtools/swagger-cli validate openapi.yaml
 # 使用 redocly 提取端点信息
 npx @redocly/cli lint openapi.yaml
 
-# 从 OpenAPI 提取所有路径
-grep -E '^\s+/' openapi.yaml | awk '{print $2}'
+# 查看端点、Schema 和统计信息，避免用 grep 误解析 YAML
+npx @redocly/cli stats openapi.yaml
 ```
 
 ### 第 2 步：生成测试用例
@@ -46,6 +46,13 @@ grep -E '^\s+/' openapi.yaml | awk '{print $2}'
 | Faker 随机生成 | 大量测试数据、压力测试 | `@faker-js/faker`、`Faker`(Python) |
 | 工厂模式 | 复杂对象关系 | factory_boy、fishery |
 | 从 Schema 生成 | 基于 OpenAPI 自动生成 | `json-schema-faker` |
+
+### 第 5 步：执行和复测
+
+- 使用项目现有测试命令运行生成的测试。
+- 根据真实失败信息修正 fixture、认证、状态码或环境依赖。
+- 再次运行，确认测试独立且可重复。
+- 无法执行时明确标注“未运行验证”，不要声称测试代码可直接通过。
 
 ## 测试模板
 
@@ -88,7 +95,9 @@ import app from '../src/app';
 
 describe('GET /api/users', () => {
   it('应返回用户列表', async () => {
-    const res = await request(app).get('/api/users');
+    const res = await request(app)
+      .get('/api/users')
+      .set('Authorization', 'Bearer test-token');
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });
@@ -121,11 +130,12 @@ describe('POST /api/users', () => {
 ```bash
 #!/bin/bash
 BASE_URL="http://localhost:3000/api"
+API_TOKEN="${API_TOKEN:?请先设置 API_TOKEN}"
 
 # 正常请求
 echo "=== GET /users ==="
 curl -s -w "\nHTTP Status: %{http_code}\n" \
-  -H "Authorization: Bearer *** \
+  -H "Authorization: Bearer $API_TOKEN" \
   "$BASE_URL/users"
 
 # POST 创建资源
@@ -133,7 +143,7 @@ echo "=== POST /users ==="
 curl -s -w "\nHTTP Status: %{http_code}\n" \
   -X POST \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer *** \
+  -H "Authorization: Bearer $API_TOKEN" \
   -d '{"name":"Alice","email":"alice@test.com"}' \
   "$BASE_URL/users"
 

@@ -1,20 +1,48 @@
-const { chromium } = require('playwright');
 const https = require('https');
 const fs = require('fs');
+const os = require('os');
+const path = require('path');
 
-const COOKIE_FILE = process.env.JUEJIN_COOKIE_FILE || `${process.env.HOME}/.hermes/projects/claude-code-skills-zh/.juejin_cookie`;
+const COOKIE_FILE = process.env.JUEJIN_COOKIE_FILE || path.join(os.homedir(), '.hermes', 'projects', 'claude-code-skills-zh', '.juejin_cookie');
 const COOKIE = process.env.JUEJIN_COOKIE || (fs.existsSync(COOKIE_FILE) ? fs.readFileSync(COOKIE_FILE, 'utf-8').trim() : '');
+const TEMP_DIR = os.tmpdir();
+const ERROR_SCREENSHOT = path.join(TEMP_DIR, 'juejin_error.png');
+const RESULT_SCREENSHOT = path.join(TEMP_DIR, 'juejin_result.png');
+const RESULT_JSON = path.join(TEMP_DIR, 'juejin_result.json');
+
+const rawArgs = process.argv.slice(2);
+const shouldPublish = rawArgs.includes('--publish');
+const args = rawArgs.filter(arg => arg !== '--publish');
+const TITLE = args[0];
+const CONTENT_FILE = args[1];
+const CATEGORY = args[2] || '开发工具';
+
+if (!TITLE || !CONTENT_FILE) {
+  console.error('用法: node post_to_juejin.js "标题" "内容文件路径" [分类] [--publish]');
+  process.exit(1);
+}
+
+if (!fs.existsSync(CONTENT_FILE)) {
+  console.error(`❌ 内容文件不存在: ${CONTENT_FILE}`);
+  process.exit(1);
+}
+
+if (!shouldPublish) {
+  const preview = fs.readFileSync(CONTENT_FILE, 'utf-8');
+  console.log('✅ 预检完成，未创建草稿、未发布文章。');
+  console.log(`标题: ${TITLE}`);
+  console.log(`分类: ${CATEGORY}`);
+  console.log(`正文字符数: ${preview.length}`);
+  console.log('确认内容后追加 --publish 才会访问掘金并产生外部状态。');
+  process.exit(0);
+}
 
 if (!COOKIE) {
   console.error('❌ 缺少掘金 Cookie：请设置 JUEJIN_COOKIE 或写入 .juejin_cookie（不要提交 Cookie 到仓库）');
   process.exit(1);
 }
 
-// 从命令行参数或默认值
-const TITLE = process.argv[2] || '测试文章-请忽略';
-const CONTENT_FILE = process.argv[3] || null;
-const CONTENT_DEFAULT = '# 测试\n\n这是一篇测试文章，验证自动发文流程。请忽略此文章。';
-const CATEGORY = process.argv[4] || '开发工具';  // 分类名称
+const { chromium } = require('playwright');
 
 async function apiPost(path, body) {
   return new Promise((resolve, reject) => {
@@ -46,7 +74,7 @@ async function apiPost(path, body) {
 }
 
 async function main() {
-  const content = CONTENT_FILE ? fs.readFileSync(CONTENT_FILE, 'utf-8') : CONTENT_DEFAULT;
+  const content = fs.readFileSync(CONTENT_FILE, 'utf-8');
 
   // Step 1: 创建草稿
   console.log('📝 Step 1: 创建草稿...');
@@ -103,7 +131,7 @@ async function main() {
     console.log('✅ 已打开发布面板');
   } else {
     console.log('❌ 未找到发布按钮');
-    await page.screenshot({ path: '/tmp/juejin_error.png' });
+    await page.screenshot({ path: ERROR_SCREENSHOT });
     await browser.close();
     process.exit(1);
   }
@@ -116,13 +144,10 @@ async function main() {
     await page.waitForTimeout(1000);
     console.log('✅ 分类已选择');
   } else {
-    // 如果找不到指定分类，尝试点击第一个可选的分类
-    const allCatBtns = await page.$$('.category-list button, .category-list span');
-    if (allCatBtns.length > 0) {
-      await allCatBtns[0].click();
-      await page.waitForTimeout(1000);
-      console.log('✅ 已选择第一个可用分类');
-    }
+    console.log(`❌ 未找到指定分类: ${CATEGORY}`);
+    await page.screenshot({ path: ERROR_SCREENSHOT });
+    await browser.close();
+    process.exit(1);
   }
 
   // 确保摘要至少50字
@@ -144,7 +169,7 @@ async function main() {
     // 方式1: 用 locator 精确匹配
     const confirmBtn = page.locator('button:has-text("确定并发布")');
     if (await confirmBtn.count() > 0) {
-      await confirmBtn.last().click({ force: true });
+      await confirmBtn.last().click();
       console.log('✅ 已点击确定并发布按钮 (locator)');
     }
   } catch(e) {
@@ -154,7 +179,7 @@ async function main() {
   await page.waitForTimeout(3000);
 
   // 检查是否需要再点击（可能弹了确认框）
-  const confirmDialog = await page.$('button:has-text("确认"), button:has-text("确定"), button:has-text("继续发布")');
+  const confirmDialog = await page.$('button:has-text("确认发布"), button:has-text("继续发布")');
   if (confirmDialog) {
     await confirmDialog.click();
     console.log('✅ 已点击确认对话框');
@@ -162,7 +187,7 @@ async function main() {
   }
 
   // 截图
-  await page.screenshot({ path: '/tmp/juejin_result.png', fullPage: false });
+  await page.screenshot({ path: RESULT_SCREENSHOT, fullPage: false });
 
   // 检查最终状态
   const finalUrl = page.url();
@@ -172,16 +197,16 @@ async function main() {
     const articleId = finalUrl.match(/post\/(\d+)/)?.[1];
     console.log(`🎉 发布成功! 文章链接: https://juejin.cn/post/${articleId}`);
     // 写入结果供外部使用
-    fs.writeFileSync('/tmp/juejin_result.json', JSON.stringify({ success: true, article_id: articleId, url: `https://juejin.cn/post/${articleId}` }));
+    fs.writeFileSync(RESULT_JSON, JSON.stringify({ success: true, article_id: articleId, url: `https://juejin.cn/post/${articleId}` }));
   } else {
     // 检查是否有成功提示
     const successTip = await page.$('text=发布成功');
     if (successTip) {
       console.log('🎉 发布成功（检测到成功提示）');
-      fs.writeFileSync('/tmp/juejin_result.json', JSON.stringify({ success: true }));
+      fs.writeFileSync(RESULT_JSON, JSON.stringify({ success: true }));
     } else {
-      console.log('⚠️ 无法确认发布状态，请查看截图 /tmp/juejin_result.png');
-      fs.writeFileSync('/tmp/juejin_result.json', JSON.stringify({ success: false, note: '需人工确认' }));
+      console.log(`⚠️ 无法确认发布状态，请查看截图 ${RESULT_SCREENSHOT}`);
+      fs.writeFileSync(RESULT_JSON, JSON.stringify({ success: false, note: '需人工确认' }));
     }
   }
 

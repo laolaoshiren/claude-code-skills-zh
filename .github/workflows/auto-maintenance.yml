@@ -17,11 +17,11 @@ jobs:
   maintain:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
@@ -36,25 +36,18 @@ jobs:
       - name: Markdown lint
         run: npx --yes markdownlint-cli2 "**/*.md"
 
-      - name: Check README links
-        uses: lycheeverse/lychee-action@v2
-        with:
-          args: --verbose README.md
-          fail: true
-          jobSummary: true
-
       - name: Check whitespace
         run: git diff --check
 
       - name: Commit automatic maintenance updates
         run: |
-          if git diff --quiet -- README.md docs/index.html; then
+          if git diff --quiet -- README.md docs/index.html docs/sitemap.xml; then
             echo "No automatic maintenance changes."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md docs/index.html
+          git add README.md docs/index.html docs/sitemap.xml
           git commit -m "docs: auto maintenance sync"
           git push

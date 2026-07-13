@@ -1,8 +1,15 @@
+if (!process.argv.includes('--publish')) {
+  console.error('这是会操作真实掘金账号的 live smoke 脚本。只有显式传入 --publish 才会运行。');
+  process.exit(1);
+}
+
 const { chromium } = require('playwright');
 const https = require('https');
 const fs = require('fs');
+const os = require('os');
+const path = require('path');
 
-const COOKIE_FILE = process.env.JUEJIN_COOKIE_FILE || `${process.env.HOME}/.hermes/projects/claude-code-skills-zh/.juejin_cookie`;
+const COOKIE_FILE = process.env.JUEJIN_COOKIE_FILE || path.join(os.homedir(), '.hermes', 'projects', 'claude-code-skills-zh', '.juejin_cookie');
 const COOKIE = process.env.JUEJIN_COOKIE || (fs.existsSync(COOKIE_FILE) ? fs.readFileSync(COOKIE_FILE, 'utf-8').trim() : '');
 
 if (!COOKIE) {
@@ -89,8 +96,9 @@ async function main() {
   await page.waitForTimeout(5000);
 
   // 截图看看页面状态
-  await page.screenshot({ path: '/tmp/juejin_draft.png', fullPage: false });
-  console.log('📸 页面截图已保存到 /tmp/juejin_draft.png');
+  const draftScreenshot = path.join(os.tmpdir(), 'juejin_draft.png');
+  await page.screenshot({ path: draftScreenshot, fullPage: false });
+  console.log(`📸 页面截图已保存到 ${draftScreenshot}`);
 
   // 查找并点击发布按钮
   const publishBtn = await page.$('button:has-text("发布")');
@@ -100,8 +108,9 @@ async function main() {
     await page.waitForTimeout(5000);
 
     // 再截图
-    await page.screenshot({ path: '/tmp/juejin_published.png', fullPage: false });
-    console.log('📸 发布后截图已保存到 /tmp/juejin_published.png');
+    const publishedScreenshot = path.join(os.tmpdir(), 'juejin_published.png');
+    await page.screenshot({ path: publishedScreenshot, fullPage: false });
+    console.log(`📸 发布后截图已保存到 ${publishedScreenshot}`);
 
     // 检查 URL 是否跳转到文章页
     const finalUrl = page.url();

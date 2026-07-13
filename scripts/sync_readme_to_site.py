@@ -8,18 +8,16 @@ sync_readme_to_site.py — 自动从 README.md 提取技能数据并同步到 do
 3. 统计实际技能数量
 4. 可选：获取 GitHub star 数（通过 API）
 5. 更新 docs/index.html 中的数据和统计数字
+6. 更新 sitemap 最近修改日期
 
 用法：
     python scripts/sync_readme_to_site.py [--fetch-stars] [--dry-run]
 """
 
 import re
-import os
 import sys
-import json
 import datetime
 from pathlib import Path
-from collections import OrderedDict
 
 
 def _configure_stdio() -> None:
@@ -37,6 +35,7 @@ _configure_stdio()
 REPO_ROOT = Path(__file__).resolve().parent.parent
 README_PATH = REPO_ROOT / "README.md"
 HTML_PATH = REPO_ROOT / "docs" / "index.html"
+SITEMAP_PATH = REPO_ROOT / "docs" / "sitemap.xml"
 GITHUB_REPO = "laolaoshiren/claude-code-skills-zh"
 
 
@@ -92,8 +91,8 @@ def classify_header(line: str) -> str | None:
     if not line.startswith("### "):
         return None
 
-    # 明星技能：有 🏆 和 万星
-    if "🏆" in line and "万星" in line:
+    # 热门技能：保留旧标题兼容，避免文案调整破坏同步
+    if "🏆" in line and ("万星" in line or "热门与高潜" in line):
         return "star"
     # 平台运营
     if "平台运营" in line or "自媒体" in line:
@@ -296,7 +295,13 @@ def count_total_skills(skills_data: dict[str, list[dict]]) -> int:
     return len(seen_urls)
 
 
-def get_repo_stars(repo: str, token: str | None = None) -> int:
+def extract_existing_repo_stars(html: str) -> int | None:
+    """从现有官网统计栏读取仓库 Star，供网络失败时安全回退。"""
+    match = re.search(r'(<h3>)(\d+)(</h3>\s*<p>GitHub Stars</p>)', html)
+    return int(match.group(2)) if match else None
+
+
+def get_repo_stars(repo: str) -> int | None:
     """通过 gh CLI 获取仓库 star 数（已认证，不受限流）"""
     try:
         import subprocess
@@ -307,10 +312,10 @@ def get_repo_stars(repo: str, token: str | None = None) -> int:
         if result.returncode == 0 and result.stdout.strip().isdigit():
             return int(result.stdout.strip())
         print(f"  ⚠️  gh CLI 获取 star 失败: {result.stderr[:100]}", file=sys.stderr)
-        return 0
+        return None
     except Exception as e:
         print(f"  ⚠️  获取 star 数失败: {e}", file=sys.stderr)
-        return 0
+        return None
 
 
 def update_html_stats(html: str, total_skills: int, repo_stars: int, total_original: int = 20) -> str:
@@ -320,6 +325,11 @@ def update_html_stats(html: str, total_skills: int, repo_stars: int, total_origi
     html = re.sub(
         r'(<h3>)\d+\+(</h3>\s*<p>精选技能</p>)',
         rf'\g<1>{total_skills}+\2',
+        html
+    )
+    html = re.sub(
+        r'(<h3>)\d+(</h3>\s*<p>原创技能</p>)',
+        rf'\g<1>{total_original}\2',
         html
     )
     html = re.sub(
@@ -333,6 +343,17 @@ def update_html_stats(html: str, total_skills: int, repo_stars: int, total_origi
         html
     )
     return html
+
+
+def update_sitemap_lastmod(sitemap: str) -> str:
+    """更新 sitemap 中站点首页的最近修改日期。"""
+    today = datetime.date.today().isoformat()
+    return re.sub(
+        r'(<lastmod>)\d{4}-\d{2}-\d{2}(</lastmod>)',
+        rf'\g<1>{today}\2',
+        sitemap,
+        count=1,
+    )
 
 
 
@@ -377,9 +398,8 @@ def replace_skills_data(html: str, skills_js: str) -> str:
     """替换 HTML 中的 skillsData 对象"""
     pattern = r"const skillsData = \{.*?\};"
     new_html, count = re.subn(pattern, skills_js, html, flags=re.DOTALL)
-    if count == 0:
-        print("  ⚠️  未找到 skillsData 块，跳过替换", file=sys.stderr)
-        return html
+    if count != 1:
+        raise RuntimeError(f"skillsData 替换失败：期望 1 个数据块，实际找到 {count} 个")
     return new_html
 
 
@@ -421,6 +441,9 @@ def main():
     print("📖 读取 docs/index.html ...")
     html_content = read_file(HTML_PATH)
 
+    print("📖 读取 docs/sitemap.xml ...")
+    sitemap_content = read_file(SITEMAP_PATH)
+
     # 2. 解析 README 中的分类表格
     print("🔍 解析 README 分类表格 ...")
     skills_data = parse_readme(readme_content)
@@ -432,24 +455,30 @@ def main():
         print(f"     {key}: {len(items)} 个")
 
     # 3. 获取 GitHub star 数
-    repo_stars = 0
+    existing_repo_stars = extract_existing_repo_stars(html_content)
     if fetch_stars:
-        token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
         print(f"⭐ 获取 {GITHUB_REPO} 的 star 数 ...")
-        repo_stars = get_repo_stars(GITHUB_REPO, token)
-        print(f"   Star 数: {repo_stars}")
-    else:
-        m = re.search(r'(<h3>)(\d+)(</h3>\s*<p>GitHub Stars</p>)', html_content)
-        if m:
-            repo_stars = int(m.group(2))
-            print(f"⭐ 使用现有 Star 数: {repo_stars}（使用 --fetch-stars 获取最新值）")
+        fetched_repo_stars = get_repo_stars(GITHUB_REPO)
+        if fetched_repo_stars is None:
+            if existing_repo_stars is None:
+                raise RuntimeError("无法获取 GitHub Star，官网中也没有可回退的现有值")
+            repo_stars = existing_repo_stars
+            print(f"   ⚠️  获取失败，保留现有 Star 数: {repo_stars}")
         else:
-            repo_stars = 65
-            print(f"⭐ 使用默认 Star 数: {repo_stars}")
+            repo_stars = fetched_repo_stars
+            print(f"   Star 数: {repo_stars}")
+    else:
+        if existing_repo_stars is None:
+            raise RuntimeError("官网中没有可读取的 GitHub Star，请使用 --fetch-stars 获取")
+        repo_stars = existing_repo_stars
+        print(f"⭐ 使用现有 Star 数: {repo_stars}（使用 --fetch-stars 获取最新值）")
 
     # 4. 计算原创技能数量
-    original_count = len([d for d in os.listdir(os.path.join(REPO_ROOT, 'skills'))
-                         if os.path.isdir(os.path.join(REPO_ROOT, 'skills', d))])
+    skills_root = REPO_ROOT / "skills"
+    original_count = sum(
+        1 for skill_dir in skills_root.iterdir()
+        if skill_dir.is_dir() and (skill_dir / "SKILL.md").is_file()
+    )
 
     # 5. 生成 JavaScript
     print("📝 生成 skillsData JavaScript ...")
@@ -461,6 +490,7 @@ def main():
     new_html = update_html_stats(new_html, total_skills, repo_stars, original_count)
     new_html = update_html_badges(new_html, total_skills, original_count, repo_stars)
     new_html = update_html_meta(new_html, total_skills, original_count)
+    new_sitemap = update_sitemap_lastmod(sitemap_content)
 
     if dry_run:
         print("\n--- 预览 skillsData ---")
@@ -470,11 +500,14 @@ def main():
         print("\n✅ dry-run 完成，未写入文件")
         return
 
-    # 6. 写入文件
+    # 7. 写入文件
     write_file(HTML_PATH, new_html)
     print(f"   ✅ 已写入 {HTML_PATH.relative_to(REPO_ROOT)}")
 
-    # 7. 更新 README badges
+    write_file(SITEMAP_PATH, new_sitemap)
+    print(f"   ✅ 已写入 {SITEMAP_PATH.relative_to(REPO_ROOT)}")
+
+    # 8. 更新 README badges
     print("🔧 更新 README.md badges ...")
     new_readme = update_readme_badges(readme_content, total_skills, repo_stars)
     write_file(README_PATH, new_readme)

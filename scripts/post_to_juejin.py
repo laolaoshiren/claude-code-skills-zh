@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.11
 """
 掘金自动发文脚本 - 浏览器自动化方案
-用法: python3.11 post_to_juejin.py "标题" "内容文件路径"
+用法: python3.11 post_to_juejin.py "标题" "内容文件路径" --publish
 """
 import json
 import sys
@@ -24,7 +24,7 @@ def load_cookie():
     raise RuntimeError("缺少掘金 Cookie：请设置 JUEJIN_COOKIE 或写入 .juejin_cookie（不要提交 Cookie 到仓库）")
 
 
-COOKIE_FULL = load_cookie()
+COOKIE_FULL = ""
 
 
 def create_draft_via_api(title, content, category_id="6809640410229036040"):
@@ -69,7 +69,7 @@ const {{ chromium }} = require('playwright');
     const page = await context.newPage();
 
     // 设置 cookies
-    const cookies = '{COOKIE_FULL}'.split(';').map(c => {{
+    const cookies = process.env.JUEJIN_COOKIE.split(';').map(c => {{
         const [name, ...rest] = c.trim().split('=');
         return {{
             name: name,
@@ -106,7 +106,10 @@ const {{ chromium }} = require('playwright');
     try:
         result = subprocess.run(
             ['node', tmp_file],
-            capture_output=True, text=True, timeout=60
+            capture_output=True,
+            text=True,
+            timeout=60,
+            env={**os.environ, "JUEJIN_COOKIE": COOKIE_FULL},
         )
         print(result.stdout)
         if result.stderr:
@@ -116,14 +119,17 @@ const {{ chromium }} = require('playwright');
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("用法: python3.11 post_to_juejin.py '标题' '内容文件路径'")
+    if len(sys.argv) < 4 or sys.argv[3] != "--publish":
+        print("用法: python3.11 post_to_juejin.py '标题' '内容文件路径' --publish")
+        print("只有显式传入 --publish 才会创建草稿并尝试发布。")
         sys.exit(1)
+
+    COOKIE_FULL = load_cookie()
 
     title = sys.argv[1]
     content_file = sys.argv[2]
 
-    with open(content_file, 'r') as f:
+    with open(content_file, 'r', encoding='utf-8') as f:
         content = f.read()
 
     print(f"📝 创建草稿: {title}")

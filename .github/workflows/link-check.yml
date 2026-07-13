@@ -13,9 +13,13 @@ jobs:
   check-links:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: lycheeverse/lychee-action@v2
         with:
-          args: --verbose README.md
+          args: >-
+            --verbose
+            --max-retries 2
+            --exclude '^https://api[.]star-history[.]com/'
+            README.md
           fail: true
           jobSummary: true

@@ -12,11 +12,15 @@ description: Changelog 生成器 - 从 Git 历史自动生成 CHANGELOG
 
 ### 第 1 步：获取 Git 历史
 ```bash
-# 获取上一个 tag 到 HEAD 的所有提交
-git log --oneline --since="$(git describe --tags --abbrev=0)" HEAD
+# 先获取最近的 tag，再用 revision range 查询
+git describe --tags --abbrev=0
+git log --oneline <last-tag>..HEAD
 
 # 或指定范围
 git log --oneline v1.0.0..HEAD
+
+# 仓库没有 tag 时，明确选择起始提交或查看全部历史
+git log --oneline
 ```
 
 ### 第 2 步：分类提交

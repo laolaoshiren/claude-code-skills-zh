@@ -71,9 +71,18 @@ model User {
 }
 ```
 ```bash
-# 生成迁移
-npx prisma migrate dev --name add-email-to-users
-npx prisma migrate dev --name add-email-to-users --create-only  # 仅生成不执行
+# 默认仅生成迁移，不执行数据库变更
+npx prisma migrate dev --name add-email-to-users --create-only
+```
+
+检查生成的 SQL、连接目标和备份后，再由用户确认执行：
+
+```bash
+# 开发环境应用迁移
+npx prisma migrate dev
+
+# 生产环境应用已审核并提交的迁移
+npx prisma migrate deploy
 ```
 
 ### Django (Python)
@@ -90,12 +99,10 @@ class Migration(migrations.Migration):
             name='email',
             field=models.EmailField(unique=True, null=True),
         ),
-        migrations.RunSQL(
-            sql='CREATE INDEX ix_users_email ON users(email);',
-            reverse_sql='reverse_sql_here',
-        ),
     ]
 ```
+
+`unique=True` 已由 Django 生成唯一约束和对应索引，不要再创建重复索引。
 
 ### Rails (Ruby)
 ```ruby
@@ -125,9 +132,10 @@ rails db:rollback STEP=3 # 回滚最近 3 次
 | 大表变更 | 使用在线 DDL 工具避免锁表 |
 
 ## 注意事项
-- 总是生成 downgrade 回滚脚本
+- 默认只生成和审查迁移；执行前确认环境、数据库连接、备份和维护窗口
+- 框架支持可逆迁移时提供 downgrade；不支持时明确恢复快照或前向修复方案
 - 大表变更需考虑在线 DDL，避免长时间锁表
 - 数据迁移与 schema 变更分开处理
-- 迁移脚本必须幂等，可重复执行不出错
+- 迁移应由框架记录版本并安全重试，不要假设版本迁移可以任意重复执行
 - 在 staging 环境验证后再应用到生产环境
 - 涉及删除列/表的变更，确保应用代码已先移除相关引用

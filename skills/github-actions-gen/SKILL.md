@@ -12,6 +12,7 @@ description: GitHub Actions CI/CD 流水线生成器：根据项目技术栈自�
 
 ### 1. 项目分析
 - 检测项目语言和框架（package.json / requirements.txt / go.mod / Cargo.toml 等）
+- 从 `engines`、`.nvmrc`、`.tool-versions`、CI 和官方支持周期推导运行时版本，不硬编码过期版本
 - 识别现有 CI 配置（.github/workflows/）
 - 分析项目结构：单体仓库 or 单项目、monorepo 工具（nx / turborepo / lerna）
 - 检测测试框架（jest / pytest / go test / cargo test）
@@ -21,8 +22,8 @@ description: GitHub Actions CI/CD 流水线生成器：根据项目技术栈自�
 
 **通用流水线模板：**
 - `ci.yml` — 代码检查 + 测试（push/PR 触发）
-- `release.yml` — 版本发布（tag 触发）
-- `deploy.yml` — 部署流水线（按需）
+- `release.yml` — 版本发布（仅在用户明确要求时生成）
+- `deploy.yml` — 部署流水线（仅在部署目标和权限明确后生成）
 
 **前端项目额外：**
 - Node.js 版本矩阵测试
@@ -59,16 +60,20 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       matrix:
-        node-version: [18, 20, 22]  # 按项目调整
+        node-version: [20, 22, 24]  # 应从项目配置和支持周期推导
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
