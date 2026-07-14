@@ -5,7 +5,7 @@
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Skills](https://img.shields.io/badge/skills-391%2B-green.svg)](#original-skills)
-[![Updated](https://img.shields.io/badge/updated-2026--07--15-brightgreen.svg)](#maintenance-update)
+[![Updated](https://img.shields.io/badge/updated-2026--07--14-brightgreen.svg)](#maintenance-update)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -115,7 +115,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [career-ops](https://github.com/santifer/career-ops) | 💼 AI 求职系统：14 种技能模式 + Go 仪表盘 + PDF 生成 | 60.1K+ |
 | [graphify](https://github.com/Graphify-Labs/graphify) | 🕸️ 将代码、文档和数据结构转为可查询知识图谱 | 86K+ |
 | [marketingskills](https://github.com/coreyhaines31/marketingskills) | 📈 营销技能包：CRO、文案、SEO、数据分析、增长工程 | 39.2K+ |
-| [planning-with-files](https://github.com/OthmanAdi/planning-with-files) | 📋 Manus 风格的持久化 Markdown 规划工作流 | 25.3K+ |
+| [planning-with-files](https://github.com/OthmanAdi/planning-with-files) | 📋 Manus 风格的持久化 Markdown 规划工作流 | 25.4K+ |
 | [humanizer](https://github.com/blader/humanizer) | ✍️ 消除 AI 写作痕迹，让文本更自然 | 29.2K+ |
 | [Claude-Code-Game-Studios](https://github.com/Donchitos/Claude-Code-Game-Studios) | 🎮 49 个 AI 代理 + 72 个工作流，完整游戏开发工作室 | 23K+ |
 | [open-saas](https://github.com/wasp-lang/open-saas) | 🔥 免费 SaaS 模板，React + Node + Prisma，AI-ready | 14.9K+ |
@@ -359,7 +359,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [loopy](https://github.com/Forward-Future/loopy) | 🔄 可复用 AI Agent 循环与工作流库：覆盖工程、评测、运营、内容与设计（2.7K⭐）|
 | [skills-manager](https://github.com/xingkongliang/skills-manager) | 轻量级跨工具技能管理桌面应用：支持 Claude Code / Cursor / Codex / Copilot 等 15+ 工具的统一安装、同步、场景切换、项目工作区与 Git 备份，中文说明完善、截图清晰，适合重度技能用户集中管理（3K⭐）|
 | [vercel-labs/skills](https://github.com/vercel-labs/skills) | Vercel 出品的开放 Agent Skills CLI：支持 OpenCode / Claude Code / Codex / Cursor 等 40+ Agent，提供安装、搜索、更新、初始化全流程（26.1K⭐）|
-| [Dimillian/CodexSkillManager](https://github.com/Dimillian/CodexSkillManager) | macOS 技能管理器：统一浏览本地 Codex / Claude Code 技能，并可从 Clawdhub 搜索、下载、删除与导入，适合多技能重度用户（1.3K⭐）|
+| [Dimillian/CodexSkillManager](https://github.com/Dimillian/CodexSkillManager) | macOS 技能管理器：统一浏览本地 Codex / Claude Code 技能，并可从 Clawdhub 搜索、下载、删除与导入，适合多技能重度用户（1.4K⭐）|
 | [ui-design-brain](https://github.com/carmahhawwari/ui-design-brain) | Cursor UI 设计技能：基于 component.gallery 沉淀 60+ 组件最佳实践、布局模式、反模式与设计哲学，安装清晰，适合生成更像资深设计师产出的前端界面（841⭐）|
 | [DrCatHicks/learning-opportunities](https://github.com/DrCatHicks/learning-opportunities) | Claude Code / Codex 学习型插件市场：在完成架构、重构、Schema 等代码工作后，自动生成 10-15 分钟刻意练习，内置 repo orientation 技能，适合团队把 AI 辅助编码转化为可复盘的能力成长（2.3K⭐）|
 | [claude-code-action](https://github.com/anthropics/claude-code-action) | Anthropic 官方 GitHub Action：让 Claude Code 在 PR / Issue 中自动答疑、审查、实现与定时维护，文档完整、支持多认证方式，适合仓库自动化运营（8.4K⭐）|
@@ -387,7 +387,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [run-llama/llamaparse-agent-skills](https://github.com/run-llama/llamaparse-agent-skills) | LlamaParse 官方 Agent Skills：提供 LlamaParse、LiteParse 和 LlamaCloud Index 检索技能，适合 PDF/Office/扫描件解析与 RAG 索引工作流（71⭐）|
 | [LerianStudio/ring](https://github.com/LerianStudio/ring) | Claude Code 插件市场：89 个 skills + 38 个专业 agents，覆盖 TDD、系统化调试、并行代码审查和 10-gate 开发流程（202⭐）|
 | [binance/binance-skills-hub](https://github.com/binance/binance-skills-hub) | Binance 官方开放 Skills Hub：为 AI Agent 提供加密资产查询、交易、钱包追踪、信号监控和 DeFi 交互能力，支持 OpenClaw / Claude Code，`npx skills add` 安装路径清晰（928⭐）|
-| [am-will/codex-skills](https://github.com/am-will/codex-skills) | Codex / Agent Skills 集合：覆盖规划、多 Agent 编排、Context7/OpenAI 文档访问、前端开发和浏览器自动化，README 列出可用技能与安装/复制路径（961⭐）|
+| [am-will/codex-skills](https://github.com/am-will/codex-skills) | Codex / Agent Skills 集合：覆盖规划、多 Agent 编排、Context7/OpenAI 文档访问、前端开发和浏览器自动化，README 列出可用技能与安装/复制路径（963⭐）|
 | [thinkyou0714/github-flow-kit](https://github.com/thinkyou0714/github-flow-kit) | GitHub 原生维护 Skills：`pr-respond`、`release-notes`、`issue-triage`、`repo-tour`、PR 权限审计和仓库安全审计 6 件套，带 CI 校验、测试和 `gh skill install` 路径，适合开源维护者处理 PR / Issue / Release（0⭐）|
 | [vibeforge1111/keep-codex-fast](https://github.com/vibeforge1111/keep-codex-fast) | Codex 本地状态维护 Skill：先报告、再备份归档会话/日志/旧 worktree，帮助重度 Codex 用户保持启动和恢复速度，强调不直接删除上下文（1.5K⭐）|
 | [x0c/session-continue](https://github.com/x0c/session-continue) | Claude Code / Codex CLI 终端会话选择与交接工具：适合多项目、多终端之间恢复上下文和继续任务（1⭐）|
