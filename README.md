@@ -509,6 +509,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [gauss314/skills](https://github.com/gauss314/skills) | 📊 金融市场数据消费 Skills：面向 Claude Code 与 AI Agent 的金融数据接入能力（152⭐）|
 | [luopan](https://github.com/zhangxiaoqiang1991/luopan) | 中文行业与公司研究路由 Skill：通过信源分级和对抗验证分析产业链权力、利润分布与公司质量，适合投资或求职研究，不替代投资建议（250⭐）|
 | [qlik-oss/agentic-skills](https://github.com/qlik-oss/agentic-skills) | Qlik 官方 Agentic Skills Hub：提供 Qlik Cloud AI readiness / MCP 优化 Skill、官方与社区插件分层、`npx skills add` 与 Claude Code plugin 安装路径（3⭐）|
+| [niubiskill](https://github.com/nathanskill/niubiskill) | 中文变现决策 Skill：打断无收入验证的瞎忙，找到离真实收钱最近的一步，二选一（引流 / 成交），停掉一件分散精力的事并给出 7 天证据测试，支持 `npx skills add nathanskill/niubiskill` 安装（53⭐）|
 
 ---
 
