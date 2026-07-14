@@ -19,7 +19,6 @@ jobs:
           args: >-
             --verbose
             --max-retries 2
-            --exclude '^https://api[.]star-history[.]com/'
             README.md
           fail: true
           jobSummary: true

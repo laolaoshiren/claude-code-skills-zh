@@ -3,12 +3,16 @@
 
 from __future__ import annotations
 
+import contextlib
+import datetime
+import io
+import json
 import os
 import re
 import subprocess
 import sys
-import datetime
 from pathlib import Path
+from unittest.mock import patch
 
 import sync_readme_to_site
 
@@ -108,6 +112,23 @@ def test_existing_star_count_is_used_only_when_present() -> None:
     assert sync_readme_to_site.extract_existing_repo_stars("<main></main>") is None
 
 
+def test_own_repo_star_uses_batch_value_or_safe_fallback() -> None:
+    repo_key = sync_readme_to_site.normalize_repo_slug(sync_readme_to_site.GITHUB_REPO)
+    assert sync_readme_to_site.resolve_own_repo_stars({repo_key: 618}, 611) == 618
+
+    warnings = io.StringIO()
+    with contextlib.redirect_stderr(warnings):
+        assert sync_readme_to_site.resolve_own_repo_stars({}, 611) == 611
+    assert "安全回退" in warnings.getvalue()
+
+    try:
+        sync_readme_to_site.resolve_own_repo_stars({}, None)
+    except RuntimeError as exc:
+        assert "没有可回退" in str(exc)
+    else:
+        raise AssertionError("missing fetched and existing repo stars should fail closed")
+
+
 def test_update_sitemap_lastmod_refreshes_date() -> None:
     sitemap = "<url><lastmod>2026-05-09</lastmod></url>"
 
@@ -125,6 +146,143 @@ def test_replace_skills_data_fails_closed() -> None:
         assert "实际找到 0 个" in str(exc)
     else:
         raise AssertionError("missing skillsData block should fail closed")
+
+
+def test_generated_js_escapes_html_breakouts_and_line_separators() -> None:
+    skills_data = {
+        "dev": [
+            {
+                "name": "safe </script>",
+                "stars": "1",
+                "desc": "A&B > C\u2028D\u2029E",
+                "url": "https://example.com/repo?x=1&y=2",
+            }
+        ]
+    }
+
+    generated = sync_readme_to_site.generate_skills_js(skills_data)
+
+    assert "</script>" not in generated
+    assert "A&B" not in generated
+    assert "\u2028" not in generated
+    assert "\u2029" not in generated
+    assert "\\u003Csafe" not in generated  # 不应改变文本顺序
+    assert "safe \\u003C/script\\u003E" in generated
+    assert "A\\u0026B \\u003E C\\u2028D\\u2029E" in generated
+    assert "x=1\\u0026y=2" in generated
+
+    replaced = sync_readme_to_site.replace_skills_data(
+        "<script>const skillsData = {};</script>", generated
+    )
+    assert generated in replaced
+
+
+def test_generated_js_rejects_non_http_or_hostless_urls() -> None:
+    for invalid_url in [
+        "javascript:alert(1)",
+        "/relative/path",
+        "https:///missing-host",
+        "https://example.com/has space",
+    ]:
+        try:
+            sync_readme_to_site.generate_skills_js(
+                {
+                    "dev": [
+                        {
+                            "name": "unsafe",
+                            "stars": "",
+                            "desc": "unsafe",
+                            "url": invalid_url,
+                        }
+                    ]
+                }
+            )
+        except ValueError as exc:
+            assert "URL" in str(exc)
+        else:
+            raise AssertionError(f"invalid URL should fail closed: {invalid_url}")
+
+
+def test_refresh_readme_stars_formats_and_unifies_duplicate_repositories() -> None:
+    readme = """### 🏆 热门与高潜技能
+
+| 技能 | 说明 | ⭐ |
+|------|------|-----|
+| [Repo](https://github.com/Owner/Repo) | 热门描述 | 9.9K+ |
+
+### 💻 开发效率
+
+| 技能 | 说明 |
+|------|------|
+| [Repo 重复](https://github.com/owner/repo) | 普通描述（7⭐）|
+| [Small](https://github.com/small/repo) | 小仓库（1.2K⭐）|
+| [Missing](https://github.com/missing/repo) | 失败时保留（88⭐）|
+"""
+
+    updated = sync_readme_to_site.refresh_readme_stars(
+        readme,
+        {"owner/repo": 1234, "small/repo": 999},
+    )
+
+    assert "| [Repo](https://github.com/Owner/Repo) | 热门描述 | 1.2K+ |" in updated
+    assert "普通描述（1.2K⭐）" in updated
+    assert "小仓库（999⭐）" in updated
+    assert "失败时保留（88⭐）" in updated
+
+    parsed = sync_readme_to_site.parse_readme(updated)
+    repositories = sync_readme_to_site.collect_github_repositories(
+        parsed,
+        extra_repositories=[sync_readme_to_site.GITHUB_REPO],
+    )
+    normalized = [sync_readme_to_site.normalize_repo_slug(repo) for repo in repositories]
+    assert normalized.count("owner/repo") == 1
+    assert sync_readme_to_site.normalize_repo_slug(sync_readme_to_site.GITHUB_REPO) in normalized
+
+
+def test_fetch_github_stars_uses_graphql_and_preserves_partial_failures() -> None:
+    completed = subprocess.CompletedProcess(
+        args=[],
+        # gh 在某个别名查询失败时会以 1 退出，但 stdout 仍含 partial data。
+        returncode=1,
+        stdout=json.dumps(
+            {
+                "data": {
+                    "r0": {"stargazerCount": 1234},
+                    "r1": None,
+                },
+                "errors": [{"message": "Could not resolve repository"}],
+            }
+        ),
+        stderr="GraphQL: Could not resolve repository",
+    )
+    warnings = io.StringIO()
+
+    with patch.object(sync_readme_to_site.subprocess, "run", return_value=completed) as run:
+        with contextlib.redirect_stderr(warnings):
+            stars = sync_readme_to_site.fetch_github_stars(
+                ["Owner/Repo", "owner/repo", "Missing/Repo"]
+            )
+
+    assert stars == {"owner/repo": 1234}
+    run.assert_called_once()
+    command = run.call_args.args[0]
+    assert command[:3] == ["gh", "api", "graphql"]
+    assert any(argument.startswith("query=query RepositoryStars") for argument in command)
+    assert "repos/" not in " ".join(command)
+    assert "Missing/Repo" in warnings.getvalue()
+    assert "保留 README 旧值" in warnings.getvalue()
+
+
+def test_checked_in_site_renders_skill_data_with_safe_dom_apis() -> None:
+    html = (REPO_ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+    render_block = html.split("function renderSkills(tab) {", 1)[1]
+    render_block = render_block.split("// Tab switching", 1)[0]
+
+    assert "container.innerHTML" not in render_block
+    assert "link.textContent = s.name" in render_block
+    assert "desc.textContent = s.desc" in render_block
+    assert "link.rel = 'noopener noreferrer'" in render_block
+    assert "container.replaceChildren(fragment)" in render_block
 
 
 def test_checked_in_site_data_matches_readme() -> None:
@@ -175,8 +333,14 @@ if __name__ == "__main__":
     test_update_html_badges_refreshes_update_date()
     test_update_html_stats_refreshes_original_count()
     test_existing_star_count_is_used_only_when_present()
+    test_own_repo_star_uses_batch_value_or_safe_fallback()
     test_update_sitemap_lastmod_refreshes_date()
     test_replace_skills_data_fails_closed()
+    test_generated_js_escapes_html_breakouts_and_line_separators()
+    test_generated_js_rejects_non_http_or_hostless_urls()
+    test_refresh_readme_stars_formats_and_unifies_duplicate_repositories()
+    test_fetch_github_stars_uses_graphql_and_preserves_partial_failures()
+    test_checked_in_site_renders_skill_data_with_safe_dom_apis()
     test_checked_in_site_data_matches_readme()
     test_original_skill_sets_and_promo_counts_are_consistent()
     print("PASS: sync_readme_to_site.py regression tests")

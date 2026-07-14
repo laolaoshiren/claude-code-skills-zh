@@ -73,6 +73,8 @@ README 是单一内容源。新增条目后必须运行同步脚本生成官网�
 python scripts/sync_readme_to_site.py --fetch-stars
 ```
 
+该命令会通过已认证的 `gh` CLI 批量读取全部精选 GitHub 仓库及本仓库的实时 Star，并统一同仓库跨分类条目的显示值。单个仓库查询失败时保留 README 中已有数字并输出警告，不得用估算值补齐。
+
 新增资源时尽量使用这种描述结构：
 
 ```markdown
@@ -138,7 +140,8 @@ git diff --check
 自动任务负责：
 
 - 运行 `scripts/test_sync_readme_to_site.py`，避免同步脚本在 Windows/GBK 等环境再次回归。
-- 运行 `scripts/sync_readme_to_site.py --fetch-stars`，同步 README badge、官网统计和站点数据。
+- 运行 `scripts/sync_readme_to_site.py --fetch-stars`，同步 README badge、官网统计、精选条目 Star 和站点数据。
+- 同步脚本只接受 `http` / `https` 资源地址；生成数据需要转义脚本边界字符，官网卡片使用 DOM API 和 `textContent` 渲染，不得重新改回拼接 `innerHTML`。
 - 运行 markdownlint 和 `git diff --check`。
 - 如果 README、`docs/index.html` 或 `docs/sitemap.xml` 有自动同步差异，直接提交 `docs: auto maintenance sync`。
 

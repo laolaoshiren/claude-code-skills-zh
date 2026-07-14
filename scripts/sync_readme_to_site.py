@@ -14,10 +14,13 @@ sync_readme_to_site.py — 自动从 README.md 提取技能数据并同步到 do
     python scripts/sync_readme_to_site.py [--fetch-stars] [--dry-run]
 """
 
-import re
-import sys
 import datetime
+import json
+import re
+import subprocess
+import sys
 from pathlib import Path
+from urllib.parse import urlsplit
 
 
 def _configure_stdio() -> None:
@@ -37,6 +40,16 @@ README_PATH = REPO_ROOT / "README.md"
 HTML_PATH = REPO_ROOT / "docs" / "index.html"
 SITEMAP_PATH = REPO_ROOT / "docs" / "sitemap.xml"
 GITHUB_REPO = "laolaoshiren/claude-code-skills-zh"
+GITHUB_GRAPHQL_BATCH_SIZE = 50
+CATEGORY_ORDER = [
+    "star",
+    "platform",
+    "dev",
+    "creative",
+    "agent",
+    "finance",
+    "chinese",
+]
 
 
 # ── 工具函数 ───────────────────────────────────────────────────────────────────
@@ -52,8 +65,35 @@ def write_file(path: Path, content: str):
 
 
 def escape_js_string(s: str) -> str:
-    """转义字符串用于嵌入 JS 单引号字符串"""
-    return s.replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ")
+    """转义字符串用于嵌入 HTML 内联 JS 单引号字符串。"""
+    return (
+        s.replace("\\", "\\\\")
+        .replace("'", "\\'")
+        .replace("\r\n", " ")
+        .replace("\r", " ")
+        .replace("\n", " ")
+        .replace("<", "\\u003C")
+        .replace(">", "\\u003E")
+        .replace("&", "\\u0026")
+        .replace("\u2028", "\\u2028")
+        .replace("\u2029", "\\u2029")
+    )
+
+
+def validate_http_url(url: str) -> str:
+    """校验将写入公开页面的 URL：仅允许 http/https 且必须有 host。"""
+    candidate = url.strip()
+    try:
+        parsed = urlsplit(candidate)
+        hostname = parsed.hostname
+    except ValueError as exc:
+        raise ValueError(f"无法解析 URL: {url!r}") from exc
+
+    if parsed.scheme.lower() not in {"http", "https"} or not parsed.netloc or not hostname:
+        raise ValueError(f"URL 必须使用 http/https 且包含 host: {url!r}")
+    if any(char.isspace() or ord(char) < 0x20 for char in candidate):
+        raise ValueError(f"URL 不得包含空白或控制字符: {url!r}")
+    return candidate
 
 
 def extract_github_url(url: str) -> str:
@@ -64,6 +104,45 @@ def extract_github_url(url: str) -> str:
         if m:
             return f"https://github.com/{m.group(1)}"
     return url
+
+
+def extract_github_repo(url: str) -> str | None:
+    """从 GitHub 仓库 URL 提取 owner/name；非 GitHub 或非仓库 URL 返回 None。"""
+    try:
+        parsed = urlsplit(validate_http_url(extract_github_url(url)))
+    except ValueError:
+        return None
+
+    if (parsed.hostname or "").lower() not in {"github.com", "www.github.com"}:
+        return None
+
+    path_parts = [part for part in parsed.path.split("/") if part]
+    if len(path_parts) < 2:
+        return None
+
+    owner = path_parts[0]
+    name = path_parts[1]
+    if name.endswith(".git"):
+        name = name[:-4]
+    if not owner or not name:
+        return None
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+", owner) or not re.fullmatch(
+        r"[A-Za-z0-9_.-]+", name
+    ):
+        return None
+    return f"{owner}/{name}"
+
+
+def normalize_repo_slug(repo: str) -> str:
+    """GitHub owner/name 大小写不敏感，内部统一用小写 key。"""
+    owner, separator, name = repo.strip().partition("/")
+    if (
+        not separator
+        or not re.fullmatch(r"[A-Za-z0-9_.-]+", owner)
+        or not re.fullmatch(r"[A-Za-z0-9_.-]+", name)
+    ):
+        raise ValueError(f"非法 GitHub 仓库名: {repo!r}")
+    return f"{owner}/{name}".lower()
 
 
 def format_stars(stars: str) -> str:
@@ -80,6 +159,18 @@ def format_stars(stars: str) -> str:
         return stars
     except ValueError:
         return stars
+
+
+def format_star_count(stars: int, *, popular: bool) -> str:
+    """把数值 Star 格式化为 README 约定：热门列用 K+，其他分类用 K。"""
+    if stars < 0:
+        raise ValueError("Star 数不能为负数")
+    if stars < 1000:
+        return str(stars)
+
+    value = f"{stars / 1000:.1f}".rstrip("0").rstrip(".")
+    suffix = "K+" if popular else "K"
+    return f"{value}{suffix}"
 
 
 def classify_header(line: str) -> str | None:
@@ -124,8 +215,8 @@ def parse_stars_from_desc(desc: str) -> tuple[str, str]:
     从描述末尾提取星标数，返回 (清理后的描述, 星标字符串)
     """
     patterns = [
-        r"[（(]\s*([\d,.]+K?)\s*⭐\s*[）)]\s*$",   # （7.0K⭐）
-        r"\s*⭐\s*([\d,.]+K?)\s*$",                  # ⭐ 7.0K
+        r"[（(]\s*([\d,.]+K?)\+?\s*⭐\s*[）)]\s*$",  # （7.0K⭐）
+        r"\s*⭐\s*([\d,.]+K?)\+?\s*$",  # ⭐ 7.0K
     ]
     for pat in patterns:
         m = re.search(pat, desc)
@@ -217,6 +308,10 @@ def parse_skill_row(cells: list[str], category: str) -> dict | None:
     name = link_match.group(1).strip()
     url = link_match.group(2).strip()
     url = extract_github_url(url)
+    try:
+        url = validate_http_url(url)
+    except ValueError as exc:
+        raise ValueError(f"技能 {name!r} 的 URL 非法: {url!r}") from exc
 
     # 第二列：描述
     desc_cell = cells[1].strip() if len(cells) > 1 else ""
@@ -247,15 +342,220 @@ def parse_skill_row(cells: list[str], category: str) -> dict | None:
     }
 
 
+# ── GitHub Star 批量刷新 ──────────────────────────────────────────────────
+
+def collect_github_repositories(
+    skills_data: dict[str, list[dict]],
+    extra_repositories: list[str] | None = None,
+) -> list[str]:
+    """收集精选分类中的 GitHub 仓库，并按 owner/name 大小写不敏感去重。"""
+    repositories: dict[str, str] = {}
+
+    for category in CATEGORY_ORDER:
+        for item in skills_data.get(category, []):
+            repo = extract_github_repo(item["url"])
+            if repo is not None:
+                repositories.setdefault(normalize_repo_slug(repo), repo)
+
+    for repo in extra_repositories or []:
+        repositories.setdefault(normalize_repo_slug(repo), repo)
+
+    return list(repositories.values())
+
+
+def _build_github_stars_query(repositories: list[str]) -> str:
+    """为一批 owner/name 生成别名固定、可解析的 GraphQL 查询。"""
+    lines = ["query RepositoryStars {"]
+    for index, repo in enumerate(repositories):
+        owner, name = repo.split("/", 1)
+        lines.append(
+            f"  r{index}: repository(owner: {json.dumps(owner)}, "
+            f"name: {json.dumps(name)}) {{ stargazerCount }}"
+        )
+    lines.append("}")
+    return "\n".join(lines)
+
+
+def _repository_list_preview(repositories: list[str], limit: int = 8) -> str:
+    preview = ", ".join(repositories[:limit])
+    if len(repositories) > limit:
+        preview += f" 等 {len(repositories)} 个仓库"
+    return preview
+
+
+def fetch_github_stars(
+    repositories: list[str],
+    batch_size: int = GITHUB_GRAPHQL_BATCH_SIZE,
+) -> dict[str, int]:
+    """
+    通过 gh GraphQL 批量获取 Star。
+
+    返回值的 key 是小写 owner/name。某批或某仓库失败时不伪造数值，
+    只返回成功项，调用方因此会保留 README 旧值。
+    """
+    if batch_size <= 0:
+        raise ValueError("batch_size 必须大于 0")
+
+    unique_repositories: dict[str, str] = {}
+    for repo in repositories:
+        try:
+            normalized = normalize_repo_slug(repo)
+        except ValueError as exc:
+            print(f"  ⚠️  {exc}，已跳过并保留 README 旧值", file=sys.stderr)
+            continue
+        unique_repositories.setdefault(normalized, repo)
+
+    canonical_repositories = list(unique_repositories.values())
+    fetched: dict[str, int] = {}
+
+    for start in range(0, len(canonical_repositories), batch_size):
+        batch = canonical_repositories[start:start + batch_size]
+        query = _build_github_stars_query(batch)
+        try:
+            result = subprocess.run(
+                ["gh", "api", "graphql", "-f", f"query={query}"],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=30,
+            )
+        except Exception as exc:
+            print(
+                "  ⚠️  gh GraphQL 批量查询异常，"
+                f"保留 README 旧值：{_repository_list_preview(batch)}；{exc}",
+                file=sys.stderr,
+            )
+            continue
+
+        if result.returncode != 0:
+            error = (result.stderr or result.stdout).strip().replace("\n", " ")[:300]
+            print(
+                "  ⚠️  gh GraphQL 批量查询失败，"
+                "将继续解析 partial data，未返回的仓库保留 README 旧值："
+                f"{_repository_list_preview(batch)}"
+                f"{f'；{error}' if error else ''}",
+                file=sys.stderr,
+            )
+
+        try:
+            payload = json.loads(result.stdout)
+        except json.JSONDecodeError as exc:
+            print(
+                "  ⚠️  gh GraphQL 返回了非法 JSON，"
+                f"保留 README 旧值：{_repository_list_preview(batch)}；{exc}",
+                file=sys.stderr,
+            )
+            continue
+        if not isinstance(payload, dict):
+            print(
+                "  ⚠️  gh GraphQL 返回的 JSON 不是对象，"
+                f"保留 README 旧值：{_repository_list_preview(batch)}",
+                file=sys.stderr,
+            )
+            continue
+
+        errors = payload.get("errors")
+        if errors:
+            messages = "; ".join(
+                str(error.get("message", error)) if isinstance(error, dict) else str(error)
+                for error in errors
+            )
+            print(f"  ⚠️  gh GraphQL 返回部分错误：{messages[:500]}", file=sys.stderr)
+
+        data = payload.get("data")
+        if not isinstance(data, dict):
+            print(
+                "  ⚠️  gh GraphQL 缺少 data，"
+                f"保留 README 旧值：{_repository_list_preview(batch)}",
+                file=sys.stderr,
+            )
+            continue
+
+        missing: list[str] = []
+        for index, repo in enumerate(batch):
+            node = data.get(f"r{index}")
+            stars = node.get("stargazerCount") if isinstance(node, dict) else None
+            if isinstance(stars, int) and not isinstance(stars, bool) and stars >= 0:
+                fetched[normalize_repo_slug(repo)] = stars
+            else:
+                missing.append(repo)
+
+        if missing:
+            print(
+                "  ⚠️  GraphQL 未返回有效 Star，"
+                f"保留 README 旧值：{_repository_list_preview(missing)}",
+                file=sys.stderr,
+            )
+
+    return fetched
+
+
+def _replace_cell_value(cell: str, value: str) -> str:
+    """替换 Markdown 单元格内容，保留原有左右空白。"""
+    leading_length = len(cell) - len(cell.lstrip())
+    trailing_length = len(cell) - len(cell.rstrip())
+    leading = cell[:leading_length]
+    trailing = cell[len(cell) - trailing_length:] if trailing_length else ""
+    return f"{leading}{value}{trailing}"
+
+
+def refresh_readme_stars(readme: str, star_counts: dict[str, int]) -> str:
+    """仅更新 README 精选分类表格中成功获取的 GitHub Star。"""
+    normalized_counts = {
+        normalize_repo_slug(repo): stars
+        for repo, stars in star_counts.items()
+        if isinstance(stars, int) and not isinstance(stars, bool) and stars >= 0
+    }
+    if not normalized_counts:
+        return readme
+
+    current_category: str | None = None
+    updated_lines: list[str] = []
+
+    for line in readme.splitlines(keepends=True):
+        body = line.rstrip("\r\n")
+        line_ending = line[len(body):]
+        stripped = body.strip()
+
+        header_category = classify_header(stripped)
+        if header_category is not None:
+            current_category = "dev" if header_category == "academic" else header_category
+        elif stripped.startswith("## ") or stripped.startswith("### "):
+            current_category = None
+
+        if current_category is not None and stripped.startswith("|"):
+            cells = body.split("|")
+            if len(cells) >= 4:
+                link_match = re.search(r"\[[^\]]+\]\(([^)]+)\)", cells[1])
+                repo = extract_github_repo(link_match.group(1)) if link_match else None
+                stars = normalized_counts.get(normalize_repo_slug(repo)) if repo else None
+
+                if stars is not None:
+                    if current_category == "star" and len(cells) >= 5:
+                        cells[3] = _replace_cell_value(
+                            cells[3], format_star_count(stars, popular=True)
+                        )
+                    else:
+                        description, _old_stars = parse_stars_from_desc(cells[2].strip())
+                        formatted = format_star_count(stars, popular=False)
+                        cells[2] = _replace_cell_value(
+                            cells[2], f"{description}（{formatted}⭐）"
+                        )
+                    body = "|".join(cells)
+
+        updated_lines.append(body + line_ending)
+
+    return "".join(updated_lines)
+
+
 # ── 生成 JavaScript ───────────────────────────────────────────────────────────
 
 def generate_skills_js(skills_data: dict[str, list[dict]]) -> str:
     """生成 skillsData JavaScript 对象代码"""
     lines = ["const skillsData = {"]
 
-    category_order = ["star", "platform", "dev", "creative", "agent", "finance", "chinese"]
-
-    for idx, key in enumerate(category_order):
+    for key in CATEGORY_ORDER:
         items = skills_data.get(key, [])
         lines.append(f"  {key}: [")
 
@@ -263,7 +563,7 @@ def generate_skills_js(skills_data: dict[str, list[dict]]) -> str:
             name = escape_js_string(item["name"])
             stars = escape_js_string(item.get("stars", ""))
             desc = escape_js_string(item["desc"])
-            url = escape_js_string(item["url"])
+            url = escape_js_string(validate_http_url(item["url"]))
 
             parts = [f"name:'{name}'"]
             if stars:
@@ -301,21 +601,23 @@ def extract_existing_repo_stars(html: str) -> int | None:
     return int(match.group(2)) if match else None
 
 
-def get_repo_stars(repo: str) -> int | None:
-    """通过 gh CLI 获取仓库 star 数（已认证，不受限流）"""
-    try:
-        import subprocess
-        result = subprocess.run(
-            ["gh", "api", f"repos/{repo}", "--jq", ".stargazers_count"],
-            capture_output=True, text=True, timeout=15
+def resolve_own_repo_stars(
+    fetched_stars: dict[str, int], existing_repo_stars: int | None
+) -> int:
+    """优先使用同批 GraphQL 数据，失败时回退到官网现有值。"""
+    fetched = fetched_stars.get(normalize_repo_slug(GITHUB_REPO))
+    if isinstance(fetched, int) and not isinstance(fetched, bool) and fetched >= 0:
+        return fetched
+    if existing_repo_stars is None:
+        raise RuntimeError(
+            "批量查询未返回本仓库 Star，官网中也没有可回退的现有值"
         )
-        if result.returncode == 0 and result.stdout.strip().isdigit():
-            return int(result.stdout.strip())
-        print(f"  ⚠️  gh CLI 获取 star 失败: {result.stderr[:100]}", file=sys.stderr)
-        return None
-    except Exception as e:
-        print(f"  ⚠️  获取 star 数失败: {e}", file=sys.stderr)
-        return None
+
+    print(
+        f"   ⚠️  本仓库 Star 获取失败，安全回退为官网现有值: {existing_repo_stars}",
+        file=sys.stderr,
+    )
+    return existing_repo_stars
 
 
 def update_html_stats(html: str, total_skills: int, repo_stars: int, total_original: int = 20) -> str:
@@ -397,7 +699,8 @@ def update_html_meta(html: str, total_skills: int, total_original: int) -> str:
 def replace_skills_data(html: str, skills_js: str) -> str:
     """替换 HTML 中的 skillsData 对象"""
     pattern = r"const skillsData = \{.*?\};"
-    new_html, count = re.subn(pattern, skills_js, html, flags=re.DOTALL)
+    # 使用函数替换，避免 JS 中的 \uXXXX 被 re 当作替换模板转义。
+    new_html, count = re.subn(pattern, lambda _match: skills_js, html, flags=re.DOTALL)
     if count != 1:
         raise RuntimeError(f"skillsData 替换失败：期望 1 个数据块，实际找到 {count} 个")
     return new_html
@@ -448,30 +751,33 @@ def main():
     print("🔍 解析 README 分类表格 ...")
     skills_data = parse_readme(readme_content)
 
-    total_skills = count_total_skills(skills_data)
-    print(f"   找到 {total_skills} 个技能：")
-    for key in ["star", "platform", "dev", "creative", "agent", "finance", "chinese"]:
-        items = skills_data.get(key, [])
-        print(f"     {key}: {len(items)} 个")
-
     # 3. 获取 GitHub star 数
     existing_repo_stars = extract_existing_repo_stars(html_content)
     if fetch_stars:
-        print(f"⭐ 获取 {GITHUB_REPO} 的 star 数 ...")
-        fetched_repo_stars = get_repo_stars(GITHUB_REPO)
-        if fetched_repo_stars is None:
-            if existing_repo_stars is None:
-                raise RuntimeError("无法获取 GitHub Star，官网中也没有可回退的现有值")
-            repo_stars = existing_repo_stars
-            print(f"   ⚠️  获取失败，保留现有 Star 数: {repo_stars}")
-        else:
-            repo_stars = fetched_repo_stars
-            print(f"   Star 数: {repo_stars}")
+        repositories = collect_github_repositories(
+            skills_data, extra_repositories=[GITHUB_REPO]
+        )
+        print(f"⭐ 通过 gh GraphQL 批量刷新 {len(repositories)} 个 GitHub 仓库 ...")
+        fetched_stars = fetch_github_stars(repositories)
+        readme_content = refresh_readme_stars(readme_content, fetched_stars)
+        # 回写 Star 后重新解析，保证官网数据与 README 完全一致。
+        skills_data = parse_readme(readme_content)
+        print(f"   成功刷新 {len(fetched_stars)} / {len(repositories)} 个仓库")
+
+        repo_stars = resolve_own_repo_stars(fetched_stars, existing_repo_stars)
+        if normalize_repo_slug(GITHUB_REPO) in fetched_stars:
+            print(f"   本仓库 Star 数: {repo_stars}")
     else:
         if existing_repo_stars is None:
             raise RuntimeError("官网中没有可读取的 GitHub Star，请使用 --fetch-stars 获取")
         repo_stars = existing_repo_stars
         print(f"⭐ 使用现有 Star 数: {repo_stars}（使用 --fetch-stars 获取最新值）")
+
+    total_skills = count_total_skills(skills_data)
+    print(f"   找到 {total_skills} 个技能：")
+    for key in CATEGORY_ORDER:
+        items = skills_data.get(key, [])
+        print(f"     {key}: {len(items)} 个")
 
     # 4. 计算原创技能数量
     skills_root = REPO_ROOT / "skills"
