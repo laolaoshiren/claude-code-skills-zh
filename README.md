@@ -5,7 +5,7 @@
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Skills](https://img.shields.io/badge/skills-391%2B-green.svg)](#original-skills)
-[![Updated](https://img.shields.io/badge/updated-2026--07--14-brightgreen.svg)](#maintenance-update)
+[![Updated](https://img.shields.io/badge/updated-2026--07--15-brightgreen.svg)](#maintenance-update)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -40,7 +40,7 @@
 - 实际核验并新增 8 个资源：`academic-research-skills`、`shuorenhua`、`AppGenesisForge`、`kc_ai_skills`、`hermes-edu-skills`、`taiwan-translate-skill`、`feishu-whiteboard-pro` 与 `ccteam`，覆盖学术研究、中文写作、工程协作、教育、本地化、飞书白板和多 Agent 团队。
 - 补齐安全与使用边界：学术输出保留人工核验，CTF / 逆向仅限授权环境，飞书写入需确认账号与租户权限，ccteam 默认无 TLS 的 Web 控制台仅建议用于可信局域网或绑定本机。
 - 加固 README → 官网同步链路：只接受 `http` / `https` 外链，安全转义脚本边界字符，并改用 DOM `textContent` 渲染卡片，防止恶意目录条目注入页面脚本。
-- 修复 Star 与入口一致性：`--fetch-stars` 现在批量刷新全部 GitHub 条目并统一跨分类重复项；同时将已合并的 SEO/GEO 独立仓迁移到 120 个营销技能的统一仓库。
+- 修复 Star、入口与日期一致性：`--fetch-stars` 现在批量刷新全部 GitHub 条目并统一跨分类重复项；公开更新时间固定按 Asia/Shanghai 计算，同时将已合并的 SEO/GEO 独立仓迁移到 120 个营销技能的统一仓库。
 - 移除会返回 503 的 Star History 图片，README 与官网统一使用 canonical `www.star-history.com` 文本入口，同时恢复该域名的常规链接检查。
 - 检查 GitHub Issues 与 PR：当前无开放 PR；长期征集 [Issue #1](https://github.com/laolaoshiren/claude-code-skills-zh/issues/1) 暂无新增未处理推荐，继续保持开放。
 
@@ -135,7 +135,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [last30days-skill](https://github.com/mvanhorn/last30days-skill) | 📅 近 30 天事件追踪：跨 Reddit / X / YouTube / HN / Polymarket 检索 | 52.2K+ |
 | [openclaw](https://github.com/openclaw/openclaw) | 🦞 OpenClaw 官方个人 AI 助手：跨 OS 调度 Skills、插件与本地工具 | 382.9K+ |
 | [hermes-agent](https://github.com/NousResearch/hermes-agent) | 🪽 NousResearch 的可成长 Agent：Skills、记忆与工具链一体化 | 214.8K+ |
-| [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) | 🧠 Karpathy 编码观察提炼的 CLAUDE.md 行为技能，减少常见 LLM 编程误区 | 192K+ |
+| [andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) | 🧠 Karpathy 编码观察提炼的 CLAUDE.md 行为技能，减少常见 LLM 编程误区 | 192.1K+ |
 | [awesome-openclaw-skills](https://github.com/VoltAgent/awesome-openclaw-skills) | 🦞 OpenClaw 5,400+ 技能精选目录，适合发现可安装技能 | 51.2K+ |
 | [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) | 📚 Claude Code Skills、Hooks、Commands、Agents 和 Plugins 生态导航 | 50K+ |
 | [awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) | 🧩 1,000+ Agent Skills 精选，兼容 Claude Code / Codex / Gemini CLI / Cursor | 28.1K+ |
@@ -152,7 +152,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [cherry-studio](https://github.com/CherryHQ/cherry-studio) | 🍒 高星 AI 生产力桌面工作台，可作为 Claude Code、OpenClaw 与 MCP 工作流入口 | 48.6K+ |
 | [memU](https://github.com/NevaMind-AI/memU) | 🧠 面向常驻主动 Agent 的长期记忆层 | 14K+ |
 | [agency-agents](https://github.com/msitarzewski/agency-agents) | 🏢 完整 AI Agency 代理团队，覆盖工程、增长、社区与交付流程 | 131.4K+ |
-| [github/spec-kit](https://github.com/github/spec-kit) | 💫 GitHub 官方规格驱动开发工具包，串联需求、计划、任务与实现 | 121.1K+ |
+| [github/spec-kit](https://github.com/github/spec-kit) | 💫 GitHub 官方规格驱动开发工具包，串联需求、计划、任务与实现 | 121.2K+ |
 | [bytedance/deer-flow](https://github.com/bytedance/deer-flow) | 🦌 字节开源长周期 SuperAgent 框架：沙箱、记忆、Tools、Skills 与 Subagents | 77K+ |
 | [paperclip](https://github.com/paperclipai/paperclip) | 📎 面向零人公司的开源 Agent 编排平台 | 73.6K+ |
 | [oh-my-openagent](https://github.com/code-yeongyu/oh-my-openagent) | 🧰 面向 Claude Code / Codex / OpenCode 的 Agent Harness 工具箱 | 65.8K+ |
@@ -477,7 +477,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [screenpipe](https://github.com/screenpipe/screenpipe) | 24/7 本地屏幕与麦克风上下文记录基础设施：让 Agent 基于真实工作流自动触发与复盘，适合个人知识捕获和运营分析（19.9K⭐）|
 | [eugeniughelbur/obsidian-second-brain](https://github.com/eugeniughelbur/obsidian-second-brain) | Obsidian 第二大脑 Claude Code Skill：31 个命令覆盖 vault-first research、定时 Agent 与长期知识维护，让知识库成为可持续演化的 Agent 工作台（3.3K⭐）|
 | [Karanjot786/agent-skills-cli](https://github.com/Karanjot786/agent-skills-cli) | 通用 Agent Skills CLI：从 SkillsMP 同步 40,000+ 技能到 Cursor、Claude Code、GitHub Copilot、OpenAI Codex 与 Antigravity，适合多工具技能市场接入（173⭐）|
-| [Leon-Drq/openagentskill](https://github.com/Leon-Drq/openagentskill) | 开放 Agent Skills 市场：提供技能发现、提交、API 文档和基于真实 Agent 使用反馈的排行，适合寻找可复用 MCP / Web 自动化 / 生产力技能（200⭐）|
+| [Leon-Drq/openagentskill](https://github.com/Leon-Drq/openagentskill) | 开放 Agent Skills 市场：提供技能发现、提交、API 文档和基于真实 Agent 使用反馈的排行，适合寻找可复用 MCP / Web 自动化 / 生产力技能（201⭐）|
 | [learn-skills.dev](https://github.com/NeverSight/learn-skills.dev) | AI Agent Skills 搜索与安装站：聚合 skills.sh 榜单和手动技能索引，支持搜索、复制与安装 Claude Code / Cursor / OpenClaw 等工具可用技能，并提供中文 README（185⭐）|
 | [agent-install](https://github.com/millionco/agent-install) | 跨 Agent 安装库与 CLI：用统一 API 安装 `SKILL.md`、MCP Server 和 AGENTS.md 片段到 Claude Code / Cursor / Codex / OpenCode 等 40+ 工具（51⭐）|
 | [Meta_Kim](https://github.com/KimYx0207/Meta_Kim) | 面向 Claude Code / Codex / OpenClaw / Cursor 的 AI 编码治理层：用 agents、skills、contracts、hooks 和验证证据把复杂任务路由、审查和沉淀成可复用执行链（252⭐）|

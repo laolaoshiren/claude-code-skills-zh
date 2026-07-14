@@ -44,6 +44,29 @@ def test_dry_run_works_with_gbk_stdout() -> None:
     assert "UnicodeEncodeError" not in result.stderr
 
 
+def test_project_date_uses_asia_shanghai_boundary() -> None:
+    before_midnight = datetime.datetime(
+        2026, 7, 14, 15, 59, tzinfo=datetime.timezone.utc
+    )
+    at_midnight = datetime.datetime(
+        2026, 7, 14, 16, 0, tzinfo=datetime.timezone.utc
+    )
+
+    assert sync_readme_to_site.current_project_date(before_midnight) == datetime.date(
+        2026, 7, 14
+    )
+    assert sync_readme_to_site.current_project_date(at_midnight) == datetime.date(
+        2026, 7, 15
+    )
+
+    try:
+        sync_readme_to_site.current_project_date(datetime.datetime(2026, 7, 15))
+    except ValueError as exc:
+        assert "时区" in str(exc)
+    else:
+        raise AssertionError("naive datetime should be rejected")
+
+
 def test_update_html_meta_refreshes_public_counts() -> None:
     html = """<meta name="description" content="收录 329+ 高质量技能、Agent 和插件，20 个原创技能。">
 <meta property="og:description" content="收录 200+ Claude Code Skills / Agents / Plugins，按场景分类，中文说明，复制即装，持续更新。">
@@ -76,7 +99,7 @@ def test_update_html_badges_refreshes_update_date() -> None:
         total_original=19,
         repo_stars=513,
     )
-    today = datetime.date.today().isoformat()
+    today = sync_readme_to_site.current_project_date().isoformat()
 
     assert "✅ 349+ 精选技能" in updated
     assert "⭐ 513 Stars" in updated
@@ -96,7 +119,7 @@ def test_update_html_stats_refreshes_original_count() -> None:
         total_original=19,
         repo_stars=513,
     )
-    today = datetime.date.today().isoformat()
+    today = sync_readme_to_site.current_project_date().isoformat()
 
     assert "<h3>349+</h3><p>精选技能</p>" in updated
     assert "<h3>19</h3><p>原创技能</p>" in updated
@@ -133,7 +156,7 @@ def test_update_sitemap_lastmod_refreshes_date() -> None:
     sitemap = "<url><lastmod>2026-05-09</lastmod></url>"
 
     updated = sync_readme_to_site.update_sitemap_lastmod(sitemap)
-    today = datetime.date.today().isoformat()
+    today = sync_readme_to_site.current_project_date().isoformat()
 
     assert f"<lastmod>{today}</lastmod>" in updated
     assert "2026-05-09" not in updated
@@ -328,6 +351,7 @@ def test_original_skill_sets_and_promo_counts_are_consistent() -> None:
 
 if __name__ == "__main__":
     test_dry_run_works_with_gbk_stdout()
+    test_project_date_uses_asia_shanghai_boundary()
     test_update_html_meta_refreshes_public_counts()
     test_hot_skills_header_is_stable_after_copy_change()
     test_update_html_badges_refreshes_update_date()

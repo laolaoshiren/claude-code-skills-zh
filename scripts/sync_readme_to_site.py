@@ -50,6 +50,7 @@ CATEGORY_ORDER = [
     "finance",
     "chinese",
 ]
+PROJECT_TIMEZONE = datetime.timezone(datetime.timedelta(hours=8), name="Asia/Shanghai")
 
 
 # ── 工具函数 ───────────────────────────────────────────────────────────────────
@@ -62,6 +63,14 @@ def read_file(path: Path) -> str:
 def write_file(path: Path, content: str):
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
+
+
+def current_project_date(now: datetime.datetime | None = None) -> datetime.date:
+    """返回项目公开日期，固定使用中国标准时间，避免 CI 的 UTC 日期回退。"""
+    current = now or datetime.datetime.now(datetime.timezone.utc)
+    if current.tzinfo is None:
+        raise ValueError("now 必须包含时区信息")
+    return current.astimezone(PROJECT_TIMEZONE).date()
 
 
 def escape_js_string(s: str) -> str:
@@ -622,7 +631,7 @@ def resolve_own_repo_stars(
 
 def update_html_stats(html: str, total_skills: int, repo_stars: int, total_original: int = 20) -> str:
     """更新 HTML 中的统计数字"""
-    today = datetime.date.today().isoformat()
+    today = current_project_date().isoformat()
 
     html = re.sub(
         r'(<h3>)\d+\+(</h3>\s*<p>精选技能</p>)',
@@ -649,7 +658,7 @@ def update_html_stats(html: str, total_skills: int, repo_stars: int, total_origi
 
 def update_sitemap_lastmod(sitemap: str) -> str:
     """更新 sitemap 中站点首页的最近修改日期。"""
-    today = datetime.date.today().isoformat()
+    today = current_project_date().isoformat()
     return re.sub(
         r'(<lastmod>)\d{4}-\d{2}-\d{2}(</lastmod>)',
         rf'\g<1>{today}\2',
@@ -662,7 +671,7 @@ def update_sitemap_lastmod(sitemap: str) -> str:
 
 def update_html_badges(html: str, total_skills: int, total_original: int, repo_stars: int) -> str:
     """更新 HTML 中 hero 区域的 badge 数字"""
-    today = datetime.date.today().isoformat()
+    today = current_project_date().isoformat()
     # 先清理控制字符
     html = html.replace('', '')
     # 用字符串替换更新 badge
@@ -708,7 +717,7 @@ def replace_skills_data(html: str, skills_js: str) -> str:
 
 def update_readme_badges(readme: str, total_skills: int, repo_stars: int) -> str:
     """更新 README.md 中的 badge 数字"""
-    today = datetime.date.today().isoformat()
+    today = current_project_date().isoformat()
 
     readme = re.sub(
         r'skills-\d+%2B',
@@ -823,7 +832,7 @@ def main():
     print("🎉 同步完成！")
     print(f"   精选技能: {total_skills}+")
     print(f"   GitHub Stars: {repo_stars}")
-    print(f"   最近更新: {datetime.date.today().isoformat()}")
+    print(f"   最近更新: {current_project_date().isoformat()}")
 
 
 if __name__ == "__main__":

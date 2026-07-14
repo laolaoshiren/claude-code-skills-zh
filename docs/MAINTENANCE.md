@@ -75,6 +75,8 @@ python scripts/sync_readme_to_site.py --fetch-stars
 
 该命令会通过已认证的 `gh` CLI 批量读取全部精选 GitHub 仓库及本仓库的实时 Star，并统一同仓库跨分类条目的显示值。单个仓库查询失败时保留 README 中已有数字并输出警告，不得用估算值补齐。
 
+README badge、官网统计和 sitemap 的公开日期统一按 Asia/Shanghai（UTC+8）计算，不能直接使用 GitHub Runner 的 UTC 日期。
+
 新增资源时尽量使用这种描述结构：
 
 ```markdown
