@@ -9,8 +9,10 @@ import io
 import json
 import os
 import re
+import stat
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
@@ -19,6 +21,46 @@ import sync_readme_to_site
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCRIPT_PATH = REPO_ROOT / "scripts" / "sync_readme_to_site.py"
+
+
+def _public_sync_fixture() -> tuple[str, str, str, str]:
+    """返回数量已一致、但公开日期较旧的最小同步输入。"""
+    readme = """> 🚀 最实用的合集 | 精选 3+ | 按场景分类 | 持续更新
+
+[![Skills](https://img.shields.io/badge/skills-3%2B-green.svg)](#original-skills)
+[![Updated](https://img.shields.io/badge/updated-2026--01--02-brightgreen.svg)](#maintenance-update)
+"""
+    skills_js = "const skillsData = {};"
+    html = f"""<meta name="description" content="最实用的 Claude Code Skills / Agents / Plugins 中文精选集，收录 3+ 高质量技能、Agent 和插件，2 个原创技能，适合 Claude Code、Codex、Gemini CLI、Cursor 用户复制即装。">
+<meta property="og:description" content="收录 3+ Claude Code Skills / Agents / Plugins，按场景分类，中文说明，复制即装，持续更新。">
+<meta name="twitter:description" content="3+ 高质量 Claude Code 技能、Agent、插件中文精选，复制即装。">
+<span class="badge green">✅ 3+ 精选技能</span>
+<span class="badge purple">🎁 2 个原创技能</span>
+<span class="badge orange">⭐ 9 Stars</span>
+<span class="badge orange">🔄 更新于 2026-01-02</span>
+<h3>3+</h3><p>精选技能</p>
+<h3>2</h3><p>原创技能</p>
+<h3>9</h3><p>GitHub Stars</p>
+<h3>2026-01-02</h3><p>最近更新</p>
+<script>{skills_js}</script>"""
+    sitemap = """<urlset>
+  <url>
+    <loc>https://claude-skills.bt199.com/</loc>
+    <lastmod>2026-01-02</lastmod>
+  </url>
+</urlset>
+"""
+    return readme, html, sitemap, skills_js
+
+
+def _expect_runtime_error(callback, expected_text: str | None = None) -> None:
+    try:
+        callback()
+    except RuntimeError as exc:
+        if expected_text is not None:
+            assert expected_text in str(exc)
+    else:
+        raise AssertionError("operation should fail closed")
 
 
 def test_dry_run_works_with_gbk_stdout() -> None:
@@ -133,6 +175,10 @@ def test_existing_star_count_is_used_only_when_present() -> None:
 
     assert sync_readme_to_site.extract_existing_repo_stars(html) == 529
     assert sync_readme_to_site.extract_existing_repo_stars("<main></main>") is None
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.extract_existing_repo_stars(html + html),
+        "重复",
+    )
 
 
 def test_own_repo_star_uses_batch_value_or_safe_fallback() -> None:
@@ -153,7 +199,10 @@ def test_own_repo_star_uses_batch_value_or_safe_fallback() -> None:
 
 
 def test_update_sitemap_lastmod_refreshes_date() -> None:
-    sitemap = "<url><lastmod>2026-05-09</lastmod></url>"
+    sitemap = """<urlset><url>
+<loc>https://claude-skills.bt199.com/</loc>
+<lastmod>2026-05-09</lastmod>
+</url></urlset>"""
 
     updated = sync_readme_to_site.update_sitemap_lastmod(sitemap)
     today = sync_readme_to_site.current_project_date().isoformat()
@@ -163,12 +212,236 @@ def test_update_sitemap_lastmod_refreshes_date() -> None:
 
 
 def test_replace_skills_data_fails_closed() -> None:
-    try:
-        sync_readme_to_site.replace_skills_data("<script></script>", "const skillsData = {};")
-    except RuntimeError as exc:
-        assert "实际找到 0 个" in str(exc)
-    else:
-        raise AssertionError("missing skillsData block should fail closed")
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.replace_skills_data(
+            "<script></script>", "const skillsData = {};"
+        ),
+        "实际找到 0 个",
+    )
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.replace_skills_data(
+            "const skillsData = {}; const skillsData = {};",
+            "const skillsData = {};",
+        ),
+        "实际找到 2 个",
+    )
+
+
+def test_date_only_difference_is_a_byte_preserving_noop() -> None:
+    readme, html, sitemap, skills_js = _public_sync_fixture()
+
+    outputs = sync_readme_to_site.build_sync_outputs(
+        readme,
+        html,
+        sitemap,
+        skills_js=skills_js,
+        total_skills=3,
+        repo_stars=9,
+        total_original=2,
+        project_date=datetime.date(2026, 7, 15),
+    )
+
+    new_readme, new_html, new_sitemap, material_changed = outputs
+    assert material_changed is False
+    assert new_readme == readme
+    assert new_html == html
+    assert new_sitemap == sitemap
+    assert "2026--01--02" in new_readme
+    assert new_html.count("2026-01-02") == 2
+
+
+def test_material_change_updates_all_public_dates_together() -> None:
+    readme, html, sitemap, skills_js = _public_sync_fixture()
+    public_date = datetime.date(2026, 7, 15)
+
+    new_readme, new_html, new_sitemap, material_changed = (
+        sync_readme_to_site.build_sync_outputs(
+            readme,
+            html,
+            sitemap,
+            skills_js=skills_js,
+            total_skills=4,
+            repo_stars=10,
+            total_original=2,
+            project_date=public_date,
+        )
+    )
+
+    assert material_changed is True
+    assert "精选 4+" in new_readme
+    assert "skills-4%2B" in new_readme
+    assert "updated-2026--07--15" in new_readme
+    assert new_html.count("2026-07-15") == 2
+    assert "✅ 4+ 精选技能" in new_html
+    assert "⭐ 10 Stars" in new_html
+    assert "<lastmod>2026-07-15</lastmod>" in new_sitemap
+    assert "2026-01-02" not in new_sitemap
+
+
+def test_public_anchors_are_strictly_unique() -> None:
+    readme, html, sitemap, _skills_js = _public_sync_fixture()
+
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.update_html_meta(
+            html.replace('<meta name="twitter:description"', '<meta name="missing"'),
+            3,
+            2,
+        ),
+        "实际找到 0 处",
+    )
+    stats_anchor = "<h3>3+</h3><p>精选技能</p>"
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.update_html_stats(
+            html + stats_anchor,
+            3,
+            9,
+            2,
+        ),
+        "实际找到 2 处",
+    )
+    hero_anchor = '<span class="badge green">✅ 3+ 精选技能</span>'
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.update_html_badges(
+            html + hero_anchor,
+            3,
+            2,
+            9,
+        ),
+        "实际找到 2 处",
+    )
+    skills_badge = "https://img.shields.io/badge/skills-3%2B-green.svg"
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.update_readme_badges(
+            readme + skills_badge,
+            3,
+            9,
+        ),
+        "实际找到 2 处",
+    )
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.update_sitemap_lastmod(
+            sitemap.replace("https://claude-skills.bt199.com/", "https://example.com/")
+        ),
+        "实际找到 0 个",
+    )
+    duplicate_homepage = sitemap.replace("</urlset>", sitemap.split("<urlset>", 1)[1])
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.update_sitemap_lastmod(duplicate_homepage),
+        "实际找到 2 个",
+    )
+
+
+def test_inconsistent_public_dates_fail_closed() -> None:
+    readme, html, sitemap, skills_js = _public_sync_fixture()
+    drifted_html = html.replace("🔄 更新于 2026-01-02", "🔄 更新于 2026-01-03")
+
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.build_sync_outputs(
+            readme,
+            drifted_html,
+            sitemap,
+            skills_js=skills_js,
+            total_skills=3,
+            repo_stars=9,
+            total_original=2,
+            project_date=datetime.date(2026, 7, 15),
+        ),
+        "公开日期不一致",
+    )
+
+
+def test_sitemap_lastmod_is_anchored_to_homepage() -> None:
+    sitemap = """<urlset>
+<url><loc>https://claude-skills.bt199.com/docs</loc><lastmod>2026-01-01</lastmod></url>
+<url><loc>https://claude-skills.bt199.com/</loc><lastmod>2026-02-02</lastmod></url>
+</urlset>"""
+
+    updated = sync_readme_to_site.update_sitemap_lastmod(
+        sitemap,
+        project_date=datetime.date(2026, 7, 15),
+    )
+
+    assert "<loc>https://claude-skills.bt199.com/docs</loc><lastmod>2026-01-01" in updated
+    assert "<loc>https://claude-skills.bt199.com/</loc><lastmod>2026-07-15" in updated
+
+
+def test_file_bundle_rolls_back_when_second_replace_fails() -> None:
+    with tempfile.TemporaryDirectory() as temporary_directory:
+        root = Path(temporary_directory)
+        paths = [root / "README.md", root / "index.html", root / "sitemap.xml"]
+        originals = [b"readme-old", b"html-old", b"sitemap-old"]
+        for path, content in zip(paths, originals):
+            path.write_bytes(content)
+
+        real_replace = os.replace
+        replace_calls = 0
+
+        def fail_second_replace(source, destination):
+            nonlocal replace_calls
+            replace_calls += 1
+            if replace_calls == 2:
+                raise OSError("injected second replace failure")
+            return real_replace(source, destination)
+
+        with patch.object(
+            sync_readme_to_site.os,
+            "replace",
+            side_effect=fail_second_replace,
+        ):
+            try:
+                sync_readme_to_site.write_file_bundle(
+                    {
+                        paths[0]: "readme-new",
+                        paths[1]: "html-new",
+                        paths[2]: "sitemap-new",
+                    }
+                )
+            except OSError as exc:
+                assert "second replace" in str(exc)
+            else:
+                raise AssertionError("second replace failure should escape after rollback")
+
+        assert [path.read_bytes() for path in paths] == originals
+        assert list(root.glob(".*.tmp")) == []
+
+
+def test_file_bundle_skips_unchanged_files() -> None:
+    with tempfile.TemporaryDirectory() as temporary_directory:
+        root = Path(temporary_directory)
+        unchanged = root / "README.md"
+        changed = root / "index.html"
+        unchanged.write_text("same", encoding="utf-8")
+        changed.write_text("old", encoding="utf-8")
+        os.chmod(changed, 0o640)
+        original_mode = stat.S_IMODE(changed.stat().st_mode)
+
+        real_replace = os.replace
+        with patch.object(
+            sync_readme_to_site.os,
+            "replace",
+            wraps=real_replace,
+        ) as replace:
+            changed_paths = sync_readme_to_site.write_file_bundle(
+                {unchanged: "same", changed: "new"}
+            )
+
+        assert changed_paths == [changed]
+        assert replace.call_count == 1
+        assert unchanged.read_text(encoding="utf-8") == "same"
+        assert changed.read_text(encoding="utf-8") == "new"
+        assert stat.S_IMODE(changed.stat().st_mode) == original_mode
+
+
+def test_main_captures_project_date_once() -> None:
+    fixed_date = datetime.date(2026, 7, 15)
+    output = io.StringIO()
+    with patch.object(sync_readme_to_site, "current_project_date", return_value=fixed_date) as now:
+        with patch.object(sync_readme_to_site.sys, "argv", [str(SCRIPT_PATH), "--dry-run"]):
+            with contextlib.redirect_stdout(output):
+                sync_readme_to_site.main()
+
+    assert now.call_count == 1
+    assert "dry-run 完成" in output.getvalue()
 
 
 def test_generated_js_escapes_html_breakouts_and_line_separators() -> None:
@@ -360,6 +633,14 @@ if __name__ == "__main__":
     test_own_repo_star_uses_batch_value_or_safe_fallback()
     test_update_sitemap_lastmod_refreshes_date()
     test_replace_skills_data_fails_closed()
+    test_date_only_difference_is_a_byte_preserving_noop()
+    test_material_change_updates_all_public_dates_together()
+    test_public_anchors_are_strictly_unique()
+    test_inconsistent_public_dates_fail_closed()
+    test_sitemap_lastmod_is_anchored_to_homepage()
+    test_file_bundle_rolls_back_when_second_replace_fails()
+    test_file_bundle_skips_unchanged_files()
+    test_main_captures_project_date_once()
     test_generated_js_escapes_html_breakouts_and_line_separators()
     test_generated_js_rejects_non_http_or_hostless_urls()
     test_refresh_readme_stars_formats_and_unifies_duplicate_repositories()

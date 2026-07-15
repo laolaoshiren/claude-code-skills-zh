@@ -1,107 +1,109 @@
 ---
 name: git-workflow
-description: Git 工作流自动化 - 智能分支管理、提交信息生成、PR 创建
+description: 安全处理 Git 状态检查、提交信息、commit、分支、push、PR 和 rebase。用于用户要求检查改动、生成或创建提交、管理分支、推送、发起 PR 或整理历史时；严格区分每个动作的授权，并保护工作树中已有和无关的修改。
 ---
 
 # Git 工作流助手
 
-## 触发条件
-当用户要求提交代码、创建分支、发起 PR、整理 commit、rebase 时激活此技能。
+## 核心原则
+
+- 只执行用户明确要求的 Git 动作。生成提交信息不等于暂存或提交；提交不等于推送；创建 PR 不等于合并 PR、关闭 Issue 或发布 Release。
+- 把工作树中已有、未跟踪和无关的修改视为用户资产，不覆盖、不回退、不混入本轮提交。
+- 优先使用非交互命令。涉及历史重写、冲突选择或远程覆盖时降低自动化程度。
 
 ## 工作流程
 
-### 第 1 步：分析当前状态
+### 1. 读取仓库规则与状态
+
+先阅读适用的 `AGENTS.md`、`CONTRIBUTING.md`、README、提交规范和 CI 说明，再检查：
+
 ```bash
-git status
+git status --short --branch
+git diff
+git diff --cached
 git log --oneline -10
-git diff --staged
+git remote -v
+git branch -vv
 ```
-识别暂存区的变更内容、涉及的文件和改动类型。
 
-### 第 2 步：确定提交类型
-根据变更内容自动判断 type：
-- `feat` — 新功能
-- `fix` — Bug 修复
-- `docs` — 仅文档变更
-- `style` — 格式调整（不影响逻辑）
-- `refactor` — 重构（非新功能、非修复）
-- `test` — 测试相关
-- `perf` — 性能优化
-- `chore` — 构建/工具链变更
+同时识别未跟踪文件、当前分支、upstream、远程差异和已有失败。不得只看 staged diff。
 
-### 第 3 步：生成提交信息
-格式遵循 Conventional Commits：`<type>(<scope>): <description>`
+### 2. 明确动作与文件范围
 
-### 第 4 步：分支管理与 PR
-根据变更类型创建分支并生成 PR 描述。
+把用户请求拆成独立授权：
 
-### 第 5 步：历史整理
-交互式 rebase 整理提交历史，合并琐碎提交。
+| 动作 | 默认权限 |
+|------|----------|
+| 分析状态、生成 commit message 或 PR 文案 | 只读 |
+| 暂存、commit | 仅用户要求后执行，只选本轮相关文件 |
+| 创建或切换分支 | 仅用户明确要求时执行；实现流程需要但未获授权时，先说明原因并取得同意 |
+| fetch、push、创建 PR | 分别确认在请求范围内，不互相推导 |
+| merge、关闭 Issue、发布 Release | 必须有明确授权 |
+| rebase、修改已发布历史、强制更新远程 | 高风险，必须明确授权并满足额外条件 |
 
-## 输出格式
+存在无关改动时不得使用 `git add .` 或 `git add -A`。逐个暂存目标文件，并用 `git diff --cached` 复核。
 
-### Commit Message 模板
+### 3. 规划原子提交
 
-```
+- 根据真实 diff 判断 `feat`、`fix`、`docs`、`refactor`、`test`、`perf` 或 `chore`。
+- 沿用仓库近期提交的语言、scope 和格式。
+- 一个提交只表达一项可独立理解和验证的改动。
+- `Closes #123` 仅在对应 Issue 确实应由该提交自动关闭时使用。
+
+提交信息遵循：
+
+```text
 <type>(<scope>): <简短描述>
 
-<body: 详细说明变更原因和内容>
+<必要时说明原因、关键实现和兼容性>
 
-<footer: 关联 Issue、Breaking Changes>
+<关联 Issue 或 Breaking Change>
 ```
 
-**示例**：
+### 4. 验证后执行
+
+提交前先检查验证脚本是否会下载依赖、访问外部服务或产生其他状态，再运行与改动相关的测试、lint、构建或文档检查，并记录实际命令和退出状态。可能产生外部副作用时先取得授权。基线已有失败时单独说明，不能把未运行的项目标为通过。
+
+执行 commit 后检查：
+
+```bash
+git status --short --branch
+git show --stat --oneline HEAD
 ```
-feat(auth): 添加 OAuth2 第三方登录支持
 
-集成 Google 和 GitHub OAuth2 登录，用户可绑定已有账号。
-新增 /api/auth/oauth/callback 端点处理回调。
+推送前先 `git fetch`，确认 upstream 没有未整合的新提交；禁止 force push。
 
-Closes #123
-```
+### 5. 创建 PR
 
-### PR 描述模板
+PR 文案应帮助 reviewer 结合 diff 和验证结果快速审查，至少包含：
 
 ```markdown
 ## 变更摘要
-简要描述本次 PR 做了什么。
 
-## 变更类型
-- [ ] 新功能 (feat)
-- [ ] Bug 修复 (fix)
-- [ ] 重构 (refactor)
-- [ ] 文档 (docs)
-- [ ] 其他 (chore)
+## 关键改动
 
-## 改动文件
-| 文件 | 变更说明 |
-|------|---------|
-| src/auth/oauth.ts | 新增 OAuth2 认证逻辑 |
-| src/routes/auth.ts | 新增回调路由 |
+## 验证结果
 
-## 测试情况
-- [ ] 单元测试通过
-- [ ] 集成测试通过
-- [ ] 手动验证完成
+## 风险与回滚
 
 ## 关联 Issue
-Closes #123
-
-## 截图/录屏（如适用）
 ```
 
-### 分支命名规范
-| 类型 | 格式 | 示例 |
-|------|------|------|
-| 新功能 | `feat/<功能名>` | `feat/oauth-login` |
-| Bug 修复 | `fix/<问题描述>` | `fix/login-timeout` |
-| 紧急修复 | `hotfix/<紧急描述>` | `hotfix/security-patch` |
-| 文档 | `docs/<内容>` | `docs/api-guide` |
-| 重构 | `refactor/<范围>` | `refactor/auth-module` |
+只勾选真实完成的检查。截图、迁移说明和回滚步骤仅在适用时加入。
 
-## 注意事项
-- 提交信息使用中文或英文均可，但同一个仓库应保持一致
-- 每个提交应保持原子性，只做一件事
-- PR 描述应足够详细，让 reviewer 无需查看代码即可理解变更
-- rebase 前确保本地改动已提交或暂存，避免丢失工作
-- 不要对已推送到远程的公共分支执行 rebase
+## Rebase 与历史整理边界
+
+- rebase 前要求工作树和暂存区都干净；未经授权不得自动 stash。
+- 先 fetch 并确认目标基线，必要时在用户允许下创建本地备份引用。
+- 不对公共分支或其他人依赖的已发布提交执行 rebase。
+- 禁止 `git push --force`。确需更新用户明确授权重写的私有分支时，只能在重新确认远程状态后使用 `--force-with-lease`。
+- 遇到冲突时停止并报告冲突文件与可选方案，不猜测内容归属或擅自解决。
+
+## 输出
+
+用中文简要报告：
+
+- 执行了哪些 Git 动作、影响哪些文件和分支。
+- 实际运行的验证及结果。
+- commit SHA、push 状态和 PR URL（若已执行）。
+- 未执行、失败或仍需用户决定的事项。

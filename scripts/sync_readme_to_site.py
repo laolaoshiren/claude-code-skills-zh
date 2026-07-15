@@ -16,9 +16,12 @@ sync_readme_to_site.py — 自动从 README.md 提取技能数据并同步到 do
 
 import datetime
 import json
+import os
 import re
+import stat
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -40,6 +43,7 @@ README_PATH = REPO_ROOT / "README.md"
 HTML_PATH = REPO_ROOT / "docs" / "index.html"
 SITEMAP_PATH = REPO_ROOT / "docs" / "sitemap.xml"
 GITHUB_REPO = "laolaoshiren/claude-code-skills-zh"
+SITE_HOME_URL = "https://claude-skills.bt199.com/"
 GITHUB_GRAPHQL_BATCH_SIZE = 50
 CATEGORY_ORDER = [
     "star",
@@ -56,13 +60,92 @@ PROJECT_TIMEZONE = datetime.timezone(datetime.timedelta(hours=8), name="Asia/Sha
 # ── 工具函数 ───────────────────────────────────────────────────────────────────
 
 def read_file(path: Path) -> str:
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, "r", encoding="utf-8", newline="") as f:
         return f.read()
 
 
-def write_file(path: Path, content: str):
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(content)
+def _replace_exact(
+    content: str,
+    pattern: str,
+    replacement,
+    label: str,
+    *,
+    flags: int = 0,
+) -> str:
+    """严格替换唯一锚点；缺失或重复都拒绝继续写入。"""
+    updated, count = re.subn(pattern, replacement, content, flags=flags)
+    if count != 1:
+        raise RuntimeError(f"{label} 替换失败：期望 1 处，实际找到 {count} 处")
+    return updated
+
+
+def _write_temp_bytes(path: Path, content: bytes, suffix: str, mode: int) -> Path:
+    """在目标同目录落临时文件，保证 os.replace 不跨文件系统。"""
+    descriptor, temporary_name = tempfile.mkstemp(
+        dir=path.parent,
+        prefix=f".{path.name}.",
+        suffix=suffix,
+    )
+    temporary_path = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "wb") as stream:
+            stream.write(content)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.chmod(temporary_path, mode)
+    except Exception:
+        temporary_path.unlink(missing_ok=True)
+        raise
+    return temporary_path
+
+
+def write_file_bundle(outputs: dict[Path, str]) -> list[Path]:
+    """
+    以可回滚 bundle 写入文件。
+
+    未变化的文件不会创建临时文件或调用 ``os.replace``。所有新文件和备份
+    都位于目标同目录；替换中途失败时，已替换目标会按逆序恢复。
+    """
+    changed: list[tuple[Path, bytes, bytes, int]] = []
+    for raw_path, content in outputs.items():
+        path = Path(raw_path)
+        original = path.read_bytes()
+        proposed = content.encode("utf-8")
+        if proposed != original:
+            mode = stat.S_IMODE(path.stat().st_mode)
+            changed.append((path, original, proposed, mode))
+
+    if not changed:
+        return []
+
+    staged: dict[Path, Path] = {}
+    backups: dict[Path, Path] = {}
+    replaced: list[Path] = []
+    try:
+        for path, original, proposed, mode in changed:
+            staged[path] = _write_temp_bytes(path, proposed, ".new.tmp", mode)
+            backups[path] = _write_temp_bytes(path, original, ".backup.tmp", mode)
+
+        for path, _original, _proposed, _mode in changed:
+            os.replace(staged[path], path)
+            replaced.append(path)
+    except Exception as exc:
+        rollback_errors: list[str] = []
+        for path in reversed(replaced):
+            try:
+                os.replace(backups[path], path)
+            except Exception as rollback_exc:  # pragma: no cover - 极端磁盘故障
+                rollback_errors.append(f"{path}: {rollback_exc}")
+        if rollback_errors:
+            raise RuntimeError(
+                "同步写入失败，且部分文件回滚失败：" + "; ".join(rollback_errors)
+            ) from exc
+        raise
+    finally:
+        for temporary_path in [*staged.values(), *backups.values()]:
+            temporary_path.unlink(missing_ok=True)
+
+    return [path for path, _original, _proposed, _mode in changed]
 
 
 def current_project_date(now: datetime.datetime | None = None) -> datetime.date:
@@ -606,8 +689,12 @@ def count_total_skills(skills_data: dict[str, list[dict]]) -> int:
 
 def extract_existing_repo_stars(html: str) -> int | None:
     """从现有官网统计栏读取仓库 Star，供网络失败时安全回退。"""
-    match = re.search(r'(<h3>)(\d+)(</h3>\s*<p>GitHub Stars</p>)', html)
-    return int(match.group(2)) if match else None
+    matches = list(re.finditer(r'<h3>(\d+)</h3>\s*<p>GitHub Stars</p>', html))
+    if len(matches) > 1:
+        raise RuntimeError(
+            f"官网 GitHub Stars 统计锚点重复：期望至多 1 处，实际找到 {len(matches)} 处"
+        )
+    return int(matches[0].group(1)) if matches else None
 
 
 def resolve_own_repo_stars(
@@ -629,63 +716,187 @@ def resolve_own_repo_stars(
     return existing_repo_stars
 
 
-def update_html_stats(html: str, total_skills: int, repo_stars: int, total_original: int = 20) -> str:
-    """更新 HTML 中的统计数字"""
-    today = current_project_date().isoformat()
+def _resolve_public_date(project_date: datetime.date | None) -> datetime.date:
+    return project_date if project_date is not None else current_project_date()
 
-    html = re.sub(
+
+def update_html_stats(
+    html: str,
+    total_skills: int,
+    repo_stars: int,
+    total_original: int = 20,
+    *,
+    project_date: datetime.date | None = None,
+    update_date: bool = True,
+) -> str:
+    """更新 HTML 中的统计数字"""
+    html = _replace_exact(
+        html,
         r'(<h3>)\d+\+(</h3>\s*<p>精选技能</p>)',
-        rf'\g<1>{total_skills}+\2',
-        html
+        lambda match: f"{match.group(1)}{total_skills}+{match.group(2)}",
+        "HTML 精选技能统计",
     )
-    html = re.sub(
+    html = _replace_exact(
+        html,
         r'(<h3>)\d+(</h3>\s*<p>原创技能</p>)',
-        rf'\g<1>{total_original}\2',
-        html
+        lambda match: f"{match.group(1)}{total_original}{match.group(2)}",
+        "HTML 原创技能统计",
     )
-    html = re.sub(
+    html = _replace_exact(
+        html,
         r'(<h3>)\d+(</h3>\s*<p>GitHub Stars</p>)',
-        rf'\g<1>{repo_stars}\2',
-        html
+        lambda match: f"{match.group(1)}{repo_stars}{match.group(2)}",
+        "HTML GitHub Stars 统计",
     )
-    html = re.sub(
+    today = _resolve_public_date(project_date).isoformat() if update_date else None
+    html = _replace_exact(
+        html,
         r'(<h3>)\d{4}-\d{2}-\d{2}(</h3>\s*<p>最近更新</p>)',
-        rf'\g<1>{today}\2',
-        html
+        (
+            (lambda match: f"{match.group(1)}{today}{match.group(2)}")
+            if update_date
+            else (lambda match: match.group(0))
+        ),
+        "HTML 最近更新统计",
     )
     return html
 
 
-def update_sitemap_lastmod(sitemap: str) -> str:
-    """更新 sitemap 中站点首页的最近修改日期。"""
-    today = current_project_date().isoformat()
-    return re.sub(
-        r'(<lastmod>)\d{4}-\d{2}-\d{2}(</lastmod>)',
-        rf'\g<1>{today}\2',
-        sitemap,
-        count=1,
+def _find_sitemap_homepage_block(sitemap: str) -> re.Match[str]:
+    """返回 sitemap 唯一首页 URL 块。"""
+    url_matches = list(re.finditer(r"<url(?:\s[^>]*)?>.*?</url>", sitemap, re.DOTALL))
+    homepage_blocks: list[re.Match[str]] = []
+    homepage_pattern = re.compile(
+        rf"<loc>\s*{re.escape(SITE_HOME_URL)}\s*</loc>"
     )
+    for match in url_matches:
+        if homepage_pattern.search(match.group(0)):
+            homepage_blocks.append(match)
+
+    if len(homepage_blocks) != 1:
+        raise RuntimeError(
+            "sitemap 首页 URL 锚点校验失败："
+            f"期望 1 个 {SITE_HOME_URL}，实际找到 {len(homepage_blocks)} 个"
+        )
+
+    block_match = homepage_blocks[0]
+    block = block_match.group(0)
+    if len(homepage_pattern.findall(block)) != 1:
+        raise RuntimeError("sitemap 首页 URL 块中的 loc 必须恰好出现 1 次")
+    return block_match
+
+
+def update_sitemap_lastmod(
+    sitemap: str,
+    *,
+    project_date: datetime.date | None = None,
+    update_date: bool = True,
+) -> str:
+    """只更新 sitemap 中首页 URL 的 lastmod，并严格校验唯一锚点。"""
+    block_match = _find_sitemap_homepage_block(sitemap)
+    block = block_match.group(0)
+
+    today = _resolve_public_date(project_date).isoformat() if update_date else None
+    updated_block = _replace_exact(
+        block,
+        r'(<lastmod>)\d{4}-\d{2}-\d{2}(</lastmod>)',
+        (
+            (lambda match: f"{match.group(1)}{today}{match.group(2)}")
+            if update_date
+            else (lambda match: match.group(0))
+        ),
+        "sitemap 首页 lastmod",
+    )
+    return sitemap[:block_match.start()] + updated_block + sitemap[block_match.end():]
+
+
+def _extract_unique_date(content: str, pattern: str, label: str) -> str:
+    matches = re.findall(pattern, content)
+    if len(matches) != 1:
+        raise RuntimeError(f"{label} 日期校验失败：期望 1 处，实际找到 {len(matches)} 处")
+    raw_date = matches[0]
+    normalized = raw_date.replace("--", "-")
+    try:
+        datetime.date.fromisoformat(normalized)
+    except ValueError as exc:
+        raise RuntimeError(f"{label} 日期非法：{raw_date}") from exc
+    return normalized
+
+
+def validate_public_dates(readme: str, html: str, sitemap: str) -> str:
+    """确认 README、HTML 两处与 sitemap 首页公开日期完全一致。"""
+    homepage_block = _find_sitemap_homepage_block(sitemap).group(0)
+    public_dates = {
+        "README Updated badge": _extract_unique_date(
+            readme,
+            r'https://img\.shields\.io/badge/updated-(\d{4}--\d{2}--\d{2})-brightgreen\.svg',
+            "README Updated badge",
+        ),
+        "HTML 最近更新统计": _extract_unique_date(
+            html,
+            r'<h3>(\d{4}-\d{2}-\d{2})</h3>\s*<p>最近更新</p>',
+            "HTML 最近更新统计",
+        ),
+        "HTML Hero 更新 badge": _extract_unique_date(
+            html,
+            r'<span class="badge orange">🔄 更新于 (\d{4}-\d{2}-\d{2})</span>',
+            "HTML Hero 更新 badge",
+        ),
+        "sitemap 首页 lastmod": _extract_unique_date(
+            homepage_block,
+            r'<lastmod>(\d{4}-\d{2}-\d{2})</lastmod>',
+            "sitemap 首页 lastmod",
+        ),
+    }
+    if len(set(public_dates.values())) != 1:
+        detail = "，".join(f"{label}={value}" for label, value in public_dates.items())
+        raise RuntimeError(f"公开日期不一致，拒绝自动同步：{detail}")
+    return next(iter(public_dates.values()))
 
 
 
 
-def update_html_badges(html: str, total_skills: int, total_original: int, repo_stars: int) -> str:
+def update_html_badges(
+    html: str,
+    total_skills: int,
+    total_original: int,
+    repo_stars: int,
+    *,
+    project_date: datetime.date | None = None,
+    update_date: bool = True,
+) -> str:
     """更新 HTML 中 hero 区域的 badge 数字"""
-    today = current_project_date().isoformat()
     # 先清理控制字符
     html = html.replace('', '')
-    # 用字符串替换更新 badge
-    import re
-    patterns = [
-        (r'✅ \d+\+[^<]*', f'✅ {total_skills}+ 精选技能'),
-        (r'🎁 \d+[^<]*个原创技能', f'🎁 {total_original} 个原创技能'),
-        (r'⭐ \d+ Stars', f'⭐ {repo_stars} Stars'),
-        (r'🔄 更新于 \d{4}-\d{2}-\d{2}', f'🔄 更新于 {today}'),
+    today = _resolve_public_date(project_date).isoformat() if update_date else None
+    replacements = [
+        (
+            r'(<span class="badge green">)✅ \d+\+ 精选技能(</span>)',
+            lambda match: f"{match.group(1)}✅ {total_skills}+ 精选技能{match.group(2)}",
+            "HTML Hero 精选技能 badge",
+        ),
+        (
+            r'(<span class="badge purple">)🎁 \d+ 个原创技能(</span>)',
+            lambda match: f"{match.group(1)}🎁 {total_original} 个原创技能{match.group(2)}",
+            "HTML Hero 原创技能 badge",
+        ),
+        (
+            r'(<span class="badge orange">)⭐ \d+ Stars(</span>)',
+            lambda match: f"{match.group(1)}⭐ {repo_stars} Stars{match.group(2)}",
+            "HTML Hero GitHub Stars badge",
+        ),
+        (
+            r'(<span class="badge orange">)🔄 更新于 \d{4}-\d{2}-\d{2}(</span>)',
+            (
+                (lambda match: f"{match.group(1)}🔄 更新于 {today}{match.group(2)}")
+                if update_date
+                else (lambda match: match.group(0))
+            ),
+            "HTML Hero 更新日期 badge",
+        ),
     ]
-    for pattern, replacement in patterns:
-        m = re.search(pattern, html)
-        if m:
-            html = html.replace(m.group(), replacement)
+    for pattern, replacement, label in replacements:
+        html = _replace_exact(html, pattern, replacement, label)
     return html
 
 
@@ -701,7 +912,12 @@ def update_html_meta(html: str, total_skills: int, total_original: int) -> str:
     }
 
     for pattern, replacement in replacements.items():
-        html = re.sub(pattern, replacement, html, count=1)
+        html = _replace_exact(
+            html,
+            pattern,
+            lambda _match, value=replacement: value,
+            f"HTML meta {pattern}",
+        )
     return html
 
 
@@ -715,26 +931,124 @@ def replace_skills_data(html: str, skills_js: str) -> str:
     return new_html
 
 
-def update_readme_badges(readme: str, total_skills: int, repo_stars: int) -> str:
-    """更新 README.md 中的 badge 数字"""
-    today = current_project_date().isoformat()
-
-    readme = re.sub(
-        r'skills-\d+%2B',
-        f'skills-{total_skills}%2B',
-        readme
+def update_readme_badges(
+    readme: str,
+    total_skills: int,
+    repo_stars: int,
+    *,
+    project_date: datetime.date | None = None,
+    update_date: bool = True,
+) -> str:
+    """更新 README badge 与首屏精选数量，并严格校验唯一锚点。"""
+    del repo_stars  # README 使用 GitHub 动态 Star badge，不写死仓库 Star。
+    readme = _replace_exact(
+        readme,
+        r'(https://img\.shields\.io/badge/skills-)\d+(%2B-green\.svg)',
+        lambda match: f"{match.group(1)}{total_skills}{match.group(2)}",
+        "README Skills badge",
     )
-    readme = re.sub(
-        r'精选 \d+\+',
-        f'精选 {total_skills}+',
-        readme
+    readme = _replace_exact(
+        readme,
+        r'(?m)^(> 🚀 .*?\| 精选 )\d+(\+ \|.*)$',
+        lambda match: f"{match.group(1)}{total_skills}{match.group(2)}",
+        "README 首屏精选数量",
     )
-    readme = re.sub(
-        r'updated-\d{4}--\d{2}--\d{2}',
-        f'updated-{today.replace("-", "--")}',
-        readme
+    today = _resolve_public_date(project_date).isoformat() if update_date else None
+    readme = _replace_exact(
+        readme,
+        r'(https://img\.shields\.io/badge/updated-)\d{4}--\d{2}--\d{2}(-brightgreen\.svg)',
+        (
+            (
+                lambda match: (
+                    f"{match.group(1)}{today.replace('-', '--')}{match.group(2)}"
+                )
+            )
+            if update_date
+            else (lambda match: match.group(0))
+        ),
+        "README Updated badge",
     )
     return readme
+
+
+def build_sync_outputs(
+    readme_content: str,
+    html_content: str,
+    sitemap_content: str,
+    *,
+    proposed_readme_content: str | None = None,
+    skills_js: str,
+    total_skills: int,
+    repo_stars: int,
+    total_original: int,
+    project_date: datetime.date,
+) -> tuple[str, str, str, bool]:
+    """先生成并校验非日期结果，仅在有实质变化时统一推进公开日期。"""
+    readme_source = (
+        proposed_readme_content
+        if proposed_readme_content is not None
+        else readme_content
+    )
+    html_without_date = replace_skills_data(html_content, skills_js)
+    html_without_date = update_html_stats(
+        html_without_date,
+        total_skills,
+        repo_stars,
+        total_original,
+        update_date=False,
+    )
+    html_without_date = update_html_badges(
+        html_without_date,
+        total_skills,
+        total_original,
+        repo_stars,
+        update_date=False,
+    )
+    html_without_date = update_html_meta(
+        html_without_date, total_skills, total_original
+    )
+    readme_without_date = update_readme_badges(
+        readme_source,
+        total_skills,
+        repo_stars,
+        update_date=False,
+    )
+    # 即使最终 no-op，也要先验证首页锚点和 lastmod 唯一性。
+    update_sitemap_lastmod(sitemap_content, update_date=False)
+    validate_public_dates(readme_without_date, html_without_date, sitemap_content)
+
+    material_changed = (
+        html_without_date != html_content or readme_without_date != readme_content
+    )
+    if not material_changed:
+        return readme_content, html_content, sitemap_content, False
+
+    new_html = update_html_stats(
+        html_without_date,
+        total_skills,
+        repo_stars,
+        total_original,
+        project_date=project_date,
+    )
+    new_html = update_html_badges(
+        new_html,
+        total_skills,
+        total_original,
+        repo_stars,
+        project_date=project_date,
+    )
+    new_readme = update_readme_badges(
+        readme_without_date,
+        total_skills,
+        repo_stars,
+        project_date=project_date,
+    )
+    new_sitemap = update_sitemap_lastmod(
+        sitemap_content,
+        project_date=project_date,
+    )
+    validate_public_dates(new_readme, new_html, new_sitemap)
+    return new_readme, new_html, new_sitemap, True
 
 
 # ── 主逻辑 ─────────────────────────────────────────────────────────────────────
@@ -742,13 +1056,15 @@ def update_readme_badges(readme: str, total_skills: int, repo_stars: int) -> str
 def main():
     fetch_stars = "--fetch-stars" in sys.argv
     dry_run = "--dry-run" in sys.argv
+    project_date = current_project_date()
 
     print("🔄 sync_readme_to_site.py — 同步 README.md → docs/index.html")
     print()
 
     # 1. 读取文件
     print("📖 读取 README.md ...")
-    readme_content = read_file(README_PATH)
+    original_readme_content = read_file(README_PATH)
+    readme_content = original_readme_content
 
     print("📖 读取 docs/index.html ...")
     html_content = read_file(HTML_PATH)
@@ -799,40 +1115,49 @@ def main():
     print("📝 生成 skillsData JavaScript ...")
     skills_js = generate_skills_js(skills_data)
 
-    # 6. 更新 HTML
-    print("🔧 更新 docs/index.html ...")
-    new_html = replace_skills_data(html_content, skills_js)
-    new_html = update_html_stats(new_html, total_skills, repo_stars, original_count)
-    new_html = update_html_badges(new_html, total_skills, original_count, repo_stars)
-    new_html = update_html_meta(new_html, total_skills, original_count)
-    new_sitemap = update_sitemap_lastmod(sitemap_content)
+    # 6. 先在内存生成并严格校验三文件结果。
+    print("🔧 在内存生成并校验 README、官网与 sitemap ...")
+    new_readme, new_html, new_sitemap, material_changed = build_sync_outputs(
+        original_readme_content,
+        html_content,
+        sitemap_content,
+        proposed_readme_content=readme_content,
+        skills_js=skills_js,
+        total_skills=total_skills,
+        repo_stars=repo_stars,
+        total_original=original_count,
+        project_date=project_date,
+    )
 
     if dry_run:
         print("\n--- 预览 skillsData ---")
         print(skills_js[:2000])
         if len(skills_js) > 2000:
             print(f"  ... (共 {len(skills_js)} 字符)")
-        print("\n✅ dry-run 完成，未写入文件")
+        state = "存在实质变化" if material_changed else "无实质变化"
+        print(f"\n✅ dry-run 完成（{state}），未写入文件")
         return
 
-    # 7. 写入文件
-    write_file(HTML_PATH, new_html)
-    print(f"   ✅ 已写入 {HTML_PATH.relative_to(REPO_ROOT)}")
-
-    write_file(SITEMAP_PATH, new_sitemap)
-    print(f"   ✅ 已写入 {SITEMAP_PATH.relative_to(REPO_ROOT)}")
-
-    # 8. 更新 README badges
-    print("🔧 更新 README.md badges ...")
-    new_readme = update_readme_badges(readme_content, total_skills, repo_stars)
-    write_file(README_PATH, new_readme)
-    print(f"   ✅ 已写入 {README_PATH.relative_to(REPO_ROOT)}")
+    # 7. 同目录临时文件 + os.replace 组成可回滚 bundle；未变化文件自动跳过。
+    changed_paths = write_file_bundle(
+        {
+            README_PATH: new_readme,
+            HTML_PATH: new_html,
+            SITEMAP_PATH: new_sitemap,
+        }
+    )
+    if changed_paths:
+        for changed_path in changed_paths:
+            print(f"   ✅ 已写入 {changed_path.relative_to(REPO_ROOT)}")
+    else:
+        print("   ✅ 无实质变化，所有文件保持原字节")
 
     print()
     print("🎉 同步完成！")
     print(f"   精选技能: {total_skills}+")
     print(f"   GitHub Stars: {repo_stars}")
-    print(f"   最近更新: {current_project_date().isoformat()}")
+    public_date = project_date.isoformat() if material_changed else "保持不变"
+    print(f"   最近更新: {public_date}")
 
 
 if __name__ == "__main__":
