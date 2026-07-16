@@ -1,164 +1,118 @@
 ---
 name: api-tester
-description: API 自动化测试 - OpenAPI 解析、测试用例生成、集成测试
+description: 依据真实 OpenAPI、路由实现和现有测试生成并验证 API 测试。用于用户要求测试接口、补集成测试、验证 API 契约、生成回归用例或排查接口兼容性时；区分“生成测试”和“执行请求”的授权，不猜测状态码、响应结构或 SLA，不在未确认环境中发送写请求。
 ---
 
-# API 测试生成器
+# API 测试助手
 
-## 触发条件
-当用户要求测试 API、生成测试用例、接口测试、集成测试时激活此技能。
+## 核心原则
+
+- 只把可核验的 OpenAPI、代码、类型、调用方或现有测试当作契约证据。
+- 生成测试不等于执行测试；读取接口定义不等于可以访问真实服务。
+- 保护现有数据、凭据和用户修改，优先使用隔离且可清理的测试环境。
 
 ## 工作流程
 
-### 第 1 步：发现 API
-按优先级查找 API 定义：
-1. OpenAPI/Swagger 文件（`openapi.yaml`、`swagger.json`）
-2. 路由定义文件（Express routes、Flask blueprints、Spring controllers）
-3. API 目录结构（`/api/`、`/routes/`、`/controllers/`）
+### 1. 读取项目与接口证据
 
-**OpenAPI 解析方法**：
-```bash
-# 使用 swagger-cli 验证
-npx @apidevtools/swagger-cli validate openapi.yaml
+先读取适用的仓库规则、测试说明、Git 状态和项目脚本，再按实际存在情况检查：
 
-# 使用 redocly 提取端点信息
-npx @redocly/cli lint openapi.yaml
+- OpenAPI / Swagger 文件及其引用的 Schema。
+- 路由、controller、handler、DTO、验证器和错误处理中间件。
+- 客户端类型、调用方、公开文档和现有 API 测试。
+- 测试配置、fixture、认证方式、环境变量模板和数据清理机制。
 
-# 查看端点、Schema 和统计信息，避免用 grep 误解析 YAML
-npx @redocly/cli stats openapi.yaml
+记录规范、实现与现有测试之间的不一致。无法确定哪个行为才是期望契约时，列出证据并请求确认，不用新测试固化猜测。
+
+### 2. 建立契约矩阵
+
+为目标 endpoint 记录：
+
+| 项目 | 证据 |
+|------|------|
+| method 与 path | OpenAPI 或路由位置 |
+| 认证与权限 | security scheme、中间件或调用方 |
+| 请求参数与约束 | Schema、DTO 或验证器 |
+| 已声明响应 | 状态码、响应结构与 header |
+| 副作用与幂等性 | 实现、文档或调用链 |
+| 测试环境与清理 | fixture、事务或 teardown |
+
+不要默认每个接口都应返回 `400`、`401`、`403`、`404`、`422` 或 `500`。只有契约已声明或代码路径真实可达时才生成对应断言。
+
+### 3. 明确环境与授权
+
+在执行任何请求前确认：
+
+- Base URL、环境归属以及是否为 local、test、staging 或 production。
+- 测试账号、权限范围和凭据来源。
+- 是否允许执行 POST、PUT、PATCH、DELETE、上传、支付、通知等有副作用操作。
+- 测试数据隔离、唯一标识、清理或事务回滚方案。
+
+用户只要求“生成测试”时只产出代码。生产环境、共享 staging、第三方服务及任何可能改变真实数据的执行都必须获得明确授权。GET 也不能仅凭 method 判定无副作用。
+
+### 4. 选择项目锁定的工具
+
+- 优先运行仓库已有的 test、OpenAPI lint 或 contract test script。
+- 读取 package manager、lockfile 和已安装版本后再选择命令。
+- 不用裸 `npx`、全局工具或临时下载的最新版解析规范。
+- 缺少依赖时先报告；安装工具、更新 lockfile 或修改测试配置需要单独授权。
+- 使用真正的 YAML / JSON / OpenAPI 解析器，不用 `grep` 推断嵌套 Schema。
+
+### 5. 设计有依据的用例
+
+按目标契约选择必要场景：
+
+- 成功路径：使用最小合法输入验证状态、结构和关键语义。
+- 边界路径：只测试 Schema 或实现中真实存在的长度、范围、枚举、格式和必填约束。
+- 认证与权限：只覆盖已声明的身份、角色和资源归属规则。
+- 失败与回归：覆盖可达错误路径、已知缺陷或兼容性要求。
+- 幂等、分页、并发、重试与超时：仅在接口契约包含这些语义时测试。
+
+断言外部可观察行为，避免绑定内部函数调用。随机数据应固定 seed，并避免真实个人信息、客户数据和生产标识。
+
+### 6. 实现最小测试
+
+- 沿用项目现有框架、目录、fixture、命名和断言风格。
+- 单元测试可隔离网络、时间和第三方服务；集成测试使用受控服务或临时资源。
+- 对写操作使用唯一数据，并在成功、失败和中断路径都执行清理。
+- 不为让测试通过而擅自修改生产代码、接口规范或认证配置。
+- 使用跨平台路径和项目脚本；平台专属命令需说明 Windows / Linux 适用范围。
+
+### 7. 执行与复验
+
+1. 先检查命令是否会下载依赖、访问外部服务或改变共享状态。
+2. 运行最小目标测试，记录命令、环境、退出状态和真实响应摘要。
+3. 按风险运行相关测试、类型检查或完整测试。
+4. 检查 Git diff 和环境状态，确认没有残留测试数据、快照、日志、Token 或无关生成物。
+5. 将基线已有失败与本轮新增失败分开报告。
+
+没有实际运行时，只能说明“已生成、未验证”。没有明确 SLA 和受控测量条件时，不添加固定耗时断言或声称性能达标。
+
+## 安全边界
+
+- 不在命令、日志、fixture 或报告中写入真实 Token、Cookie、密码和个人数据。
+- 未经明确授权，不访问生产环境、真实客户账号、付费 API 或受监管系统。
+- 压测、模糊测试、大批量数据生成和安全探测需要单独授权及限流方案。
+- 遇到权限不足、环境不明、清理方案缺失或响应可能含敏感信息时停止执行并报告。
+
+## 输出
+
+```markdown
+## API 测试结果
+
+- 目标接口与契约证据：
+- 环境与授权范围：
+- 新增或修改文件：
+
+## 用例
+
+| 场景 | 契约依据 | 是否执行 | 结果 |
+|------|----------|----------|------|
+
+## 验证
+
+- 实际命令与退出状态：
+- 数据清理：
+- 基线已有失败：
+- 未确认契约与限制：
 ```
-
-### 第 2 步：生成测试用例
-为每个 endpoint 生成三类测试：
-- **正常场景**（happy path）— 合法输入，期望成功响应
-- **边界值测试** — 空值、超长字符串、特殊字符、极值
-- **错误场景** — 400/401/403/404/422/500
-
-### 第 3 步：生成测试代码
-根据项目技术栈选择测试框架并生成代码。
-
-### 第 4 步：测试数据生成
-
-**策略**：
-| 策略 | 适用场景 | 工具/方法 |
-|------|---------|----------|
-| 固定数据 | 简单接口、确定性测试 | JSON fixture 文件 |
-| Faker 随机生成 | 大量测试数据、压力测试 | `@faker-js/faker`、`Faker`(Python) |
-| 工厂模式 | 复杂对象关系 | factory_boy、fishery |
-| 从 Schema 生成 | 基于 OpenAPI 自动生成 | `json-schema-faker` |
-
-### 第 5 步：执行和复测
-
-- 使用项目现有测试命令运行生成的测试。
-- 根据真实失败信息修正 fixture、认证、状态码或环境依赖。
-- 再次运行，确认测试独立且可重复。
-- 无法执行时明确标注“未运行验证”，不要声称测试代码可直接通过。
-
-## 测试模板
-
-### pytest (Python)
-```python
-import pytest
-
-# 正常场景
-def test_get_users_success(client):
-    response = client.get("/api/users")
-    assert response.status_code == 200
-    assert isinstance(response.json(), list)
-
-# 边界值测试
-def test_create_user_empty_name(client):
-    response = client.post("/api/users", json={"name": ""})
-    assert response.status_code == 422
-
-# 认证测试
-def test_get_users_unauthorized(client):
-    response = client.get("/api/users", headers={})
-    assert response.status_code == 401
-
-# 参数化批量测试
-@pytest.mark.parametrize("name,expected_status", [
-    ("Alice", 200),
-    ("", 422),
-    ("a" * 500, 422),
-    (None, 422),
-])
-def test_create_user_validation(client, name, expected_status):
-    response = client.post("/api/users", json={"name": name})
-    assert response.status_code == expected_status
-```
-
-### Jest (JavaScript/TypeScript)
-```typescript
-import request from 'supertest';
-import app from '../src/app';
-
-describe('GET /api/users', () => {
-  it('应返回用户列表', async () => {
-    const res = await request(app)
-      .get('/api/users')
-      .set('Authorization', 'Bearer test-token');
-    expect(res.status).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
-  });
-
-  it('未认证应返回 401', async () => {
-    const res = await request(app).get('/api/users');
-    expect(res.status).toBe(401);
-  });
-});
-
-describe('POST /api/users', () => {
-  it('空名称应返回 422', async () => {
-    const res = await request(app)
-      .post('/api/users')
-      .send({ name: '' });
-    expect(res.status).toBe(422);
-  });
-
-  it('有效数据应返回 201', async () => {
-    const res = await request(app)
-      .post('/api/users')
-      .send({ name: 'Alice', email: 'alice@test.com' });
-    expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty('id');
-  });
-});
-```
-
-### curl 测试脚本
-```bash
-#!/bin/bash
-BASE_URL="http://localhost:3000/api"
-API_TOKEN="${API_TOKEN:?请先设置 API_TOKEN}"
-
-# 正常请求
-echo "=== GET /users ==="
-curl -s -w "\nHTTP Status: %{http_code}\n" \
-  -H "Authorization: Bearer $API_TOKEN" \
-  "$BASE_URL/users"
-
-# POST 创建资源
-echo "=== POST /users ==="
-curl -s -w "\nHTTP Status: %{http_code}\n" \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $API_TOKEN" \
-  -d '{"name":"Alice","email":"alice@test.com"}' \
-  "$BASE_URL/users"
-
-# 错误场景 - 空 body
-echo "=== POST /users (empty) ==="
-curl -s -w "\nHTTP Status: %{http_code}\n" \
-  -X POST \
-  -H "Content-Type: application/json" \
-  -d '{}' \
-  "$BASE_URL/users"
-```
-
-## 注意事项
-- 测试用例应独立运行，不依赖执行顺序
-- 使用 `beforeEach` 或 fixture 管理测试数据的初始化和清理
-- 敏感信息（API Key、Token）使用环境变量，不要硬编码
-- 集成测试建议使用独立的测试数据库
-- 关注响应时间，添加超时断言

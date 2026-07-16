@@ -227,6 +227,30 @@ def test_replace_skills_data_fails_closed() -> None:
     )
 
 
+def test_crlf_site_data_is_a_byte_preserving_noop() -> None:
+    readme, html, sitemap, skills_js = _public_sync_fixture()
+    readme = readme.replace("\n", "\r\n")
+    html = html.replace("\n", "\r\n")
+    sitemap = sitemap.replace("\n", "\r\n")
+
+    outputs = sync_readme_to_site.build_sync_outputs(
+        readme,
+        html,
+        sitemap,
+        skills_js=skills_js,
+        total_skills=3,
+        repo_stars=9,
+        total_original=2,
+        project_date=datetime.date(2026, 7, 16),
+    )
+
+    new_readme, new_html, new_sitemap, material_changed = outputs
+    assert material_changed is False
+    assert new_readme == readme
+    assert new_html == html
+    assert new_sitemap == sitemap
+
+
 def test_date_only_difference_is_a_byte_preserving_noop() -> None:
     readme, html, sitemap, skills_js = _public_sync_fixture()
 
@@ -633,6 +657,7 @@ if __name__ == "__main__":
     test_own_repo_star_uses_batch_value_or_safe_fallback()
     test_update_sitemap_lastmod_refreshes_date()
     test_replace_skills_data_fails_closed()
+    test_crlf_site_data_is_a_byte_preserving_noop()
     test_date_only_difference_is_a_byte_preserving_noop()
     test_material_change_updates_all_public_dates_together()
     test_public_anchors_are_strictly_unique()

@@ -16,12 +16,14 @@ concurrency:
 jobs:
   maintain:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
+          persist-credentials: false
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: '3.12'
 
@@ -34,20 +36,59 @@ jobs:
         run: python scripts/sync_readme_to_site.py --fetch-stars
 
       - name: Markdown lint
-        run: npx --yes markdownlint-cli2 "**/*.md"
+        uses: DavidAnson/markdownlint-cli2-action@8de2aa07cae85fd17c0b35642db70cf5495f1d25 # v24.0.0
+        with:
+          globs: '**/*.md'
 
       - name: Check whitespace
         run: git diff --check
 
       - name: Commit automatic maintenance updates
+        id: commit
+        shell: bash
         run: |
+          set -euo pipefail
+
           if git diff --quiet -- README.md docs/index.html docs/sitemap.xml; then
             echo "No automatic maintenance changes."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add README.md docs/index.html docs/sitemap.xml
+          git add -- README.md docs/index.html docs/sitemap.xml
+          git diff --cached --check
           git commit -m "docs: auto maintenance sync"
-          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Push automatic maintenance updates
+        if: steps.commit.outputs.changed == 'true'
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TARGET_REF: ${{ github.ref }}
+          TARGET_REF_TYPE: ${{ github.ref_type }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$TARGET_REF_TYPE" != "branch" ]]; then
+            echo "Refusing to push non-branch ref: $TARGET_REF" >&2
+            exit 1
+          fi
+
+          askpass="$RUNNER_TEMP/git-askpass.sh"
+          umask 077
+          cat > "$askpass" <<'EOF'
+          #!/usr/bin/env sh
+          case "$1" in
+            *Username*) printf '%s\n' 'x-access-token' ;;
+            *Password*) printf '%s\n' "$GITHUB_TOKEN" ;;
+            *) exit 1 ;;
+          esac
+          EOF
+          chmod 700 "$askpass"
+          trap 'rm -f "$askpass"' EXIT
+
+          GIT_ASKPASS="$askpass" GIT_TERMINAL_PROMPT=0 \
+            git push origin "HEAD:$TARGET_REF"

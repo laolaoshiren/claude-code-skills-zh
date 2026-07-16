@@ -921,11 +921,36 @@ def update_html_meta(html: str, total_skills: int, total_original: int) -> str:
     return html
 
 
+def _detect_newline_style(content: str, label: str) -> str | None:
+    """识别唯一换行风格；混用 CRLF、LF 或 CR 时拒绝自动替换。"""
+    without_crlf = content.replace("\r\n", "")
+    styles = []
+    if "\r\n" in content:
+        styles.append("\r\n")
+    if "\n" in without_crlf:
+        styles.append("\n")
+    if "\r" in without_crlf:
+        styles.append("\r")
+    if len(styles) > 1:
+        raise RuntimeError(f"{label} 混用了多种换行符，拒绝自动同步")
+    return styles[0] if styles else None
+
+
 def replace_skills_data(html: str, skills_js: str) -> str:
-    """替换 HTML 中的 skillsData 对象"""
+    """替换 HTML 中的 skillsData 对象，并保留目标数据块的换行风格。"""
     pattern = r"const skillsData = \{.*?\};"
+
+    def render_replacement(match: re.Match[str]) -> str:
+        newline = (
+            _detect_newline_style(match.group(0), "skillsData 数据块")
+            or _detect_newline_style(html, "HTML")
+            or "\n"
+        )
+        normalized = skills_js.replace("\r\n", "\n").replace("\r", "\n")
+        return normalized.replace("\n", newline)
+
     # 使用函数替换，避免 JS 中的 \uXXXX 被 re 当作替换模板转义。
-    new_html, count = re.subn(pattern, lambda _match: skills_js, html, flags=re.DOTALL)
+    new_html, count = re.subn(pattern, render_replacement, html, flags=re.DOTALL)
     if count != 1:
         raise RuntimeError(f"skillsData 替换失败：期望 1 个数据块，实际找到 {count} 个")
     return new_html
