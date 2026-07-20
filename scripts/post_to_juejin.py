@@ -4,6 +4,7 @@
 用法: python3.11 post_to_juejin.py "标题" "内容文件路径" --publish
 """
 import json
+import re
 import sys
 import os
 import subprocess
@@ -59,6 +60,9 @@ def create_draft_via_api(title, content, category_id="6809640410229036040"):
 
 def publish_via_browser(draft_id):
     """通过浏览器打开草稿并点击发布按钮"""
+    if not re.fullmatch(r"\d+", str(draft_id)):
+        raise ValueError(f"草稿 ID 格式异常，拒绝拼接执行: {draft_id!r}")
+
     # 构造 playwright 脚本
     js_code = f"""
 const {{ chromium }} = require('playwright');
