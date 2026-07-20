@@ -5,7 +5,8 @@ const path = require('path');
 
 const COOKIE_FILE = process.env.JUEJIN_COOKIE_FILE || path.join(os.homedir(), '.hermes', 'projects', 'claude-code-skills-zh', '.juejin_cookie');
 const COOKIE = process.env.JUEJIN_COOKIE || (fs.existsSync(COOKIE_FILE) ? fs.readFileSync(COOKIE_FILE, 'utf-8').trim() : '');
-const TEMP_DIR = os.tmpdir();
+const TEMP_DIR = path.join(__dirname, '..', '.tmp');
+fs.mkdirSync(TEMP_DIR, { recursive: true });
 const ERROR_SCREENSHOT = path.join(TEMP_DIR, 'juejin_error.png');
 const RESULT_SCREENSHOT = path.join(TEMP_DIR, 'juejin_result.png');
 const RESULT_JSON = path.join(TEMP_DIR, 'juejin_result.json');

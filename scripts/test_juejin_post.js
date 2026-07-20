@@ -11,6 +11,8 @@ const path = require('path');
 
 const COOKIE_FILE = process.env.JUEJIN_COOKIE_FILE || path.join(os.homedir(), '.hermes', 'projects', 'claude-code-skills-zh', '.juejin_cookie');
 const COOKIE = process.env.JUEJIN_COOKIE || (fs.existsSync(COOKIE_FILE) ? fs.readFileSync(COOKIE_FILE, 'utf-8').trim() : '');
+const TEMP_DIR = path.join(__dirname, '..', '.tmp');
+fs.mkdirSync(TEMP_DIR, { recursive: true });
 
 if (!COOKIE) {
   console.error('❌ 缺少掘金 Cookie：请设置 JUEJIN_COOKIE 或写入 .juejin_cookie（不要提交 Cookie 到仓库）');
@@ -96,7 +98,7 @@ async function main() {
   await page.waitForTimeout(5000);
 
   // 截图看看页面状态
-  const draftScreenshot = path.join(os.tmpdir(), 'juejin_draft.png');
+  const draftScreenshot = path.join(TEMP_DIR, 'juejin_draft.png');
   await page.screenshot({ path: draftScreenshot, fullPage: false });
   console.log(`📸 页面截图已保存到 ${draftScreenshot}`);
 
@@ -108,7 +110,7 @@ async function main() {
     await page.waitForTimeout(5000);
 
     // 再截图
-    const publishedScreenshot = path.join(os.tmpdir(), 'juejin_published.png');
+    const publishedScreenshot = path.join(TEMP_DIR, 'juejin_published.png');
     await page.screenshot({ path: publishedScreenshot, fullPage: false });
     console.log(`📸 发布后截图已保存到 ${publishedScreenshot}`);
 
