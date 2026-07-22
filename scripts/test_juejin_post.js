@@ -17,6 +17,11 @@ if (!COOKIE) {
   process.exit(1);
 }
 
+const { createPrivateTempDir } = require('./secure_temp');
+const TEMP_DIR = createPrivateTempDir('claude-skills-juejin-smoke-');
+const DRAFT_SCREENSHOT = path.join(TEMP_DIR, 'juejin_draft.png');
+const PUBLISHED_SCREENSHOT = path.join(TEMP_DIR, 'juejin_published.png');
+
 // 测试文章
 const TITLE = '测试文章-请忽略';
 const CONTENT = '# 测试\n\n这是一篇测试文章，验证自动发文流程。请忽略此文章。';
@@ -96,9 +101,8 @@ async function main() {
   await page.waitForTimeout(5000);
 
   // 截图看看页面状态
-  const draftScreenshot = path.join(os.tmpdir(), 'juejin_draft.png');
-  await page.screenshot({ path: draftScreenshot, fullPage: false });
-  console.log(`📸 页面截图已保存到 ${draftScreenshot}`);
+  await page.screenshot({ path: DRAFT_SCREENSHOT, fullPage: false });
+  console.log(`📸 页面截图已保存到 ${DRAFT_SCREENSHOT}`);
 
   // 查找并点击发布按钮
   const publishBtn = await page.$('button:has-text("发布")');
@@ -108,9 +112,8 @@ async function main() {
     await page.waitForTimeout(5000);
 
     // 再截图
-    const publishedScreenshot = path.join(os.tmpdir(), 'juejin_published.png');
-    await page.screenshot({ path: publishedScreenshot, fullPage: false });
-    console.log(`📸 发布后截图已保存到 ${publishedScreenshot}`);
+    await page.screenshot({ path: PUBLISHED_SCREENSHOT, fullPage: false });
+    console.log(`📸 发布后截图已保存到 ${PUBLISHED_SCREENSHOT}`);
 
     // 检查 URL 是否跳转到文章页
     const finalUrl = page.url();

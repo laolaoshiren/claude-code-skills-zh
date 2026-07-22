@@ -4,10 +4,14 @@
   "private": true,
   "description": "运营脚本：掘金发文等自动化工具",
   "scripts": {
+    "test": "node --test test_secure_temp.js",
     "post-juejin": "node post_to_juejin.js",
     "live-smoke-juejin": "node test_juejin_post.js --publish"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
-    "playwright": "^1.40.0"
+    "playwright": "1.61.1"
   }
 }

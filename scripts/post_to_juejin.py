@@ -58,10 +58,17 @@ def create_draft_via_api(title, content, category_id="6809640410229036040"):
     return None
 
 
+def validate_draft_id(draft_id):
+    """只接受掘金返回的 ASCII 数字草稿 ID，供 URL 和脚本安全拼接。"""
+    normalized = str(draft_id)
+    if not re.fullmatch(r"[0-9]+", normalized):
+        raise ValueError(f"草稿 ID 格式异常，拒绝拼接执行: {draft_id!r}")
+    return normalized
+
+
 def publish_via_browser(draft_id):
     """通过浏览器打开草稿并点击发布按钮"""
-    if not re.fullmatch(r"\d+", str(draft_id)):
-        raise ValueError(f"草稿 ID 格式异常，拒绝拼接执行: {draft_id!r}")
+    draft_id = validate_draft_id(draft_id)
 
     # 构造 playwright 脚本
     js_code = f"""
@@ -103,7 +110,9 @@ const {{ chromium }} = require('playwright');
 """
 
     # 写入临时文件并执行
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.js', delete=False) as f:
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".js", delete=False, encoding="utf-8"
+    ) as f:
         f.write(js_code)
         tmp_file = f.name
 
@@ -112,6 +121,8 @@ const {{ chromium }} = require('playwright');
             ['node', tmp_file],
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             timeout=60,
             env={**os.environ, "JUEJIN_COOKIE": COOKIE_FULL},
         )

@@ -5,10 +5,6 @@ const path = require('path');
 
 const COOKIE_FILE = process.env.JUEJIN_COOKIE_FILE || path.join(os.homedir(), '.hermes', 'projects', 'claude-code-skills-zh', '.juejin_cookie');
 const COOKIE = process.env.JUEJIN_COOKIE || (fs.existsSync(COOKIE_FILE) ? fs.readFileSync(COOKIE_FILE, 'utf-8').trim() : '');
-const TEMP_DIR = os.tmpdir();
-const ERROR_SCREENSHOT = path.join(TEMP_DIR, 'juejin_error.png');
-const RESULT_SCREENSHOT = path.join(TEMP_DIR, 'juejin_result.png');
-const RESULT_JSON = path.join(TEMP_DIR, 'juejin_result.json');
 
 const rawArgs = process.argv.slice(2);
 const shouldPublish = rawArgs.includes('--publish');
@@ -43,6 +39,11 @@ if (!COOKIE) {
 }
 
 const { chromium } = require('playwright');
+const { createPrivateTempDir, writePrivateJson } = require('./secure_temp');
+const TEMP_DIR = createPrivateTempDir('claude-skills-juejin-');
+const ERROR_SCREENSHOT = path.join(TEMP_DIR, 'juejin_error.png');
+const RESULT_SCREENSHOT = path.join(TEMP_DIR, 'juejin_result.png');
+const RESULT_JSON = path.join(TEMP_DIR, 'juejin_result.json');
 
 async function apiPost(path, body) {
   return new Promise((resolve, reject) => {
@@ -197,16 +198,16 @@ async function main() {
     const articleId = finalUrl.match(/post\/(\d+)/)?.[1];
     console.log(`🎉 发布成功! 文章链接: https://juejin.cn/post/${articleId}`);
     // 写入结果供外部使用
-    fs.writeFileSync(RESULT_JSON, JSON.stringify({ success: true, article_id: articleId, url: `https://juejin.cn/post/${articleId}` }));
+    writePrivateJson(RESULT_JSON, { success: true, article_id: articleId, url: `https://juejin.cn/post/${articleId}` });
   } else {
     // 检查是否有成功提示
     const successTip = await page.$('text=发布成功');
     if (successTip) {
       console.log('🎉 发布成功（检测到成功提示）');
-      fs.writeFileSync(RESULT_JSON, JSON.stringify({ success: true }));
+      writePrivateJson(RESULT_JSON, { success: true });
     } else {
       console.log(`⚠️ 无法确认发布状态，请查看截图 ${RESULT_SCREENSHOT}`);
-      fs.writeFileSync(RESULT_JSON, JSON.stringify({ success: false, note: '需人工确认' }));
+      writePrivateJson(RESULT_JSON, { success: false, note: '需人工确认' });
     }
   }
 
