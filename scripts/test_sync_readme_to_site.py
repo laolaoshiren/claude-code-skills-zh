@@ -618,6 +618,23 @@ def test_checked_in_site_data_matches_readme() -> None:
     assert match.group(0) == expected
 
 
+def test_checked_in_readme_is_a_user_facing_landing_page() -> None:
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert '<a id="maintenance-update"></a>' not in readme
+    assert not re.search(
+        r"^#{2,6}\s+\d{4}-\d{2}-\d{2}\s+维护更新\s*$",
+        readme,
+        flags=re.MULTILINE,
+    )
+    assert re.search(
+        r"\[!\[Updated\]\(https://img\.shields\.io/badge/updated-"
+        r"\d{4}--\d{2}--\d{2}-brightgreen\.svg\)\]"
+        r"\(https://github\.com/laolaoshiren/claude-code-skills-zh/commits/main\)",
+        readme,
+    )
+
+
 def test_original_skill_sets_and_promo_counts_are_consistent() -> None:
     skills_root = REPO_ROOT / "skills"
     skill_names = {
@@ -672,5 +689,6 @@ if __name__ == "__main__":
     test_fetch_github_stars_uses_graphql_and_preserves_partial_failures()
     test_checked_in_site_renders_skill_data_with_safe_dom_apis()
     test_checked_in_site_data_matches_readme()
+    test_checked_in_readme_is_a_user_facing_landing_page()
     test_original_skill_sets_and_promo_counts_are_consistent()
     print("PASS: sync_readme_to_site.py regression tests")

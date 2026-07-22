@@ -5,7 +5,7 @@
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Skills](https://img.shields.io/badge/skills-406%2B-green.svg)](#original-skills)
-[![Updated](https://img.shields.io/badge/updated-2026--07--22-brightgreen.svg)](#maintenance-update)
+[![Updated](https://img.shields.io/badge/updated-2026--07--22-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -32,64 +32,6 @@
 - **中文友好**：很多说明直接面向中文开发者，不用自己二次理解
 - **高频场景覆盖全**：代码审查、文档、测试、安全、性能、重构、CI/CD 都覆盖
 - **持续维护**：定期补新技能、更新 README、官网和分类结构
-
-<a id="maintenance-update"></a>
-
-### 2026-07-22 维护更新
-
-- 实际核验并新增 5 个资源：中文产品视频与手绘动画 Skills、LangChain 官方跨 Agent 插件市场、ABP Framework 官方工程技能，以及飞书 / Lark Card JSON 2.0 Skill，精选目录增至 406+。
-- 审查社区 PR #14–#16：批准并合并 [PR #15](https://github.com/laolaoshiren/claude-code-skills-zh/pull/15) 的 `draft_id` 注入修复；#14 固定到 2023 年旧版 Playwright、#16 使用共享仓库 `.tmp` 均未原样接受，改为当前版本 lockfile 与私有临时目录方案。
-- 加固掘金脚本但未运行发布流程：Playwright 固定为当前实测 `1.61.1` 并提交 lockfile；截图与结果写入每次运行唯一的用户临时目录，POSIX 下目录强制为 `0700`、JSON 强制为 `0600`；Python 发布器固定 UTF-8，避免 Windows GBK 写入或解码失败；普通预检不产生调试文件；新增 Python / Node 离线安全回归并接入只读 `Script Safety` CI。
-- 重写原创 `github-actions-gen`：第三方 Action 使用完整 commit SHA 和版本注释，checkout 默认不持久化凭据，并补齐 fork PR、`pull_request_target`、Secrets、OIDC、Environment 与 shell 注入边界。
-- 清理两个 canonical 重定向：`ComposioHQ/awesome-codex-skills` 迁至 `composio-community`，`x0c/session-continue` 改名为 `x0c/pickup` 并更新平台、系统和 tmux 前置条件。
-- 实时检查 GitHub Issues、PR 与三类评论：长期征集 Issue #1 无新增推荐；除本轮处理的 #14–#16 外没有新社区事项。
-
----
-
-### 2026-07-19 维护更新
-
-- 实际核验并新增 4 个官方资源：Supabase 后端与 Postgres Skills、Together AI 多模态与 GPU 工作流、Sentry 跨 Agent 可观测性插件源码，以及带简体中文文档的腾讯 RTC 集成 Skill。
-- 重写原创 `dep-auditor`：默认只读并以 lockfile、advisory 和工具原始结果为证据；禁止隐式下载审计工具或未经授权执行 `--fix`，不再把 GPL / AGPL 简化成固定风险等级或法律结论。
-- 修正 GitHub 仓库简介的长期漂移：移除容易过期的“100+ / 18 个原创”数字，改为稳定的中文项目定位。
-- 实时检查 GitHub Issues、PR、issue comment、PR review comment 与 commit comment：开放 PR 为 0；长期征集 Issue #1 没有新增未处理推荐，继续保持开放。
-
----
-
-### 2026-07-17 维护更新
-
-- 实际核验并新增 3 个资源：NVIDIA 官方 230 个验证型 Agent Skills、带中文文档的 GitHub README 视觉重构 Skill，以及 PlanetScale 官方 15 个数据库审查与运维 Skills。
-- 修复 Windows `core.autocrlf=true` 下的同步幂等问题：替换 `skillsData` 时保留目标 CRLF / LF 风格，并新增真实 CRLF 字节级 no-op 回归测试。
-- 重写原创 `api-tester`：按 OpenAPI、路由和现有测试的真实契约生成用例，区分“生成测试”与“执行请求”授权，禁止裸 `npx`、猜测状态码 / SLA 和未确认的生产写请求。
-- 加固 GitHub Actions：固定所有第三方 Action 的完整 commit SHA，只读任务显式使用 `contents: read` 和超时；自动维护不再持久化 Git 凭据，仅在最终 push 步骤临时注入 Token。
-- 更新长期征集 [Issue #1](https://github.com/laolaoshiren/claude-code-skills-zh/issues/1)：将“提交即上榜”改为“审核后收录”，明确真实资产、安装路径、许可证、重复项和安全合规核验标准。
-- 检查 GitHub Issues、PR、review 与评论：当前无开放 PR、无新增未处理推荐或评论；PR #13 已合并且无后续反馈。
-
----
-
-### 2026-07-15 维护更新
-
-- 实际核验并新增 8 个资源：`academic-research-skills`、`shuorenhua`、`AppGenesisForge`、`kc_ai_skills`、`hermes-edu-skills`、`taiwan-translate-skill`、`feishu-whiteboard-pro` 与 `ccteam`，覆盖学术研究、中文写作、工程协作、教育、本地化、飞书白板和多 Agent 团队。
-- 审查并合并社区 [PR #13](https://github.com/laolaoshiren/claude-code-skills-zh/pull/13)：实际检查 `niubiskill` 的中文 `SKILL.md`、安装路径、25 个行为场景与校验脚本；目录描述补充“不承诺收益”和受监管活动权限边界。
-- 新增 `dotnet/skills` 与 `tex-manual-translation`：前者提供 .NET 团队维护的 15 组跨 Agent 插件，后者用中文术语表、CJK 编译门禁和检查脚本处理 LaTeX 手册翻译。
-- 补齐安全与使用边界：学术输出保留人工核验，CTF / 逆向仅限授权环境，飞书写入需确认账号与租户权限，ccteam 默认无 TLS 的 Web 控制台仅建议用于可信局域网或绑定本机。
-- 重写 `git-workflow`、`eslint-fix`、`perf-profiler` 与 `test-generator` 的关键流程：严格区分 Git 动作授权，禁止隐式下载 ESLint，用真实基线和 profiler 证据报告性能，并按真实代码契约生成测试。
-- 加固 README → 官网同步链路：只接受 `http` / `https` 外链，安全转义脚本边界字符，并改用 DOM `textContent` 渲染卡片，防止恶意目录条目注入页面脚本。
-- 让同步任务真正幂等并失败关闭：公开锚点缺失或重复时拒绝写入，仅在内容实质变化时统一推进日期，并通过同目录临时文件、原子替换和逆序回滚保护 README、官网与 sitemap。
-- 修复 Star、入口与日期一致性：`--fetch-stars` 现在批量刷新全部 GitHub 条目并统一跨分类重复项；公开更新时间固定按 Asia/Shanghai 计算，同时将已合并的 SEO/GEO 独立仓迁移到 120 个营销技能的统一仓库。
-- 移除会返回 503 的 Star History 图片，README 与官网统一使用 canonical `www.star-history.com` 文本入口，同时恢复该域名的常规链接检查。
-- 检查 GitHub Issues、PR 与评论：PR #13 已完成中文 review 并合并，当前无开放 PR；长期征集 [Issue #1](https://github.com/laolaoshiren/claude-code-skills-zh/issues/1) 暂无新增未处理推荐，继续保持开放。
-
----
-
-### 2026-07-14 维护更新
-
-- 修复连续三次失败的自动维护任务：替换 404 资源、排除不稳定的 Star History 图片接口，并升级 GitHub Actions 运行时版本。
-- 核验 PR #11 / #12 的 LinkedIn Skills，未直接合并不符合中文表格规范的改动；改为收录一个仓库级中文条目，并明确 Token、云浏览器和真实账号风险。
-- 新增 Microsoft SkillOpt、Microsoft Agent Skills、claudelint、finding-unknowns、codex-hygiene、歸藏材质插画、人文学科写作伙伴、罗盘和繁体中文去 AI 味等高价值资源。
-- 清理重定向、重复与归档条目：迁移到 canonical URL，以 GSD Core 替代已归档旧仓库，移除已归档抖音 MCP，并更新热门项目 Star。
-- 新增原创 `skill-curator`，用中文核验候选仓库的实际资产、安装方式、分类、重复项和风险，原创技能增至 20 个。
-- 加固 README → 官网同步：修复原创数量统计、Star 获取失败回退、`skillsData` 替换失败保护，并自动更新 sitemap 日期。
-- 修复 API 测试和数据库迁移示例，收紧环境变量脱敏规则；掘金脚本默认只预检，必须显式 `--publish` 才会产生外部状态。
 
 ---
 

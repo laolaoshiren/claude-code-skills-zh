@@ -77,6 +77,8 @@ python scripts/sync_readme_to_site.py --fetch-stars
 
 README badge、官网统计和 sitemap 的公开日期统一按 Asia/Shanghai（UTC+8）计算，不能直接使用 GitHub Runner 的 UTC 日期。
 
+README 是面向用户的项目首页，只保留项目价值、安装入口、精选目录和必要的更新时间，不堆叠按日期展开的完整维护日志。详细变更写入 Git commit、PR / Issue 回复和交付记录；README 的 `Updated` badge 链接到 `main` 分支提交历史，供需要的用户查看。
+
 新增资源时尽量使用这种描述结构：
 
 ```markdown
@@ -113,7 +115,7 @@ README badge、官网统计和 sitemap 的公开日期统一按 Asia/Shanghai（
 - 保持官网与 README 数据一致，避免用户觉得项目停更。
 - 把热门原创技能放在 README 前半屏，降低安装门槛。
 - 处理社区 PR，让贡献者愿意继续推荐资源。
-- 为每次维护写清楚“新增了什么、修了什么、为什么值得看”。
+- 在 Git commit、PR / Issue 回复和交付记录中写清楚“新增了什么、修了什么、为什么值得看”，不要把完整维护日志堆进 README。
 
 不建议做的增长动作：
 
