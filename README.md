@@ -93,6 +93,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [graphify](https://github.com/Graphify-Labs/graphify) | 🕸️ 将代码、文档和数据结构转为可查询知识图谱 | 97.3K+ |
 | [marketingskills](https://github.com/coreyhaines31/marketingskills) | 📈 营销技能包：CRO、文案、SEO、数据分析、增长工程 | 42K+ |
 | [planning-with-files](https://github.com/OthmanAdi/planning-with-files) | 📋 Manus 风格的持久化 Markdown 规划工作流 | 25.8K+ |
+| [octopus-skill](https://github.com/levi-qiao/octopus-skill) | 🐙 长周期 agent skill：持久 ledger + 清洁上下文监督者 + 可验证闸门，抑制 agent 漂移；Markdown 提示词库（loop-graph · quest），支持 Claude Code / Cursor / Codex / Grok，非运行时框架 | 38+ |
 | [humanizer](https://github.com/blader/humanizer) | ✍️ 消除 AI 写作痕迹，让文本更自然 | 31.6K+ |
 | [Claude-Code-Game-Studios](https://github.com/Donchitos/Claude-Code-Game-Studios) | 🎮 49 个 AI 代理 + 72 个工作流，完整游戏开发工作室 | 23.4K+ |
 | [open-saas](https://github.com/wasp-lang/open-saas) | 🔥 免费 SaaS 模板，React + Node + Prisma，AI-ready | 15.1K+ |
