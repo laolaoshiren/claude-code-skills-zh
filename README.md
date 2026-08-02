@@ -531,6 +531,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [kc_ai_skills](https://github.com/KerberosClaw/kc_ai_skills) | 中文优先的 22 个通用 Agent Skills：覆盖仓库预检、ADR / PRD、故障诊断、报告和内容生成，兼容 Claude Code / Codex；其中 CTF / 逆向仅限授权环境，外部服务技能部署前需审查认证与网络配置（77⭐）|
 | [hermes-edu-skills](https://github.com/hezkvectory/hermes-edu-skills) | 面向中国教育场景的 170 个 Agent Skills：覆盖教材同步、备考、拍照答疑、错题复盘、亲子陪学和教师工具，Hermes 可直接安装并可导出到 Claude Code / Codex / Cursor；处理学生资料时需保护隐私，输出仍应由教师或家长核验（57⭐）|
 | [taiwan-translate-skill](https://github.com/Moksa1123/taiwan-translate-skill) | 台湾正体中文本地化 Skill：内置 2,300+ WordPress 官方词汇，支持 PO / POT 与双来源术语策略，可通过 npm 安装到 14 类 AI 工具；法律、医疗等专业文本仍需人工校对（7⭐）|
+| [ai-ready-website](https://github.com/yao-care/ai-ready-website) | 繁体中文建站 Skill：用 Claude Code 从零建一个内容与版型分离的 Astro 静态站，内建 sitemap / robots / JSON-LD，串接 Search Console 与 GA4，免费部署到 GitHub Pages；仓库、网域、原始档全部留在使用者自己名下，日后用聊天改 Markdown 即可更新（0⭐）|
 
 ---
 
