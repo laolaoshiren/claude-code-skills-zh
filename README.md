@@ -393,6 +393,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [coleam00/helpline](https://github.com/coleam00/helpline) | Claude Code 完整 AI 层示范（108⭐）|
 | [sruthik27/creating-claude-md](https://github.com/sruthik27/creating-claude-md) | 自动生成高质量 CLAUDE.md（64⭐）|
 | [AppGenesisForge](https://github.com/pcliangx/AppGenesisForge) | Claude Code Agent Teams 应用工程脚手架：19 个角色、7 道阶段门与强制 Skills / Hooks / DoD 串联 Web、微信小程序和 macOS / iOS 交付；安装会写入目标 Git 仓，建议先在分支或备份中试用（412⭐）|
+| [hard-won-claude-skills](https://github.com/poloplay0114/hard-won-claude-skills) | 八个工程纪律 Skill：独立来源验证、xlsx/OOXML 外科手术式编辑、背景任务 UI 状态机、内容键快取、工程经济、三方交接、规格引用、UI 交付验收；每条规则都附上换来它的真实事故。繁体中文原生撰写（非英文翻译）+ 英文镜像双包，`/plugin marketplace add` 一行安装（0⭐）|
 
 ### 🎨 内容创作
 
