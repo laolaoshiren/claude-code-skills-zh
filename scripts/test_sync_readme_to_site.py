@@ -635,6 +635,20 @@ def test_checked_in_readme_is_a_user_facing_landing_page() -> None:
     )
 
 
+def test_checked_in_landing_pages_avoid_unsynced_ecosystem_stats() -> None:
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    html = (REPO_ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+
+    assert "## 📊 技能生态数据" not in readme
+    assert not re.search(
+        r"^- \[[^]]+\]\([^)]+\) — \d+(?:\.\d+)?K? ⭐\s*$",
+        readme,
+        flags=re.MULTILINE,
+    )
+    assert "<!-- Ecosystem -->" not in html
+    assert "AI Coding Skills 正在爆发式增长" not in html
+
+
 def test_original_skill_sets_and_promo_counts_are_consistent() -> None:
     skills_root = REPO_ROOT / "skills"
     skill_names = {
@@ -690,5 +704,6 @@ if __name__ == "__main__":
     test_checked_in_site_renders_skill_data_with_safe_dom_apis()
     test_checked_in_site_data_matches_readme()
     test_checked_in_readme_is_a_user_facing_landing_page()
+    test_checked_in_landing_pages_avoid_unsynced_ecosystem_stats()
     test_original_skill_sets_and_promo_counts_are_consistent()
     print("PASS: sync_readme_to_site.py regression tests")
