@@ -1,11 +1,11 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 415+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 414+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-415%2B-green.svg)](#original-skills)
-[![Updated](https://img.shields.io/badge/updated-2026--08--22-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
+[![Skills](https://img.shields.io/badge/skills-414%2B-green.svg)](#original-skills)
+[![Updated](https://img.shields.io/badge/updated-2026--08--23-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -398,7 +398,6 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [cwinvestments/memstack](https://github.com/cwinvestments/memstack) | 127 个技能的结构化框架 + Dashboard（414⭐）|
 | [coleam00/helpline](https://github.com/coleam00/helpline) | Claude Code 完整 AI 层示范（110⭐）|
 | [sruthik27/creating-claude-md](https://github.com/sruthik27/creating-claude-md) | 自动生成高质量 CLAUDE.md（63⭐）|
-| [AppGenesisForge](https://github.com/pcliangx/AppGenesisForge) | Claude Code Agent Teams 应用工程脚手架：19 个角色、7 道阶段门与强制 Skills / Hooks / DoD 串联 Web、微信小程序和 macOS / iOS 交付；安装会写入目标 Git 仓，建议先在分支或备份中试用（412⭐）|
 
 ### 🎨 内容创作
 
@@ -442,7 +441,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [zLanqing/codex-claude-academic-skills](https://github.com/zLanqing/codex-claude-academic-skills) | 学术科研全流程 Skills（3.1K⭐）|
 | [Haojae/scipilot-figure-skill](https://github.com/Haojae/scipilot-figure-skill) | 出版级科学图表绘制（1.9K⭐）|
 | [xiaofenggan01/aigc-reduce](https://github.com/xiaofenggan01/aigc-reduce) | 降低学术论文 AIGC 查重率（514⭐）|
-| [u7079256/paperjury](https://github.com/u7079256/paperjury) | 论文投稿前 AI 压力测试（974⭐）|
+| [Spark-To-Paper-Skills/paperjury](https://github.com/Spark-To-Paper-Skills/paperjury) | 论文投稿前 AI 压力测试（974⭐）|
 | [Awesome-Vibe-Research](https://github.com/modelscope/Awesome-Vibe-Research) | 🔬 魔搭社区开源 AI 辅助科研全流程仓库：收集 agents、skills、workflows 与最佳实践（399⭐）|
 | [Awesome-Journal-Skills](https://github.com/brycewang-stanford/Awesome-Journal-Skills) | 面向 Claude Code / Codex 的期刊投稿 Skills 包：覆盖 AER、QJE、Nature、Cell、管理世界、经济研究等 200+ 期刊，支持选题、识别策略、表格规范和审稿回复（1K⭐）|
 | [humanities-writing-companion](https://github.com/tizzy916/humanities-writing-companion) | 人文学科写作伙伴：中英双语 SKILL.md 覆盖研究问题、文献图谱、写作、对抗审阅、修订和 AI 使用披露，强调保留作者声音；采用 CC BY-NC 4.0（362⭐）|
