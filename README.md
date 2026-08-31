@@ -1,10 +1,10 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 425+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 424+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-425%2B-green.svg)](#original-skills)
+[![Skills](https://img.shields.io/badge/skills-424%2B-green.svg)](#original-skills)
 [![Updated](https://img.shields.io/badge/updated-2026--08--31-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
@@ -373,7 +373,6 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [microsoft/skills](https://github.com/microsoft/skills) | Microsoft 官方 Agent Skills 仓库：175 个 Skills 覆盖 Azure SDK、Foundry、MCP、Custom Agents 与 AGENTS.md 模板，支持 `npx skills add` 选择安装（3K⭐）|
 | [claudelint](https://github.com/pdugan20/claudelint) | Claude Code 项目 Linter：校验 CLAUDE.md、Skills、Settings、Hooks、MCP 和 Plugin 结构，提供 npm CLI、自动修复与 Claude Code 插件；需 Node.js 20+（11⭐）|
 | [finding-unknowns-skills](https://github.com/Neeeophytee/finding-unknowns-skills) | 实现前盲点发现 Skills：8 个技能覆盖未知风险扫描、需求访谈、参考检索、实施计划、变更测验和交付说明，兼容 Claude Code / Codex（317⭐）|
-| [codex-hygiene](https://github.com/sunflower-of-parchman/codex-hygiene) | Codex Desktop 上下文与工具面审计 Skill：用只读 SQLite 测量定位 MCP、Plugin、缓存和长任务回放开销，仅建议可逆优化；目前面向 macOS/Unix（254⭐）|
 | [hashicorp/agent-skills](https://github.com/hashicorp/agent-skills) | HashiCorp 官方 Agent Skills 与 Claude Code 插件：覆盖 Terraform 代码生成、模块生成、Provider 开发和 Packer 工作流，支持 `npx skills add` 与 `/plugin install`（850⭐）|
 | [google-labs-code/stitch-skills](https://github.com/google-labs-code/stitch-skills) | Google Stitch 设计 Skills：提供 `stitch-design`、`stitch-build`、`stitch-utilities` 插件，把前端代码、设计系统和 Stitch MCP 串成可安装设计工作流（8.2K⭐）|
 | [vuejs-ai/skills](https://github.com/vuejs-ai/skills) | Vue 3 Agent Skills：沉淀 Vue 最佳实践、Router/Composable 等专项技能，可用 `npx skills add` 或 Claude Code marketplace 安装（2.8K⭐）|
@@ -536,7 +535,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [luban-skill](https://github.com/LearnPrompt/luban-skill) | 🔧 鲁班 Agent Skill 打磨工作坊：把能用的 Skill 打磨成能被装、能传播、能验证、能进化的公共资产（935⭐）|
 | [compass-skills](https://github.com/dongshuyan/compass-skills) | 🧭 司南：个性化 AI 任务总控 Skills 系统，面向中文用户的 Agent 任务编排（705⭐）|
 | [chubbyguan/chubbyskills](https://github.com/chubbyguan/chubbyskills) | 中文全渠道内容采集（抖音/B站/小红书/公众号）（645⭐）|
-| [dzcmemory-web/bazi-ziwei-skill](https://github.com/dzcmemory-web/bazi-ziwei-skill) | 八字+紫微斗数排盘（897⭐）|
+| [mingze21/bazi-ziwei-skill](https://github.com/mingze21/bazi-ziwei-skill) | 八字 + 紫微斗数算法排盘 Skill：不依赖 LLM 猜测，三种分析模式，一键生成水墨风 HTML 命盘海报，兼容 Claude / Codex / Cursor（9⭐）|
 | [lan1177/interview-prep](https://github.com/lan1177/interview-prep) | 产品/运营岗位面试准备文档生成器（90⭐）|
 | [ziwei-doushu](https://github.com/Linden-TR/ziwei-doushu-skill) | 🔮 紫微斗数命盘排盘与解读：中州派为宗，融合三合/飞星/钦天/河洛四大学派，支持十二宫分析、四化追踪、大限流年、45种格局识别，基于 MCP 的专业命理 Claude Code Skill（4⭐） |
 | [offer-helper](https://github.com/dominciyue/resume_skill) | 💼 中文求职助手：摄入简历/GitHub 仓库/文档建可持久化经历库，按 JD 生成 STAR 量化简历（严格防虚构），并做大厂式由浅及深的深挖面试（1⭐） |
