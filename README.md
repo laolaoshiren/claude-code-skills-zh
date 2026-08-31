@@ -1,11 +1,11 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 422+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 425+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-422%2B-green.svg)](#original-skills)
-[![Updated](https://img.shields.io/badge/updated-2026--08--28-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
+[![Skills](https://img.shields.io/badge/skills-425%2B-green.svg)](#original-skills)
+[![Updated](https://img.shields.io/badge/updated-2026--08--31-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -273,6 +273,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [MaxKmet/idea-validation-agents](https://github.com/MaxKmet/idea-validation-agents) | 创业想法验证 Agent Skills：从 idea brainstorming 到市场验证、GTM 策略和机会评估，兼容 Claude Code / Codex / Cursor，适合独立开发者和增长团队快速筛选项目（446⭐）|
 | [feishu-whiteboard-pro](https://github.com/LcpMarvel/feishu-whiteboard-pro) | 可编辑飞书 / Lark 白板设计 Skill：用布局组件、预渲染 fit-check 和独立设计评审生成有层次的真实白板；依赖已认证的 `lark-cli` 与飞书账号，写入租户前需确认权限和敏感内容（57⭐）|
 | [feishu_msg_card_skill](https://github.com/lageev/feishu_msg_card_skill) | 飞书 / Lark Card JSON 2.0 Skill：构造、审查和校验通知、报告、表单与回调卡片，附模板、专项校验器和只封装不发送的 Webhook 签名脚本；真正发送或更新卡片前仍需确认权限并保护密钥（9⭐）|
+| [claude-seo](https://github.com/AgriciDaniel/claude-seo) | Claude Code SEO 审计插件：25 个子技能 + 18 个专家 Agent 并行覆盖技术 SEO、内容质量（E-E-A-T）、Schema.org、AI 搜索优化（GEO）、本地 / 电商 / 国际 SEO，输出按优先级排序的行动计划；MIT 开源版可通过 `/plugin marketplace add` 安装（15.9K⭐）|
 
 ### 💻 开发效率
 
@@ -402,6 +403,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [taste-skill](https://github.com/Leonxlnx/taste-skill) | 前端反套路设计 Skills：13 个技能约束排版、配色与组件选择，让 Claude Code / Cursor / Codex 生成的界面摆脱千篇一律的 AI 风格（81.8K⭐）|
 | [ai-website-cloner-template](https://github.com/JCodesMore/ai-website-cloner-template) | 网站克隆模板：给 Agent 一个 URL 即可复刻为干净的 Next.js 应用，支持 Claude Code / Codex / Cursor / Gemini；仅用于有权限的站点，注意版权与素材授权（33.3K⭐）|
 | [hallmark](https://github.com/Nutlope/hallmark) | Together AI 出品的反 AI 味设计 Skill：21 套主题 + 57 道 slop 检测门禁 + 发射前自评，让落地页不像同一套模板换色，支持 Claude Code / Cursor / Codex（27.4K⭐）|
+| [Skill_Seekers](https://github.com/yusufkaraaslan/Skill_Seekers) | 文档转 AI 知识资产工具：把文档站、GitHub 仓库、PDF、视频、Notebook 等 18 种来源转成结构化知识，一键导出到 Claude / Gemini / OpenAI Skills、RAG 管线和 Cursor / Windsurf；`pip install skill-seekers`，支持 22 种目标格式（14.9K⭐）|
 
 ### 🎨 内容创作
 
@@ -498,6 +500,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [swaylq/master-skill](https://github.com/swaylq/master-skill) | 输入行业自动调研→Master OS skill（126⭐）|
 | [ccteam](https://github.com/firstintent/ccteam) | 自托管 Claude Code / Codex 多 Agent 团队控制台：通过 Telegram、飞书或 Web 远程派单、收集结果并限制层级、并发和预算；默认监听 `0.0.0.0:7331` 且无 TLS，仅建议用于可信局域网或改为绑定本机（368⭐）|
 | [ruflo](https://github.com/ruvnet/ruflo) | Agent 元编排框架：为 Claude Code / Codex 提供多智能体集群、任务分解与共享记忆，30 个 SKILL.md 可按需安装，MIT 许可（69.6K⭐）|
+| [ego-lite](https://github.com/citrolabs/ego-lite) | 面向 AI Agent 的共享浏览器：Agent 在独立 Space 里运行多个浏览器任务，复用用户真实登录态和标签页，减少 token 消耗；内置 `ego-browser` Skill，目前仅支持 macOS，Windows / Linux 在路线图（14.4K⭐）|
 
 ### 💰 金融/商业
 
