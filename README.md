@@ -518,6 +518,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [luopan](https://github.com/zhangxiaoqiang1991/luopan) | 中文行业与公司研究路由 Skill：通过信源分级和对抗验证分析产业链权力、利润分布与公司质量，适合投资或求职研究，不替代投资建议（376⭐）|
 | [qlik-oss/agentic-skills](https://github.com/qlik-oss/agentic-skills) | Qlik 官方 Agentic Skills Hub：提供 Qlik Cloud AI readiness / MCP 优化 Skill、官方与社区插件分层、`npx skills add` 与 Claude Code plugin 安装路径（8⭐）|
 | [niubiskill](https://github.com/nathanskill/niubiskill) | 中文变现决策 Skill：打断无收入验证的瞎忙，找到离真实收钱最近的一步，二选一（引流 / 成交），停掉一件分散精力的事并给出 7 天证据测试，支持 `npx skills add nathanskill/niubiskill` 安装；不承诺收益，涉及受监管活动时需先核验权限（204⭐）|
+| [babyGao/agent-pilot-skills](https://github.com/babyGao/agent-pilot-skills/tree/main/skills/hello-boss) | hello-boss 冷启动获客流水线：五条穷举路径把“谁能买我的东西”挖穷、四信号收敛从公开工商数据锁定经营主体和邮箱、四段式开发信，产出三份验收物（1⭐） |
 
 ---
 
