@@ -1,11 +1,11 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 424+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 426+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-424%2B-green.svg)](#original-skills)
-[![Updated](https://img.shields.io/badge/updated-2026--09--04-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
+[![Skills](https://img.shields.io/badge/skills-426%2B-green.svg)](#original-skills)
+[![Updated](https://img.shields.io/badge/updated-2026--09--05-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -454,6 +454,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [academic-research-skills](https://github.com/Imbad0202/academic-research-skills) | 人机协作学术研究 Skills 套件：4 个核心 Skill 串联深度研究、论文写作、审稿与修订，带引用核验和完整性门禁，支持 Claude Code 插件安装；采用 CC BY-NC 4.0，最终论证与学术诚信仍由研究者负责（46.1K⭐）|
 | [tex-manual-translation](https://github.com/Explorer-cc/tex-manual-translation) | 中文 LaTeX 手册翻译 Agent Skill：通过术语表、CJK 编译门禁和 3 个检查脚本处理环境失衡、中文标点反斜杠与漏译问题，支持 npm 安装到 Claude Code / Codex；安装器需 Node.js 18+，编译验证需 TeX Live 或 MiKTeX（0⭐）|
 | [book-to-skill](https://github.com/virgiliojr94/book-to-skill) | 把技术书 PDF 蒸馏成可查询 Skill：按框架、决策规则和反模式组织分章文件，Agent 按需加载对应章节作答而非整本摘要，支持 Claude Code / Codex；仅处理本地书籍文件，注意版权边界（28.4K⭐）|
+| [entropy-box-zh](https://github.com/chenli-yy/entropy-box-public/tree/main/skills/entropy-box-zh) | 具身智能知识图谱中文 Skill：15 个顶层领域、2,511 个垂直主题，支持技术全景、能力分解、依赖分析与资产选型，兼容 Claude Code / Codex / Cursor / Gemini CLI；在线 API 走 ngrok 隧道可能不稳定，可下载仓库 zip 离线使用，涉及真实机器人需专业人员审查（2⭐）|
 
 ### 🤖 AI Agent
 
@@ -518,6 +519,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [luopan](https://github.com/zhangxiaoqiang1991/luopan) | 中文行业与公司研究路由 Skill：通过信源分级和对抗验证分析产业链权力、利润分布与公司质量，适合投资或求职研究，不替代投资建议（376⭐）|
 | [qlik-oss/agentic-skills](https://github.com/qlik-oss/agentic-skills) | Qlik 官方 Agentic Skills Hub：提供 Qlik Cloud AI readiness / MCP 优化 Skill、官方与社区插件分层、`npx skills add` 与 Claude Code plugin 安装路径（8⭐）|
 | [niubiskill](https://github.com/nathanskill/niubiskill) | 中文变现决策 Skill：打断无收入验证的瞎忙，找到离真实收钱最近的一步，二选一（引流 / 成交），停掉一件分散精力的事并给出 7 天证据测试，支持 `npx skills add nathanskill/niubiskill` 安装；不承诺收益，涉及受监管活动时需先核验权限（204⭐）|
+| [hello-boss](https://github.com/babyGao/agent-pilot-skills/tree/main/skills/hello-boss) | 冷启动获客流水线 Skill：五条穷举路径挖掘可买行业、四路信号从公开工商数据锁定经营主体与邮箱、输出调研报告与开发信模板；MIT 许可，流水线末段会实际批量发送邮件，运行前需确认发件账号与合规边界（1⭐）|
 
 ---
 
