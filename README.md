@@ -1,10 +1,10 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 426+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 425+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-426%2B-green.svg)](#original-skills)
+[![Skills](https://img.shields.io/badge/skills-425%2B-green.svg)](#original-skills)
 [![Updated](https://img.shields.io/badge/updated-2026--09--05-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
@@ -348,7 +348,6 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [langchain-plugins](https://github.com/langchain-ai/langchain-plugins) | LangChain 官方跨 Agent 插件市场：为 Claude Code、Codex 和 dcode 提供 LangChain / LangGraph / LangSmith Skills、实时文档与 API Reference MCP；LangSmith 工作区读取需 OAuth，安装同步的外部 Skills 前应分别核对许可证（7⭐）|
 | [abp-skills](https://github.com/abpframework/abp-skills) | ABP Framework 官方 Agent Skills：15 个领域插件、80 个技能覆盖 DDD、数据访问、鉴权、多租户、API、Blazor / Angular、微服务、测试与升级，支持 Claude Code / Codex / Cursor / VS Code；迁移和认证配置需核对 ABP 版本并先备份验证（16⭐）|
 | [NVIDIA/skills](https://github.com/NVIDIA/skills) | NVIDIA 官方验证 Agent Skills 目录：当前 230 个可安装技能覆盖 CUDA、Jetson、NeMo、DeepStream、TAO、RAG、医疗与 Physical AI，提供签名、治理卡和评测，并支持 Claude Code / Codex / Cursor 一行安装；具体技能可能依赖 NVIDIA GPU、云服务或产品环境（3.2K⭐）|
-| [skills-manage](https://github.com/iamzhihuix/skills-manage) | 跨平台技能管理桌面应用：统一管理 Claude Code / Cursor / Gemini CLI / Codex / Hermes / OpenClaw 等 20+ 平台技能，支持本地发现、集合安装、GitHub 导入与市场浏览（2.2K⭐）|
 | [BuilderIO/skills](https://github.com/BuilderIO/skills) | 🏗️ BuilderIO 官方 Agent Skills 集合，面向编码代理的生产级技能库（4.2K⭐）|
 | [produck-skills](https://github.com/tryproduck/produck-skills) | 🛠️ 产品导向 Agent Skills：帮助构建用户喜爱的产品，Apache-2.0 开源（513⭐）|
 | [loopy](https://github.com/Forward-Future/loopy) | 🔄 可复用 AI Agent 循环与工作流库：覆盖工程、评测、运营、内容与设计（3.1K⭐）|
