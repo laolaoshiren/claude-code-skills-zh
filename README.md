@@ -510,6 +510,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [ccteam](https://github.com/firstintent/ccteam) | 自托管 Claude Code / Codex 多 Agent 团队控制台：通过 Telegram、飞书或 Web 远程派单、收集结果并限制层级、并发和预算；默认监听 `0.0.0.0:7331` 且无 TLS，仅建议用于可信局域网或改为绑定本机（500⭐）|
 | [ruflo](https://github.com/ruvnet/ruflo) | Agent 元编排框架：为 Claude Code / Codex 提供多智能体集群、任务分解与共享记忆，30 个 SKILL.md 可按需安装，MIT 许可（71.9K⭐）|
 | [ego-lite](https://github.com/citrolabs/ego-lite) | 面向 AI Agent 的共享浏览器：Agent 在独立 Space 里运行多个浏览器任务，复用用户真实登录态和标签页，减少 token 消耗；内置 `ego-browser` Skill，目前仅支持 macOS，Windows / Linux 在路线图（15.6K⭐）|
+| [yylo-skills](https://github.com/yylo-dev/yylo-skills) | YYLO 官方编码代理技能包：7 个 SKILL.md 覆盖看板任务管理、任务规划、项目理解、wiki 知识与经验证交付循环，支持 `npx skills add yylo-dev/yylo-skills` 安装到 Claude Code / Codex / Pi（0⭐）|
 
 ### 💰 金融/商业
 
