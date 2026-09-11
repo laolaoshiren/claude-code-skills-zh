@@ -116,6 +116,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [awesome-openclaw-skills](https://github.com/VoltAgent/awesome-openclaw-skills) | 🦞 OpenClaw 5,400+ 技能精选目录，适合发现可安装技能 | 52.5K+ |
 | [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) | 📚 Claude Code Skills、Hooks、Commands、Agents 和 Plugins 生态导航 | 53.8K+ |
 | [awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) | 🧩 1,000+ Agent Skills 精选，兼容 Claude Code / Codex / Gemini CLI / Cursor | 34K+ |
+| [sensedeal/cue-skills](https://github.com/sensedeal/cue-skills) | 📄 cue-omni-reader：把网页（含页内视频/附件）、PDF、扫描件、音频和视频收成 Markdown，一行安装 `npx skills add sensedeal/cue-skills --skill cue-omni-reader`（MIT，可能计费） | 7★ |
 | [vercel-agent-skills](https://github.com/vercel-labs/agent-skills) | ▲ Vercel 官方 Agent Skills，适合前端、部署与现代 Web 工程工作流 | 31K+ |
 | [awesome-copilot](https://github.com/github/awesome-copilot) | 🐙 GitHub Copilot 官方社区 Instructions、Agents、Skills 与配置合集 | 38.8K+ |
 | [google/skills](https://github.com/google/skills) | 🏛️ Google 官方 Agent Skills：覆盖 Cloud、Gemini API、BigQuery、GKE、Firebase 与 Ads | 19.7K+ |
