@@ -44,6 +44,7 @@
 | [zh-readme](skills/zh-readme/) | 对开源项目、作品集、内部工具都很实用 |
 | [api-tester](skills/api-tester/) | 依据真实契约生成测试，并在确认环境、授权和清理方案后执行 |
 | [perf-profiler](skills/perf-profiler/) | 基于可复现基线和 profiler 证据排查慢接口、慢任务、慢页面 |
+- [mblode/agent-skills](https://github.com/mblode/agent-skills) - Nobody ships AI slop on purpose. These skills make sure you don't. UI audits, typography, docs, PR review, and releases.
 
 ---
 
