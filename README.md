@@ -406,6 +406,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [ai-website-cloner-template](https://github.com/JCodesMore/ai-website-cloner-template) | 网站克隆模板：给 Agent 一个 URL 即可复刻为干净的 Next.js 应用，支持 Claude Code / Codex / Cursor / Gemini；仅用于有权限的站点，注意版权与素材授权（34.5K⭐）|
 | [hallmark](https://github.com/Nutlope/hallmark) | Together AI 出品的反 AI 味设计 Skill：21 套主题 + 57 道 slop 检测门禁 + 发射前自评，让落地页不像同一套模板换色，支持 Claude Code / Cursor / Codex（28.7K⭐）|
 | [Skill_Seekers](https://github.com/yusufkaraaslan/Skill_Seekers) | 文档转 AI 知识资产工具：把文档站、GitHub 仓库、PDF、视频、Notebook 等 18 种来源转成结构化知识，一键导出到 Claude / Gemini / OpenAI Skills、RAG 管线和 Cursor / Windsurf；`pip install skill-seekers`，支持 22 种目标格式（15K⭐）|
+| [orca-replay](https://github.com/Continuum-AI-Corp/OrcaReplay) | 让 Agent 回答「上次那次运行到底做了什么」时先读录像、而不是凭记忆复述：`orca record` 在进程外录下 Claude Code / Codex / OpenCode / Cursor 等会话的模型请求、工具调用、shell 退出码和文件改动，技能据此沿因果链回答「哪一步改了这个文件」，并强制区分 `recorded`（录到的）与 `inferred`（查询时按规则推出来的）两类证据；需 Node 20+ 与 `orcareplay` 的 MCP server，且必须已有录像。重放只阻断模型侧出网，录下的 shell 命令会真的再跑一遍；默认会用录像覆盖工作区，应传 `worktree: true`；重放通过只说明录下的那次能复现，不能证明重新跑一次也会失败（234⭐）|
 
 ### 🎨 内容创作
 
