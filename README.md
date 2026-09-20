@@ -1,11 +1,11 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 437+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 442+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-437%2B-green.svg)](#original-skills)
-[![Updated](https://img.shields.io/badge/updated-2026--09--19-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
+[![Skills](https://img.shields.io/badge/skills-442%2B-green.svg)](#original-skills)
+[![Updated](https://img.shields.io/badge/updated-2026--09--20-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -116,6 +116,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [awesome-openclaw-skills](https://github.com/VoltAgent/awesome-openclaw-skills) | 🦞 OpenClaw 5,400+ 技能精选目录，适合发现可安装技能 | 52.7K+ |
 | [awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) | 📚 Claude Code Skills、Hooks、Commands、Agents 和 Plugins 生态导航 | 54.3K+ |
 | [awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) | 🧩 1,000+ Agent Skills 精选，兼容 Claude Code / Codex / Gemini CLI / Cursor | 34.6K+ |
+| [sensedeal/cue-skills](https://github.com/sensedeal/cue-skills) | 面向中文用户的 Agent 技能合集：cue-omni-reader 把网页、PDF、扫描件、音频和视频解析成 Markdown，另有 cue-research 深度研究、cue-data-mcp 公共数据查询，附中文 README 与 `SKILL.zh-CN.md`，可用 `npx skills add sensedeal/cue-skills --skill cue-omni-reader` 安装；解析能力由 Cue 官方 MCP 提供，需要 `CUE_API_KEY` 且服务可能计费，运行前请确认。 | 7 |
 | [vercel-agent-skills](https://github.com/vercel-labs/agent-skills) | ▲ Vercel 官方 Agent Skills，适合前端、部署与现代 Web 工程工作流 | 31.3K+ |
 | [awesome-copilot](https://github.com/github/awesome-copilot) | 🐙 GitHub Copilot 官方社区 Instructions、Agents、Skills 与配置合集 | 39.2K+ |
 | [google/skills](https://github.com/google/skills) | 🏛️ Google 官方 Agent Skills：覆盖 Cloud、Gemini API、BigQuery、GKE、Firebase 与 Ads | 20.2K+ |
@@ -406,6 +407,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [ai-website-cloner-template](https://github.com/JCodesMore/ai-website-cloner-template) | 网站克隆模板：给 Agent 一个 URL 即可复刻为干净的 Next.js 应用，支持 Claude Code / Codex / Cursor / Gemini；仅用于有权限的站点，注意版权与素材授权（34.6K⭐）|
 | [hallmark](https://github.com/Nutlope/hallmark) | Together AI 出品的反 AI 味设计 Skill：21 套主题 + 57 道 slop 检测门禁 + 发射前自评，让落地页不像同一套模板换色，支持 Claude Code / Cursor / Codex（28.9K⭐）|
 | [Skill_Seekers](https://github.com/yusufkaraaslan/Skill_Seekers) | 文档转 AI 知识资产工具：把文档站、GitHub 仓库、PDF、视频、Notebook 等 18 种来源转成结构化知识，一键导出到 Claude / Gemini / OpenAI Skills、RAG 管线和 Cursor / Windsurf；`pip install skill-seekers`，支持 22 种目标格式（15K⭐）|
+| [mblode/agent-skills](https://github.com/mblode/agent-skills) | 面向 Coding Agent 的工程技能库：27 个 SKILL.md 覆盖 UI 与排版审计、文档写作、README 生成、PR 创建与审查、发布流程和脚手架，MIT 许可；安装命令为 `npx skills add mblode/agent-skills`，可按需挑选单个技能（126⭐）|
 
 ### 🎨 内容创作
 
@@ -510,6 +512,8 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [ccteam](https://github.com/firstintent/ccteam) | 自托管 Claude Code / Codex 多 Agent 团队控制台：通过 Telegram、飞书或 Web 远程派单、收集结果并限制层级、并发和预算；默认监听 `0.0.0.0:7331` 且无 TLS，仅建议用于可信局域网或改为绑定本机（584⭐）|
 | [ruflo](https://github.com/ruvnet/ruflo) | Agent 元编排框架：为 Claude Code / Codex 提供多智能体集群、任务分解与共享记忆，30 个 SKILL.md 可按需安装，MIT 许可（72.8K⭐）|
 | [ego-lite](https://github.com/citrolabs/ego-lite) | 面向 AI Agent 的共享浏览器：Agent 在独立 Space 里运行多个浏览器任务，复用用户真实登录态和标签页，减少 token 消耗；内置 `ego-browser` Skill，目前仅支持 macOS，Windows / Linux 在路线图（16.2K⭐）|
+| [yylo-skills](https://github.com/yylo-dev/yylo-skills) | yylo-dev 组织维护的编码代理任务管理技能包：7 个 SKILL.md 覆盖看板任务账本、任务规划、项目理解、wiki 知识与经验证交付循环，MIT 许可，可用 `npx skills add yylo-dev/yylo-skills` 装到 Claude Code / Codex / Pi（1⭐）|
+| [OrcaReplay](https://github.com/Continuum-AI-Corp/OrcaReplay) | Agent 运行的时间旅行调试工具：`orca record` 录制会话的模型请求、工具调用、shell 退出码与文件改动，`orca replay` 离线重放或换模型分叉对比；内置 `skills/orca-replay` 让 Agent 回答“上次那次运行做了什么”时先读录像而非凭记忆复述；需 Node 20+，重放仍会真实执行录下的 shell 命令、默认会用录像覆盖工作区（应传 `worktree: true`，这不是沙箱），且“重放通过”不等于重新跑一次也会失败（258⭐）|
 
 ### 💰 金融/商业
 
@@ -530,6 +534,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [qlik-oss/agentic-skills](https://github.com/qlik-oss/agentic-skills) | Qlik 官方 Agentic Skills Hub：提供 Qlik Cloud AI readiness / MCP 优化 Skill、官方与社区插件分层、`npx skills add` 与 Claude Code plugin 安装路径（11⭐）|
 | [niubiskill](https://github.com/nathanskill/niubiskill) | 中文变现决策 Skill：打断无收入验证的瞎忙，找到离真实收钱最近的一步，二选一（引流 / 成交），停掉一件分散精力的事并给出 7 天证据测试，支持 `npx skills add nathanskill/niubiskill` 安装；不承诺收益，涉及受监管活动时需先核验权限（199⭐）|
 | [hello-boss](https://github.com/babyGao/agent-pilot-skills/tree/main/skills/hello-boss) | 冷启动获客流水线 Skill：五条穷举路径挖掘可买行业、四路信号从公开工商数据锁定经营主体与邮箱、输出调研报告与开发信模板；MIT 许可，流水线末段会实际批量发送邮件，运行前需确认发件账号与合规边界（1⭐）|
+| [ai-trader-team](https://github.com/TLSRUF/ai-trader-team) | 投资研究工作流框架：`/screen`、`/trade-team` 等 5 个 SKILL.md 驱动趋势 / 宏观 / 风险 / 资金面 4 个视角子 Agent 并行分析，分歧时明确标注 Gray Zone 而不强行折中，仓位与相关系数等计算交给 `tools/trading_rigor.py` 而非 LLM 心算；MIT 许可，行情取自 yfinance，仓库声明仅供教育研究、不构成投资建议，决策前请自行核实数据与风险（2⭐）|
 
 ---
 
