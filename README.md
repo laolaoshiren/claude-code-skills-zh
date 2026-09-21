@@ -513,6 +513,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [ego-lite](https://github.com/citrolabs/ego-lite) | 面向 AI Agent 的共享浏览器：Agent 在独立 Space 里运行多个浏览器任务，复用用户真实登录态和标签页，减少 token 消耗；内置 `ego-browser` Skill，目前仅支持 macOS，Windows / Linux 在路线图（16.3K⭐）|
 | [yylo-skills](https://github.com/yylo-dev/yylo-skills) | yylo-dev 组织维护的编码代理任务管理技能包：7 个 SKILL.md 覆盖看板任务账本、任务规划、项目理解、wiki 知识与经验证交付循环，MIT 许可，可用 `npx skills add yylo-dev/yylo-skills` 装到 Claude Code / Codex / Pi（1⭐）|
 | [OrcaReplay](https://github.com/Continuum-AI-Corp/OrcaReplay) | Agent 运行的时间旅行调试工具：`orca record` 录制会话的模型请求、工具调用、shell 退出码与文件改动，`orca replay` 离线重放或换模型分叉对比；内置 `skills/orca-replay` 让 Agent 回答“上次那次运行做了什么”时先读录像而非凭记忆复述；需 Node 20+，重放仍会真实执行录下的 shell 命令、默认会用录像覆盖工作区（应传 `worktree: true`，这不是沙箱），且“重放通过”不等于重新跑一次也会失败（258⭐）|
+| [mnemoverse/claude-plugin](https://github.com/mnemoverse/claude-plugin) | mnemoverse 组织维护的 Claude Code 记忆插件：经 MCP 接入托管记忆服务，与 Cursor、VS Code 共用同一份记忆，召回结果按反馈重排；含 remember / recall / memory-status 三个命令和 agent-memory-discipline（CC0）、setup 两个技能；需 Mnemoverse 账号并首次 OAuth 登录，有免费额度，插件 MIT（0⭐）|
 
 ### 💰 金融/商业
 
