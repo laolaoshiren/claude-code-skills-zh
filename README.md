@@ -408,6 +408,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [hallmark](https://github.com/Nutlope/hallmark) | Together AI 出品的反 AI 味设计 Skill：21 套主题 + 57 道 slop 检测门禁 + 发射前自评，让落地页不像同一套模板换色，支持 Claude Code / Cursor / Codex（29K⭐）|
 | [Skill_Seekers](https://github.com/yusufkaraaslan/Skill_Seekers) | 文档转 AI 知识资产工具：把文档站、GitHub 仓库、PDF、视频、Notebook 等 18 种来源转成结构化知识，一键导出到 Claude / Gemini / OpenAI Skills、RAG 管线和 Cursor / Windsurf；`pip install skill-seekers`，支持 22 种目标格式（15K⭐）|
 | [mblode/agent-skills](https://github.com/mblode/agent-skills) | 面向 Coding Agent 的工程技能库：27 个 SKILL.md 覆盖 UI 与排版审计、文档写作、README 生成、PR 创建与审查、发布流程和脚手架，MIT 许可；安装命令为 `npx skills add mblode/agent-skills`，可按需挑选单个技能（126⭐）|
+| [Bestax skills](https://github.com/allxsmith/bestax/tree/main/skills) | Bestax（基于 Bulma v1 的 React 组件库）的 7 个 Agent Skills：覆盖页面布局、表单、图标、主题、自定义组件、迁移和 CSS 优化，MIT 许可，用 `npx skills add https://github.com/allxsmith/bestax --skill <name>` 按需安装（11⭐）|
 
 ### 🎨 内容创作
 
