@@ -1,11 +1,11 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 442+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 444+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-442%2B-green.svg)](#original-skills)
-[![Updated](https://img.shields.io/badge/updated-2026--09--22-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
+[![Skills](https://img.shields.io/badge/skills-444%2B-green.svg)](#original-skills)
+[![Updated](https://img.shields.io/badge/updated-2026--10--04-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -408,6 +408,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [hallmark](https://github.com/Nutlope/hallmark) | Together AI 出品的反 AI 味设计 Skill：21 套主题 + 57 道 slop 检测门禁 + 发射前自评，让落地页不像同一套模板换色，支持 Claude Code / Cursor / Codex（29K⭐）|
 | [Skill_Seekers](https://github.com/yusufkaraaslan/Skill_Seekers) | 文档转 AI 知识资产工具：把文档站、GitHub 仓库、PDF、视频、Notebook 等 18 种来源转成结构化知识，一键导出到 Claude / Gemini / OpenAI Skills、RAG 管线和 Cursor / Windsurf；`pip install skill-seekers`，支持 22 种目标格式（15K⭐）|
 | [mblode/agent-skills](https://github.com/mblode/agent-skills) | 面向 Coding Agent 的工程技能库：27 个 SKILL.md 覆盖 UI 与排版审计、文档写作、README 生成、PR 创建与审查、发布流程和脚手架，MIT 许可；安装命令为 `npx skills add mblode/agent-skills`，可按需挑选单个技能（126⭐）|
+| [allxsmith/bestax](https://github.com/allxsmith/bestax) | Bestax（基于 Bulma 的 React 组件库）附带 7 个 Agent Skills：页面布局脚手架、表单、图标、主题定制、自定义组件、迁移与 CSS 优化，MIT 许可，可用 `npx skills add https://github.com/allxsmith/bestax --skill <name>` 安装；适合用 Bulma + React 的团队让 Agent 直接按组件库约定出页面（12⭐）|
 
 ### 🎨 内容创作
 
@@ -446,6 +447,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [novel-to-webnovel](https://github.com/aimerfeng/novel-to-webnovel) | 中文小说网文化改写 Claude Code Skill：五阶段流水线把日轻译稿、机翻稿或自写草稿去翻译腔并转成中文网文口感，含 Perl 分章、格式清理和 QA 脚本，明确版权与未成年露骨内容边界（1⭐）|
 | [guizang-material-illustration](https://github.com/op7418/guizang-material-illustration) | 歸藏材质插画 Skill：把文章、截图或数据转成带中文标签的机制图、解释图和材质化图表，内置参考调研、提示词模板与图像 QA；仓库暂未声明许可证（1.2K⭐）|
 | [OrkasVideoStudio](https://github.com/Orkas-AI/Orkas-VideoStudio) | 本地优先的视频制作 CLI + MCP：用可编辑 plan.json 时间线驱动 Claude Code / Codex 完成规划、编排、生成与自动组装，10 个官方 SKILL.md 可一键装入，MIT 许可；视频生成依赖 ffmpeg 等本地工具链（490⭐）|
+| [listening-script-kit](https://github.com/GODGOD126/listening-script-kit) | 长文听稿 Skill：把研究报告、学习长文和读书笔记改写成离开屏幕也能听懂的稿件，保留数字、来源归属、限定语和不确定性，输出纯文字、不合成音频；把 `skills/listening-script/` 复制到 `~/.claude/skills/` 即可用，MIT 许可，技能包不含脚本、不访问账号、无需 API Key，AI 输出仍需对照原文核查（0⭐）|
 
 ### 🔬 学术科研
 
