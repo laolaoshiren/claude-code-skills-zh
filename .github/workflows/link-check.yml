@@ -1,16 +1,28 @@
-# 定期检查 README 中的链接是否有效
+# 定期检查 README 中的链接是否有效（低频、低并发）
+#
+# 维护约定（请勿收紧）：
+# - 不在 push 时运行：一次检查会访问 README 中约 500 个外部链接，每次提交
+#   都跑等于对第三方站点持续施压，也让 Actions 长期高频运转。
+# - 并发与重试刻意压低（--max-concurrency 4 / --max-retries 1），避免瞬时
+#   产生大量外部请求。
+# - 只在 PR 改动 README、每周定时与手动触发时运行。
 name: Link Check
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
+    paths:
+      - 'README.md'
   schedule:
     - cron: '0 9 * * 1'  # 每周一 9:00 UTC
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: link-check
+  cancel-in-progress: false
 
 jobs:
   check-links:
@@ -23,8 +35,9 @@ jobs:
       - uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
           args: >-
-            --verbose
-            --max-retries 2
+            --max-concurrency 4
+            --max-retries 1
+            --timeout 20
             README.md
           fail: true
           jobSummary: true

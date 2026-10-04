@@ -1,9 +1,14 @@
-# 每 3 天自动同步 README / 官网统计并执行质量检查
+# 每周一次自动同步 README / 官网统计并执行质量检查
+#
+# 维护约定（请勿收紧）：
+# - cron 刻意保持每周一次。本工作流会批量查询全库 440+ 个仓库的 Star 并可能
+#   自动提交，频率过高只会增加 GitHub API 与 Actions 的消耗，不产生额外价值。
+# - workflow_dispatch 仅用于异常时补跑，不要频繁手动触发。
 name: Auto Maintenance
 
 on:
   schedule:
-    - cron: '0 2 */3 * *'
+    - cron: '0 2 * * 1'  # 每周一 2:00 UTC（北京 10:00）
   workflow_dispatch:
 
 permissions:

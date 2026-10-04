@@ -139,7 +139,7 @@ git diff --check
 
 ## 自动维护任务
 
-`.github/workflows/auto-maintenance.yml` 每 3 天运行一次，也支持在 GitHub Actions 页面手动触发。
+`.github/workflows/auto-maintenance.yml` 每周运行一次（周一 UTC 02:00），也可在 GitHub Actions 页面手动触发。
 
 自动任务负责：
 
@@ -149,7 +149,7 @@ git diff --check
 - 运行 markdownlint 和 `git diff --check`。
 - 如果 README、`docs/index.html` 或 `docs/sitemap.xml` 有自动同步差异，直接提交 `docs: auto maintenance sync`。
 
-README 外部链接由独立的 `Link Check` workflow 定期检查。链接波动或第三方图片接口故障不应阻断已经完成的统计同步提交。
+README 外部链接由独立的 `Link Check` workflow 检查：只在 PR 改动 README、每周定时或手动触发时运行，且并发与重试保持低值。一次检查会访问 README 中约 500 个外部链接，因此不在每次 push 时运行。链接波动或第三方图片接口故障不应阻断已经完成的统计同步提交。
 
 自动任务不负责：
 
@@ -158,3 +158,15 @@ README 外部链接由独立的 `Link Check` workflow 定期检查。链接波�
 - 自动修改原创 skills 的行为。
 
 新增精选资源仍然需要遵守本手册的收录原则，由维护者基于相关性、安装清晰度和中文用户价值判断。
+
+## 自动化频率约定
+
+项目账户曾因被判定滥用 GitHub 功能而封禁，因此仓库自动化刻意保持低频。以下为硬性约定，不要收紧频率：
+
+- `auto-maintenance.yml` 保持每周一次，不要改回每 3 天或更高频率。
+- `link-check.yml` 不在 `push` 时运行；并发保持低值（`--max-concurrency 4`），重试不超过 1 次。
+- `markdown-lint.yml` 只在 Markdown 或 lint 配置变化时触发。
+- 不要用 `gh workflow run` 手动触发定时 workflow；确需补跑时先说明理由。
+- 不要轮询 CI 状态（`gh run watch` 或循环 `gh run list`），需要确认结果时只做单次查询。
+- 核验第三方仓库时优先用一次 GraphQL 批量取数，避免逐仓库、逐文件的大量 API 调用。
+- 单轮维护尽量合并为一次推送，减少 workflow 触发次数，也减少对外部站点的请求。

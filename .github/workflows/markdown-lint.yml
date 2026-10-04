@@ -1,11 +1,22 @@
-# Markdown 格式检查
+# Markdown 格式检查（仅在有 Markdown 或 lint 配置变化时运行）
+#
+# 维护约定：markdownlint 是纯本地解析，但仍只在与 Markdown 相关的改动上
+# 触发，避免纯代码或数据提交也启动一次 workflow。
 name: Markdown Lint
 
 on:
   push:
     branches: [main]
+    paths:
+      - '**/*.md'
+      - '.markdownlint.json'
+      - '.github/workflows/markdown-lint.yml'
   pull_request:
     branches: [main]
+    paths:
+      - '**/*.md'
+      - '.markdownlint.json'
+      - '.github/workflows/markdown-lint.yml'
 
 permissions:
   contents: read
