@@ -1,10 +1,10 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 444+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 442+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-444%2B-green.svg)](#original-skills)
+[![Skills](https://img.shields.io/badge/skills-442%2B-green.svg)](#original-skills)
 [![Updated](https://img.shields.io/badge/updated-2026--10--04-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
@@ -209,7 +209,6 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [DemonDamon/AgenticX](https://github.com/DemonDamon/AgenticX) | 生产级多 Agent 平台：Python SDK + CLI + Studio + 桌面端，内置 MCP Hub、层级记忆、Skill 生态、安全沙箱与飞书/微信 IM 网关，适合把办公协作和 Agent 技能运营统一到一套平台（233⭐）|
 | [LAVARONG/wechat-automation-api](https://github.com/LAVARONG/wechat-automation-api) | 微信 Windows 自动化发送 Agent Skill / HTTP API：基于 UI 自动化支持文本、图片、批量发送和队列管理，非 Hook/非协议（175⭐）|
 | [zhimaAi/ChatClaw](https://github.com/zhimaAi/ChatClaw) | 轻量 OpenClaw-like 个人 AI Agent：内置 Skill Market、知识库、记忆、MCP、定时任务，并连接微信企微、飞书、钉钉、QQ、Slack 等渠道（310⭐）|
-| [aitytech/agentkits-marketing](https://github.com/aitytech/agentkits-marketing) | 企业级 AI 营销自动化 AgentKit：18 个 Agents、93 条 Commands、28 个 Skills，覆盖 SaaS 增长、内容、SEO、营销活动、报告与数据分析（606⭐）|
 | [kostja94/marketing-skills](https://github.com/kostja94/marketing-skills) | Marketing & SEO Skills for AI Agents：160+ Markdown 技能覆盖 SEO、页面类型、付费广告、渠道和策略，支持 npx skills 安装（989⭐）|
 | [BrianRWagner/ai-marketing-claude-code-skills](https://github.com/BrianRWagner/ai-marketing-claude-code-skills) | Claude Code 营销框架技能集：23 个免费 + 10 个 Pro skills，支持 quick/standard/deep 执行模式，覆盖转化、定位、文案、渠道和增长审计（423⭐）|
 | [AgriciDaniel/claude-youtube](https://github.com/AgriciDaniel/claude-youtube) | YouTube 创作者 Claude Code Skill：14 个子技能覆盖频道审计、视频 SEO、留存脚本、标题缩略图、Shorts、内容日历、变现和竞品分析，README 文档完整且仍活跃（388⭐）|
@@ -425,7 +424,6 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [bevibing/tutor-skills](https://github.com/bevibing/tutor-skills) | 学习型 Claude Code Skill：把 PDF、文档和代码库转成 Obsidian 学习库，适合课程化内容沉淀、知识整理和自学复盘（1.2K⭐）|
 | [AgriciDaniel/claude-blog](https://github.com/AgriciDaniel/claude-blog) | 博客内容生产与优化 Claude Code Skill 生态：覆盖选题、写作、SEO/GEO 优化、内容管理和发布，兼顾 Google 排名与 AI 引用，README 安装与工作流说明清晰（2.2K⭐）|
 | [beautify-github-readme](https://github.com/oil-oil/beautify-github-readme) | GitHub README 视觉重构 Skill：先核验项目真实内容，再用项目原生 SVG / 可选 GIF 重排信息架构与证据；支持只读审查、仅生成素材或整页优化，明确未经授权不修改、提交或推送，中文文档和安装路径完整（1.8K⭐）|
-| [video-shotcraft](https://github.com/Vincentwei1021/video-shotcraft) | 中文双语产品视频 Agent Skill：用 106 张镜头配方卡、161 条动态样片和可运行的 Remotion 模板制作宣传片，覆盖真实页面截图、2.5D 运镜、节奏卡点与声音设计；企业使用前需核对 Remotion、截图和素材许可（9.2K⭐）|
 | [story-to-handdrawn-video](https://github.com/gnipbao/story-to-handdrawn-video) | 中文故事手绘动画 Skill：把故事文案或有序图片转换为 3:4 手绘日记漫画静音视频，提供 Remotion 渲染器、预览 / 正式输出和本地校验；需 Node.js 20+、Python 3.10+、FFmpeg 与 Chrome，上传素材前应确认隐私和版权（2K⭐）|
 | [claude-world/notebooklm-skill](https://github.com/claude-world/notebooklm-skill) | NotebookLM × Claude Code 内容工作流：NotebookLM 负责研究，Claude 负责写作，串联 Research → Synthesis → Content Creation → Publishing，并提供 Skill + MCP Server（462⭐）|
 | [limecloud/lime](https://github.com/limecloud/lime) | 本地优先 AI Agent 创作工作台：面向中文创作者把 Workspace、Agent、Skills、MCP、Claw 渠道和 Artifact 交付整合到桌面端，覆盖成稿、成图、成片与项目沉淀（1.5K⭐）|
