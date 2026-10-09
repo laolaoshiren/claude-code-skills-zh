@@ -408,6 +408,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [Skill_Seekers](https://github.com/yusufkaraaslan/Skill_Seekers) | 文档转 AI 知识资产工具：把文档站、GitHub 仓库、PDF、视频、Notebook 等 18 种来源转成结构化知识，一键导出到 Claude / Gemini / OpenAI Skills、RAG 管线和 Cursor / Windsurf；`pip install skill-seekers`，支持 22 种目标格式（15.1K⭐）|
 | [mblode/agent-skills](https://github.com/mblode/agent-skills) | 面向 Coding Agent 的工程技能库：27 个 SKILL.md 覆盖 UI 与排版审计、文档写作、README 生成、PR 创建与审查、发布流程和脚手架，MIT 许可；安装命令为 `npx skills add mblode/agent-skills`，可按需挑选单个技能（142⭐）|
 | [allxsmith/bestax](https://github.com/allxsmith/bestax) | Bestax（基于 Bulma 的 React 组件库）附带 7 个 Agent Skills：页面布局脚手架、表单、图标、主题定制、自定义组件、迁移与 CSS 优化，MIT 许可，可用 `npx skills add https://github.com/allxsmith/bestax --skill <name>` 安装；适合用 Bulma + React 的团队让 Agent 直接按组件库约定出页面（12⭐）|
+| [masakaai/jet-browser](https://github.com/masakaai/jet-browser) | 面向 Codex、Claude Code 等编码 Agent 的独立 WPE WebKit 浏览器运行时与 Agent Skill：每个容器一个隔离会话，通过有序 JSONL 提供原生输入、语义 DOM 与截图，并附离线 smoke test 和可复现基准；需 Docker 与 Node.js 24+，当前发布镜像仅支持 `linux/amd64`，不会接管日常 Chrome 登录态（1⭐）|
 
 ### 🎨 内容创作
 
