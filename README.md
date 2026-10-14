@@ -274,6 +274,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [feishu-whiteboard-pro](https://github.com/LcpMarvel/feishu-whiteboard-pro) | 可编辑飞书 / Lark 白板设计 Skill：用布局组件、预渲染 fit-check 和独立设计评审生成有层次的真实白板；依赖已认证的 `lark-cli` 与飞书账号，写入租户前需确认权限和敏感内容（60⭐）|
 | [feishu_msg_card_skill](https://github.com/lageev/feishu_msg_card_skill) | 飞书 / Lark Card JSON 2.0 Skill：构造、审查和校验通知、报告、表单与回调卡片，附模板、专项校验器和只封装不发送的 Webhook 签名脚本；真正发送或更新卡片前仍需确认权限并保护密钥（11⭐）|
 | [claude-seo](https://github.com/AgriciDaniel/claude-seo) | Claude Code SEO 审计插件：25 个子技能 + 18 个专家 Agent 并行覆盖技术 SEO、内容质量（E-E-A-T）、Schema.org、AI 搜索优化（GEO）、本地 / 电商 / 国际 SEO，输出按优先级排序的行动计划；MIT 开源版可通过 `/plugin marketplace add` 安装（18.7K⭐）|
+| [notfair-plugin](https://github.com/nowork-studio/notfair-plugin) | 开源 SEO / GEO / 营销 Agent Skills：48 个 `SKILL.md` 工作流覆盖站点审计、AI 搜索可见性、GA4 / Search Console 分析，以及 Google / Meta / LinkedIn / Reddit / TikTok 广告诊断，支持 Claude Code / Codex / Cursor / Gemini CLI 安装；读取真实账户数据需通过 OAuth 连接 NotFair MCP，账户改动需用户明确批准（3.9K⭐）|
 
 <a id="cat-dev"></a>
 ### 💻 开发效率
