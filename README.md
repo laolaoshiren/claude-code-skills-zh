@@ -573,6 +573,8 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [kc_ai_skills](https://github.com/KerberosClaw/kc_ai_skills) | 中文优先的 22 个通用 Agent Skills：覆盖仓库预检、ADR / PRD、故障诊断、报告和内容生成，兼容 Claude Code / Codex；其中 CTF / 逆向仅限授权环境，外部服务技能部署前需审查认证与网络配置（79⭐）|
 | [hermes-edu-skills](https://github.com/hezkvectory/hermes-edu-skills) | 面向中国教育场景的 170 个 Agent Skills：覆盖教材同步、备考、拍照答疑、错题复盘、亲子陪学和教师工具，Hermes 可直接安装并可导出到 Claude Code / Codex / Cursor；处理学生资料时需保护隐私，输出仍应由教师或家长核验（110⭐）|
 | [taiwan-translate-skill](https://github.com/Moksa1123/taiwan-translate-skill) | 台湾正体中文本地化 Skill：内置 2,300+ WordPress 官方词汇，支持 PO / POT 与双来源术语策略，可通过 npm 安装到 14 类 AI 工具；法律、医疗等专业文本仍需人工校对（14⭐）|
+| [takeout-coupon](https://github.com/moooai/takeout-coupon) | 外卖领券 Skill：一次返回美团、饿了么/淘宝闪购、京东的红包与隐藏券口令，附 H5 直达与二维码；标准 SKILL.md 格式，公开 API 零密钥，口令原样透传不改写（1⭐） |
+| [obtain-coupons-all-in-one](https://github.com/moooai/obtain-coupons-all-in-one) | 生活服务领券全家桶：外卖、出行（滴滴/酒店）、电影票、快递四类券一站获取，配套 4 个单场景仓库（0⭐） |
 
 ---
 
