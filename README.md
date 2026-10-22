@@ -1,11 +1,11 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 438+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 439+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-438%2B-green.svg)](#original-skills)
-[![Updated](https://img.shields.io/badge/updated-2026--10--20-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
+[![Skills](https://img.shields.io/badge/skills-439%2B-green.svg)](#original-skills)
+[![Updated](https://img.shields.io/badge/updated-2026--10--22-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -526,6 +526,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 
 | 技能 | 说明 |
 |------|------|
+| [yangdavip/effective-requirements-analysis-skill](https://github.com/yangdavip/effective-requirements-analysis-skill) | B 端需求分析 Skill：先向业务方提问澄清，再产出全套可追溯的需求文档；用阶段闸门与自检脚本强制执行，分析结论不会混进访谈产物，编号撞号与溯源缺失会自动报错；支持 `npx skills add` 一行安装，脚本仅依赖 Python 标准库（0⭐）|
 | [wondelai/skills](https://github.com/wondelai/skills) | 把商业、营销、UX 与工程经典书框架整理成 50 个 Skills + 12 条引导路径，支持 Claude Code / Codex / Cursor 等；适合产品、增长和团队决策参考，框架不能替代真实数据和专业判断（2.5K⭐）|
 | [dbskill](https://github.com/dontbesilent2025/dbskill) | 🏢 商业诊断技能包：市场分析、竞品调研、商业模式画布（10.8K⭐） |
 | [gtm-eng-skills](https://github.com/getaero-io/gtm-eng-skills) | GTM Engineering Claude Code Skills：覆盖 TAM 构建、联系人/LinkedIn 查找、线索富集、投放受众和 outbound 工作流，内置成本门禁与 `npx skills add` 安装路径（68⭐）|
