@@ -346,6 +346,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [togethercomputer/skills](https://github.com/togethercomputer/skills) | Together AI 官方 Agent Skills：覆盖推理、图像、视频、音频、Embedding、微调、批处理、评测、Sandbox 与 GPU 基础设施，兼容 Claude Code / Codex / Cursor / Gemini CLI；运行示例需 API Key，远程 API 与 GPU 资源可能产生费用（37⭐）|
 | [getsentry/sentry-for-ai](https://github.com/getsentry/sentry-for-ai) | Sentry 官方跨 Agent 技能源码库：为 Claude Code、Codex、Cursor、Grok 生成各自的安装仓库，覆盖接入、生产问题诊断、AI / LLM 监控、OpenTelemetry、告警与 PR 修复；应安装对应 Agent 的生成插件，并以最小权限访问可能含敏感信息的生产遥测（271⭐）|
 | [Tencent-RTC/agent-skills](https://github.com/Tencent-RTC/agent-skills) | 腾讯 RTC 官方集成 Skill：提供简体中文文档，覆盖 Conference Web、Chat、AI 客服 / 口语陪练 / 实时翻译与 TIMPush，支持 Claude Code / Codex / Cursor 等工具；需腾讯云账号、密钥并关注计费，Live、Call 与 RTC Engine 的集成引导仍在开发中（14⭐）|
+| [curlshot-mcp](https://github.com/SergiuPogor/curlshot-mcp) | CurlShot 网页截图 MCP Server + Claude Code 插件与 Skill：让 Agent 对公开网页截图，输出 PNG / JPEG / WebP / PDF 或滚动视频，支持整页、手机/平板设备预设和深色模式；服务端托管在 curlshot.com，需注册获取 API Key（免费版每月 100 张），仅支持公开网址（0⭐）|
 | [app-onboarding-questionnaire](https://github.com/adamlyttleapps/claude-skill-app-onboarding-questionnaire) | 高转化 App 引导页问卷设计：基于顶级订阅 App 的转化模式（1.2K⭐）|
 | [bmad-skills](https://github.com/aj-geddes/claude-code-bmad-skills) | BMAD Method：自动检测 + Memory 集成 + 完整开发流程（488⭐）|
 | [rails-upgrade](https://github.com/ombulabs/claude-code_rails-upgrade-skill) | Rails 一键升级技能，自动化版本迁移（392⭐）|
