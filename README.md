@@ -603,6 +603,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [kc_ai_skills](https://github.com/KerberosClaw/kc_ai_skills) | 中文优先的 22 个通用 Agent Skills：覆盖仓库预检、ADR / PRD、故障诊断、报告和内容生成，兼容 Claude Code / Codex；其中 CTF / 逆向仅限授权环境，外部服务技能部署前需审查认证与网络配置（79⭐）|
 | [hermes-edu-skills](https://github.com/hezkvectory/hermes-edu-skills) | 面向中国教育场景的 170 个 Agent Skills：覆盖教材同步、备考、拍照答疑、错题复盘、亲子陪学和教师工具，Hermes 可直接安装并可导出到 Claude Code / Codex / Cursor；处理学生资料时需保护隐私，输出仍应由教师或家长核验（121⭐）|
 | [taiwan-translate-skill](https://github.com/Moksa1123/taiwan-translate-skill) | 台湾正体中文本地化 Skill：内置 2,300+ WordPress 官方词汇，支持 PO / POT 与双来源术语策略，可通过 npm 安装到 14 类 AI 工具；法律、医疗等专业文本仍需人工校对（14⭐）|
+| [shiji-tongjian-decisions](https://github.com/zhuyep/shiji-tongjian-decisions) | 史鉴人生抉择：用《史记》《资治通鉴》推演去留/晋升等进退两难，引文可离线核验（exact / 缺口明说）；MIT，skills.sh 已收录，`npx skills add` 可装（4⭐）|
 
 ---
 
