@@ -1,11 +1,11 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 440+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 444+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-440%2B-green.svg)](#original-skills)
-[![Updated](https://img.shields.io/badge/updated-2026--10--26-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
+[![Skills](https://img.shields.io/badge/skills-444%2B-green.svg)](#original-skills)
+[![Updated](https://img.shields.io/badge/updated-2026--11--01-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -445,6 +445,8 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [masakaai/jet-browser](https://github.com/masakaai/jet-browser) | 面向编码 Agent 的独立 WPE WebKit 浏览器运行时与 Skill：每个容器一个隔离会话，通过有序 JSONL 提供原生输入、语义 DOM 与截图，附离线 smoke test 与可复现基准，Apache-2.0 许可并含中文 README；需要容器运行环境，用于网页自动化前请确认目标站点授权与隔离边界（2⭐）|
 | [sensedeal/cue-skills](https://github.com/sensedeal/cue-skills) | 面向中文用户的 Agent 技能合集：cue-omni-reader 把网页、PDF、扫描件、音频和视频解析成 Markdown，另有 cue-research 深度研究、cue-data-mcp 公共数据查询，附中文 README 与 `SKILL.zh-CN.md`，可用 `npx skills add sensedeal/cue-skills --skill cue-omni-reader` 安装；解析能力由 Cue 官方 MCP 提供，需要 `CUE_API_KEY` 且服务可能计费，运行前请确认（6⭐）|
 | [curlshot-mcp](https://github.com/SergiuPogor/curlshot-mcp) | 网页截图 MCP Server 与 Claude Code 插件：把公开网址渲染成 PNG / JPEG / WebP、PDF，或整页滚动的 MP4 / WebM / GIF，也可把自有 HTML / Markdown 转图片；直连托管服务 `https://curlshot.com/api/mcp`，需自行注册并配置 `CURLSHOT_API_KEY`（免费版每月 100 张、无需绑卡，缓存命中与失败渲染不计费），仅支持公开网址；MIT 许可，可用 `claude mcp add --transport http` 或 `/plugin install` 安装（0⭐）|
+| [npmscan-mcp-plugin](https://github.com/salemalem/npmscan-mcp-plugin) | npm 供应链安全 MCP 与 Claude Code 插件：在安装或升级 npm 包前检查恶意包、已知漏洞、仿冒包名、维护者变更、安装脚本与发布来源证明，附带 dependency-audit / package-trust-check / new-dependency-evaluation / incident-response / ci-pr-gate 五个 Skill；插件本身 MIT 开源，但连接的 npmscan.com 服务端不开源，查询的包名与依赖清单会发送到该服务，只读免费、无需 API Key、每 IP 限速 30 次/分钟（504⭐）|
+| [agent-qa](https://github.com/vostride/agent-qa) | 面向 Web / Android / iOS 的 QA 测试 Skills 与 MCP：4 个技能覆盖用例编写、缺陷定位修复、知识沉淀与结果分诊，带持久记忆与经验证的自我改进；含中文 README，需 Node.js 24+ 并自行配置模型提供方（可能产生费用），许可证为 FSL-1.1-ALv2（限制竞争性商业使用，两年后转 Apache-2.0）（913⭐）|
 
 <a id="cat-creative"></a>
 ### 🎨 内容创作
@@ -484,6 +486,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [guizang-material-illustration](https://github.com/op7418/guizang-material-illustration) | 歸藏材质插画 Skill：把文章、截图或数据转成带中文标签的机制图、解释图和材质化图表，内置参考调研、提示词模板与图像 QA；仓库暂未声明许可证（1.2K⭐）|
 | [OrkasVideoStudio](https://github.com/Orkas-AI/Orkas-VideoStudio) | 本地优先的视频制作 CLI + MCP：用可编辑 plan.json 时间线驱动 Claude Code / Codex 完成规划、编排、生成与自动组装，10 个官方 SKILL.md 可一键装入，MIT 许可；视频生成依赖 ffmpeg 等本地工具链（328⭐）|
 | [listening-script-kit](https://github.com/GODGOD126/listening-script-kit) | 长文听稿 Skill：把研究报告、学习长文和读书笔记改写成离开屏幕也能听懂的稿件，保留数字、来源归属、限定语和不确定性，输出纯文字、不合成音频；把 `skills/listening-script/` 复制到 `~/.claude/skills/` 即可用，MIT 许可，技能包不含脚本、不访问账号、无需 API Key，AI 输出仍需对照原文核查（0⭐）|
+| [writing-with-agents](https://github.com/Jeffallan/writing-with-agents) | 按 Betty Flowers「疯子 / 建筑师 / 木匠 / 法官」四阶段写作法拆分的 Claude Code 写作插件：10 个 Skill 覆盖创意发散、结构设计、成稿打磨、质量评审，另含 SEO 写作、内容策略、调研 intake 与知识沉淀；MIT 许可，可用 `npx skills add Jeffallan/writing-with-agents` 或 `/plugin marketplace add` 安装（37⭐）|
 
 <a id="cat-academic"></a>
 ### 🔬 学术科研
@@ -603,6 +606,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [kc_ai_skills](https://github.com/KerberosClaw/kc_ai_skills) | 中文优先的 22 个通用 Agent Skills：覆盖仓库预检、ADR / PRD、故障诊断、报告和内容生成，兼容 Claude Code / Codex；其中 CTF / 逆向仅限授权环境，外部服务技能部署前需审查认证与网络配置（79⭐）|
 | [hermes-edu-skills](https://github.com/hezkvectory/hermes-edu-skills) | 面向中国教育场景的 170 个 Agent Skills：覆盖教材同步、备考、拍照答疑、错题复盘、亲子陪学和教师工具，Hermes 可直接安装并可导出到 Claude Code / Codex / Cursor；处理学生资料时需保护隐私，输出仍应由教师或家长核验（121⭐）|
 | [taiwan-translate-skill](https://github.com/Moksa1123/taiwan-translate-skill) | 台湾正体中文本地化 Skill：内置 2,300+ WordPress 官方词汇，支持 PO / POT 与双来源术语策略，可通过 npm 安装到 14 类 AI 工具；法律、医疗等专业文本仍需人工校对（14⭐）|
+| [shiji-tongjian-decisions](https://github.com/zhuyep/shiji-tongjian-decisions) | 用《史记》《资治通鉴》做人生抉择推演的中文 Skill：围绕去留、晋升、合作等场景，先定位处境再援引史例，引文可离线核验、不编造出处，附完整推演示例；MIT 许可，可用 `npx skills add zhuyep/shiji-tongjian-decisions --skill shiji-tongjian-decisions` 安装（4⭐）|
 
 ---
 
