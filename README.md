@@ -1,11 +1,11 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 440+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 441+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-440%2B-green.svg)](#original-skills)
-[![Updated](https://img.shields.io/badge/updated-2026--10--26-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
+[![Skills](https://img.shields.io/badge/skills-441%2B-green.svg)](#original-skills)
+[![Updated](https://img.shields.io/badge/updated-2026--10--31-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -445,6 +445,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [masakaai/jet-browser](https://github.com/masakaai/jet-browser) | 面向编码 Agent 的独立 WPE WebKit 浏览器运行时与 Skill：每个容器一个隔离会话，通过有序 JSONL 提供原生输入、语义 DOM 与截图，附离线 smoke test 与可复现基准，Apache-2.0 许可并含中文 README；需要容器运行环境，用于网页自动化前请确认目标站点授权与隔离边界（2⭐）|
 | [sensedeal/cue-skills](https://github.com/sensedeal/cue-skills) | 面向中文用户的 Agent 技能合集：cue-omni-reader 把网页、PDF、扫描件、音频和视频解析成 Markdown，另有 cue-research 深度研究、cue-data-mcp 公共数据查询，附中文 README 与 `SKILL.zh-CN.md`，可用 `npx skills add sensedeal/cue-skills --skill cue-omni-reader` 安装；解析能力由 Cue 官方 MCP 提供，需要 `CUE_API_KEY` 且服务可能计费，运行前请确认（6⭐）|
 | [curlshot-mcp](https://github.com/SergiuPogor/curlshot-mcp) | 网页截图 MCP Server 与 Claude Code 插件：把公开网址渲染成 PNG / JPEG / WebP、PDF，或整页滚动的 MP4 / WebM / GIF，也可把自有 HTML / Markdown 转图片；直连托管服务 `https://curlshot.com/api/mcp`，需自行注册并配置 `CURLSHOT_API_KEY`（免费版每月 100 张、无需绑卡，缓存命中与失败渲染不计费），仅支持公开网址；MIT 许可，可用 `claude mcp add --transport http` 或 `/plugin install` 安装（0⭐）|
+| [vostride/agent-qa](https://github.com/vostride/agent-qa) | QA Skills 与 MCP：支持 Web / Android / iOS 测试，具备持久记忆和经验证的自我改进能力；附中文 README，需 Node.js 24+、模型配置及获授权测试环境；FSL-1.1-ALv2（912⭐） |
 
 <a id="cat-creative"></a>
 ### 🎨 内容创作
