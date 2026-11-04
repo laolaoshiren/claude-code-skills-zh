@@ -1,11 +1,11 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 444+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 442+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-444%2B-green.svg)](#original-skills)
-[![Updated](https://img.shields.io/badge/updated-2026--11--02-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
+[![Skills](https://img.shields.io/badge/skills-442%2B-green.svg)](#original-skills)
+[![Updated](https://img.shields.io/badge/updated-2026--11--05-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -412,7 +412,6 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [michtio/craftcms-claude-skills](https://github.com/michtio/craftcms-claude-skills) | Craft CMS 5 专项 Claude Code 插件：11 个 skills、6 个 agents 和 105 个 reference 文件覆盖插件开发、内容建模、Twig、DDEV、Craft Cloud / Servd 部署，支持 `/plugin marketplace add` 与 `npx skills add`（87⭐）|
 | [ory/gemini-cli-extension](https://github.com/ory/gemini-cli-extension) | Ory 官方 Gemini CLI 扩展：把认证、授权、本地 Ory stack、slash commands 与 skills 打包到编码代理工作流，适合需要安全登录体系的应用脚手架（0⭐）|
 | [run-llama/llamaparse-agent-skills](https://github.com/run-llama/llamaparse-agent-skills) | LlamaParse 官方 Agent Skills：提供 LlamaParse、LiteParse 和 LlamaCloud Index 检索技能，适合 PDF/Office/扫描件解析与 RAG 索引工作流（85⭐）|
-| [LerianStudio/ring](https://github.com/LerianStudio/ring) | Claude Code 插件市场：89 个 skills + 38 个专业 agents，覆盖 TDD、系统化调试、并行代码审查和 10-gate 开发流程（218⭐）|
 | [binance/binance-skills-hub](https://github.com/binance/binance-skills-hub) | Binance 官方开放 Skills Hub：为 AI Agent 提供加密资产查询、交易、钱包追踪、信号监控和 DeFi 交互能力，支持 OpenClaw / Claude Code，`npx skills add` 安装路径清晰（1.1K⭐）|
 | [am-will/codex-skills](https://github.com/am-will/codex-skills) | Codex / Agent Skills 集合：覆盖规划、多 Agent 编排、Context7/OpenAI 文档访问、前端开发和浏览器自动化，README 列出可用技能与安装/复制路径（1K⭐）|
 | [thinkyou0714/github-flow-kit](https://github.com/thinkyou0714/github-flow-kit) | GitHub 原生维护 Skills：`pr-respond`、`release-notes`、`issue-triage`、`repo-tour`、PR 权限审计和仓库安全审计 6 件套，带 CI 校验、测试和 `gh skill install` 路径，适合开源维护者处理 PR / Issue / Release（0⭐）|
@@ -444,7 +443,6 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [ITW-Creative-Works/workkit](https://github.com/ITW-Creative-Works/workkit) | 用 GitHub Issues 驱动的 Claude Code 开发流水线插件：issue 按标签依次经过收集 → 规格 → 构建 → QA → 发布，主会话作为经理把已确认规格分派给 worker 子代理，再由不看实现过程的 verifier 子代理审查，hooks 保证测试不通过不提交；含 9 个 `/workkit:*` 技能与 5 个代理，许可证为 FSL-1.1-MIT（限制竞争性商业使用，两年后转 MIT），安装用 `claude plugin marketplace add ITW-Creative-Works/workkit`（4⭐）|
 | [masakaai/jet-browser](https://github.com/masakaai/jet-browser) | 面向编码 Agent 的独立 WPE WebKit 浏览器运行时与 Skill：每个容器一个隔离会话，通过有序 JSONL 提供原生输入、语义 DOM 与截图，附离线 smoke test 与可复现基准，Apache-2.0 许可并含中文 README；需要容器运行环境，用于网页自动化前请确认目标站点授权与隔离边界（2⭐）|
 | [sensedeal/cue-skills](https://github.com/sensedeal/cue-skills) | 面向中文用户的 Agent 技能合集：cue-omni-reader 把网页、PDF、扫描件、音频和视频解析成 Markdown，另有 cue-research 深度研究、cue-data-mcp 公共数据查询，附中文 README 与 `SKILL.zh-CN.md`，可用 `npx skills add sensedeal/cue-skills --skill cue-omni-reader` 安装；解析能力由 Cue 官方 MCP 提供，需要 `CUE_API_KEY` 且服务可能计费，运行前请确认（6⭐）|
-| [curlshot-mcp](https://github.com/SergiuPogor/curlshot-mcp) | 网页截图 MCP Server 与 Claude Code 插件：把公开网址渲染成 PNG / JPEG / WebP、PDF，或整页滚动的 MP4 / WebM / GIF，也可把自有 HTML / Markdown 转图片；直连托管服务 `https://curlshot.com/api/mcp`，需自行注册并配置 `CURLSHOT_API_KEY`（免费版每月 100 张、无需绑卡，缓存命中与失败渲染不计费），仅支持公开网址；MIT 许可，可用 `claude mcp add --transport http` 或 `/plugin install` 安装（0⭐）|
 | [npmscan-mcp-plugin](https://github.com/salemalem/npmscan-mcp-plugin) | npm 供应链安全 MCP 与 Claude Code 插件：在安装或升级 npm 包前检查恶意包、已知漏洞、仿冒包名、维护者变更、安装脚本与发布来源证明，附带 dependency-audit / package-trust-check / new-dependency-evaluation / incident-response / ci-pr-gate 五个 Skill；插件本身 MIT 开源，但连接的 npmscan.com 服务端不开源，查询的包名与依赖清单会发送到该服务，只读免费、无需 API Key、每 IP 限速 30 次/分钟（509⭐）|
 | [agent-qa](https://github.com/vostride/agent-qa) | 面向 Web / Android / iOS 的 QA 测试 Skills 与 MCP：4 个技能覆盖用例编写、缺陷定位修复、知识沉淀与结果分诊，带持久记忆与经验证的自我改进；含中文 README，需 Node.js 24+ 并自行配置模型提供方（可能产生费用），许可证为 FSL-1.1-ALv2（限制竞争性商业使用，两年后转 Apache-2.0）（915⭐）|
 
@@ -480,7 +478,6 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [zenstory-ai/video-recap-skills](https://github.com/zenstory-ai/video-recap-skills) | 视频→中文解说视频（601⭐）|
 | [aref-vc/tufte-claude-skill](https://github.com/aref-vc/tufte-claude-skill) | Tufte 风格数据图表生成（314⭐）|
 | [Jaderson-bit/mindmap-markmap-viewer](https://github.com/Jaderson-bit/mindmap-markmap-viewer) | Markdown→交互式思维导图（75⭐）|
-| [micheledalsanto/design-from-references](https://github.com/micheledalsanto/design-from-references) | Claude Code 视觉设计参考技能：从优秀站点量测字体、颜色、间距并生成原创可访问的 Figma 设计系统（0⭐）|
 | [anything-to-course](https://github.com/lowwwbank/anything-to-course) | 学习科学驱动的 Agent Skill：把文档、笔记、转录、幻灯片或代码库转成自学课程，内置检索练习、间隔复习、交错练习和独立答案文件，支持 Claude Code / Claude.ai / Codex 安装（30⭐）|
 | [novel-to-webnovel](https://github.com/aimerfeng/novel-to-webnovel) | 中文小说网文化改写 Claude Code Skill：五阶段流水线把日轻译稿、机翻稿或自写草稿去翻译腔并转成中文网文口感，含 Perl 分章、格式清理和 QA 脚本，明确版权与未成年露骨内容边界（1⭐）|
 | [guizang-material-illustration](https://github.com/op7418/guizang-material-illustration) | 歸藏材质插画 Skill：把文章、截图或数据转成带中文标签的机制图、解释图和材质化图表，内置参考调研、提示词模板与图像 QA；仓库暂未声明许可证（1.2K⭐）|
@@ -554,6 +551,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [OrcaReplay](https://github.com/Continuum-AI-Corp/OrcaReplay) | Agent 运行的时间旅行调试工具：`orca record` 录制会话的模型请求、工具调用、shell 退出码与文件改动，`orca replay` 离线重放或换模型分叉对比；内置 `skills/orca-replay` 让 Agent 回答“上次那次运行做了什么”时先读录像而非凭记忆复述；需 Node 20+，重放仍会真实执行录下的 shell 命令、默认会用录像覆盖工作区（应传 `worktree: true`，这不是沙箱），且“重放通过”不等于重新跑一次也会失败（295⭐）|
 | [mnemoverse/claude-plugin](https://github.com/mnemoverse/claude-plugin) | Claude Code 持久记忆插件：经 MCP 接入托管记忆服务，OAuth 2.1 登录、无需粘贴 API Key，提供 `/mnemoverse:remember`、`/mnemoverse:recall`、`/mnemoverse:memory-status` 三条命令，并内置 CC0 的 `agent-memory-discipline` 技能决定何时该召回、何时该写入；需注册 Mnemoverse 账号（有免费额度），记忆引擎是托管服务且只保存用户或 Claude 经记忆工具显式写入的内容，不记录对话，安装用 `/plugin marketplace add mnemoverse/claude-plugin`（0⭐）|
 | [ct-jaryn/baizhi-claude-code-plugin](https://github.com/ct-jaryn/baizhi-claude-code-plugin) | 百智云 Agent Toolkit 社区插件：为中文 Claude Code 用户提供 HTTP MCP 连接与显式调用的公开资料研究 Skill，仓库含 `plugin.json`、`marketplace.json` 与 `SKILL.md`；MIT 只覆盖插件配置与文档，使用托管服务需自有百智账号与 Key、调用可能计费，单独复制 SKILL.md 不会注册 MCP（0⭐）|
+| [agent-arcade](https://github.com/ArbakovMaxim/agent-arcade) | 把 Claude Code 变成小工作台的插件：项目看板（卡片可一键交给 Claude 并把结果写回）、所有会话共享的笔记本、可选的团队看板与聊天，agent 工作时还能玩 NES 游戏、读公版书；基于 Mods（function hooks）注册 `mcp__arcade__notes` 等工具，需 Claude Code 2.1.275+，团队看板与聊天需 GitHub 登录并经 Arcade 网站（Cloudflare）提供；AGPL-3.0，免费无广告与统计，可用 `claude plugin marketplace add ArbakovMaxim/agent-arcade` 安装（12⭐）|
 
 <a id="cat-finance"></a>
 ### 💰 金融/商业
