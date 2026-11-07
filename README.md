@@ -52,6 +52,7 @@
 | [🤖 AI Agent](#cat-agent) | 多 Agent 编排、记忆、浏览器自动化、技能市场 | 搭 Agent 工作流 |
 | [💰 金融 / 商业](#cat-finance) | 投研、财报、增长与商业化 | 金融与商业分析 |
 | [🌏 中文专属](#cat-chinese) | 为中文场景专门打造 | 找中文优化项目 |
+| [CrakSEO/skills](https://github.com/CrakSEO/skills) | Connect Claude/Cursor/Codex to CrakSEO remote MCP servers for keyword research, SERP, backlinks, rank tracking, site audit, local SEO, AI visibility, Search Console and URL indexing | Claude Code, Cursor, Codex | MIT |
 
 **其他常用入口：** [🎁 原创技能](#original-skills) · [📦 快速安装](#original-install) · [⚡ 30 秒上手](#quick-start) · [📖 什么是 Skills](#what-is-skills) · [✍️ 自己写 Skill](#how-to-create) · [🤝 贡献](#contributing) · [📊 维护手册](docs/MAINTENANCE.md)
 
