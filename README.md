@@ -139,6 +139,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [GSD Core](https://github.com/open-gsd/gsd-core) | ⚡ Get Shit Done 的活跃后继项目：规格驱动开发、Skills、Agents、Hooks 与中文 README | 11.4K+ |
 | [superpowers-zh](https://github.com/jnMetaCode/superpowers-zh) | 🇨🇳 superpowers 完整汉化 + 6 个中国原创 Skills，支持多款 AI 工具 | 8.5K+ |
 | [claude-mem](https://github.com/thedotmack/claude-mem) | 🧠 自动捕获会话上下文，AI 压缩后注入未来会话，告别遗忘 | 115.1K+ |
+| [deja-vu](https://github.com/vshulcz/deja-vu) | 🧠 跨 Claude Code / Codex / Cursor 等 43 款编程 Agent 的本地会话记忆引擎：直接索引已有转录，提供 Skills、Hooks 与 MCP | 1.4K+ |
 | [claude-hud](https://github.com/jarrodwatts/claude-hud) | 📊 实时显示上下文用量、活跃工具、运行中 Agent 和 TODO 进度 | 29.1K+ |
 | [claude-plugins-official](https://github.com/anthropics/claude-plugins-official) | 🏛️ Anthropic 官方 Claude Code 插件目录 | 46.5K+ |
 | [agent-skills](https://github.com/addyosmani/agent-skills) | ⚙️ 生产级工程技能集，覆盖前端、后端与 DevOps | 114.3K+ |
