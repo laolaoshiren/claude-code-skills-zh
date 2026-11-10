@@ -37,6 +37,25 @@ body:
       placeholder: 例如：支持 Claude Code / Codex，包含可安装 SKILL.md，适合代码审查场景。
     validations:
       required: true
+  - type: textarea
+    id: chinese_value
+    attributes:
+      label: 对中文用户的价值（必填）
+      description: 本仓库是「Claude Code Skills 中文精选集」，中文是核心。请具体说明中文用户为什么值得看：是否有中文文档？是否覆盖国内平台（公众号、小红书、飞书、企业微信、B 站、抖音等）？是否针对中文语境优化？如果都没有，它解决了中文开发者的什么问题？
+      placeholder: 例如：提供完整中文 README 与中文提示词；覆盖公众号排版场景，可直接生成可粘贴的中文稿件。
+    validations:
+      required: true
+  - type: checkboxes
+    id: chinese_support
+    attributes:
+      label: 中文支持情况
+      options:
+        - label: 仓库提供中文 README 或中文文档
+          required: false
+        - label: 描述中包含中文场景（如国内平台、中文写作、中文语境优化）
+          required: false
+        - label: 仅英文文档，但能力对中文用户有明确价值（请在上方说明）
+          required: false
   - type: checkboxes
     id: checks
     attributes:
