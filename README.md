@@ -1,11 +1,11 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 442+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 443+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-442%2B-green.svg)](#original-skills)
-[![Updated](https://img.shields.io/badge/updated-2026--11--09-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
+[![Skills](https://img.shields.io/badge/skills-443%2B-green.svg)](#original-skills)
+[![Updated](https://img.shields.io/badge/updated-2026--11--11-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -26,9 +26,9 @@
 <!-- fact-summary -->
 ## 📌 一句话事实
 
-**claude-code-skills-zh（Claude Code Skills 中文精选集）** 是面向中文开发者的 Claude Code Skills / Agents / Plugins 精选仓库：**442+** 个精选技能按场景分类（平台运营、开发效率、内容创作、学术科研、AI Agent、金融/商业、中文专属等），另含 **20 个**可直接安装的原创中文技能，复制即装，MIT 许可，持续更新。
+**claude-code-skills-zh（Claude Code Skills 中文精选集）** 是面向中文开发者的 Claude Code Skills / Agents / Plugins 精选仓库：**443+** 个精选技能按场景分类（平台运营、开发效率、内容创作、学术科研、AI Agent、金融/商业、中文专属等），另含 **20 个**可直接安装的原创中文技能，复制即装，MIT 许可，持续更新。
 
-**English:** claude-code-skills-zh is a curated GitHub repository of 442+ Claude Code Skills, Agents and Plugins for Chinese-speaking developers, organized by scenario with Chinese documentation, plus 20 original install-ready skills (zh-code-reviewer, zh-readme, api-tester, and more). MIT licensed, updated continuously.
+**English:** claude-code-skills-zh is a curated GitHub repository of 443+ Claude Code Skills, Agents and Plugins for Chinese-speaking developers, organized by scenario with Chinese documentation, plus 20 original install-ready skills (zh-code-reviewer, zh-readme, api-tester, and more). MIT licensed, updated continuously.
 
 - 仓库：https://github.com/laolaoshiren/claude-code-skills-zh
 - 官网：https://claude-skills.bt199.com
@@ -565,6 +565,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [mnemoverse/claude-plugin](https://github.com/mnemoverse/claude-plugin) | Claude Code 持久记忆插件：经 MCP 接入托管记忆服务，OAuth 2.1 登录、无需粘贴 API Key，提供 `/mnemoverse:remember`、`/mnemoverse:recall`、`/mnemoverse:memory-status` 三条命令，并内置 CC0 的 `agent-memory-discipline` 技能决定何时该召回、何时该写入；需注册 Mnemoverse 账号（有免费额度），记忆引擎是托管服务且只保存用户或 Claude 经记忆工具显式写入的内容，不记录对话，安装用 `/plugin marketplace add mnemoverse/claude-plugin`（0⭐）|
 | [ct-jaryn/baizhi-claude-code-plugin](https://github.com/ct-jaryn/baizhi-claude-code-plugin) | 百智云 Agent Toolkit 社区插件：为中文 Claude Code 用户提供 HTTP MCP 连接与显式调用的公开资料研究 Skill，仓库含 `plugin.json`、`marketplace.json` 与 `SKILL.md`；MIT 只覆盖插件配置与文档，使用托管服务需自有百智账号与 Key、调用可能计费，单独复制 SKILL.md 不会注册 MCP（0⭐）|
 | [agent-arcade](https://github.com/ArbakovMaxim/agent-arcade) | 把 Claude Code 变成小工作台的插件：项目看板（卡片可一键交给 Claude 并把结果写回）、所有会话共享的笔记本、可选的团队看板与聊天，agent 工作时还能玩 NES 游戏、读公版书；基于 Mods（function hooks）注册 `mcp__arcade__notes` 等工具，需 Claude Code 2.1.275+，团队看板与聊天需 GitHub 登录并经 Arcade 网站（Cloudflare）提供；AGPL-3.0，免费无广告与统计，可用 `claude plugin marketplace add ArbakovMaxim/agent-arcade` 安装（13⭐）|
+| [deja-vu](https://github.com/vshulcz/deja-vu) | 跨 Agent 的本地会话记忆引擎：直接索引 Claude Code / Codex / Cursor / OpenClaw / Gemini CLI / OpenCode 等 43 款编程 Agent 已经存在磁盘上的会话转录，用单个 Go 二进制在本地建立索引，零 LLM 调用、数据不出本机，提供 `deja-search`、`deja-reflect` 两个 Skill 与 Hooks / MCP 接入，另可做跨 Agent 交接与代码恢复；MIT 许可，含简体中文文档（1.5K⭐）|
 
 <a id="cat-finance"></a>
 ### 💰 金融/商业

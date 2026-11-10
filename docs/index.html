@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Claude Code Skills 中文精选集 | 中文开发者最好的技能资源站</title>
-<meta name="description" content="最实用的 Claude Code Skills / Agents / Plugins 中文精选集，收录 442+ 高质量技能、Agent 和插件，20 个原创技能，适合 Claude Code、Codex、Gemini CLI、Cursor 用户复制即装。">
+<meta name="description" content="最实用的 Claude Code Skills / Agents / Plugins 中文精选集，收录 443+ 高质量技能、Agent 和插件，20 个原创技能，适合 Claude Code、Codex、Gemini CLI、Cursor 用户复制即装。">
 <meta name="robots" content="index,follow,max-image-preview:large">
 <link rel="canonical" href="https://claude-skills.bt199.com/">
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Claude Code Skills 中文精选集">
 <meta property="og:title" content="Claude Code Skills 中文精选集 | 中文开发者最好的技能资源站">
-<meta property="og:description" content="收录 442+ Claude Code Skills / Agents / Plugins，按场景分类，中文说明，复制即装，持续更新。">
+<meta property="og:description" content="收录 443+ Claude Code Skills / Agents / Plugins，按场景分类，中文说明，复制即装，持续更新。">
 <meta property="og:url" content="https://claude-skills.bt199.com/">
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Claude Code Skills 中文精选集">
-<meta name="twitter:description" content="442+ 高质量 Claude Code 技能、Agent、插件中文精选，复制即装。">
+<meta name="twitter:description" content="443+ 高质量 Claude Code 技能、Agent、插件中文精选，复制即装。">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -243,10 +243,10 @@ footer .footer-links a{color:var(--text2);font-size:.9rem}
     <h1>Claude Code Skills<br><span class="gradient">中文精选集</span></h1>
     <p class="hero-sub">最实用的 Claude Code Skills / Agents / Plugins 合集。不只是列表，更包含可直接安装的原创技能包。适合想快速补齐代码审查、README、API 测试、重构和性能分析能力的中文开发者。</p>
     <div class="hero-badges">
-      <span class="badge green">✅ 442+ 精选技能</span>
+      <span class="badge green">✅ 443+ 精选技能</span>
       <span class="badge purple">🎁 20 个原创技能</span>
       <span class="badge orange">⭐ 905 Stars</span>
-      <span class="badge orange">🔄 更新于 2026-11-09</span>
+      <span class="badge orange">🔄 更新于 2026-11-11</span>
     </div>
     <div class="hero-actions">
       <a href="#install" class="btn btn-primary">🚀 先安装再说</a>
@@ -480,7 +480,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/</pre>
   <div class="container">
     <div class="stats-bar fade-in">
       <div class="stat-item">
-        <h3>442+</h3>
+        <h3>443+</h3>
         <p>精选技能</p>
       </div>
       <div class="stat-item">
@@ -492,7 +492,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/</pre>
         <p>GitHub Stars</p>
       </div>
       <div class="stat-item">
-        <h3>2026-11-09</h3>
+        <h3>2026-11-11</h3>
         <p>最近更新</p>
       </div>
     </div>
@@ -939,6 +939,7 @@ const skillsData = {
     {name:'mnemoverse/claude-plugin',stars:'0',desc:'Claude Code 持久记忆插件：经 MCP 接入托管记忆服务，OAuth 2.1 登录、无需粘贴 API Key，提供 `/mnemoverse:remember`、`/mnemoverse:recall`、`/mnemoverse:memory-status` 三条命令，并内置 CC0 的 `agent-memory-discipline` 技能决定何时该召回、何时该写入；需注册 Mnemoverse 账号（有免费额度），记忆引擎是托管服务且只保存用户或 Claude 经记忆工具显式写入的内容，不记录对话，安装用 `/plugin marketplace add mnemoverse/claude-plugin`',url:'https://github.com/mnemoverse/claude-plugin'},
     {name:'ct-jaryn/baizhi-claude-code-plugin',stars:'0',desc:'百智云 Agent Toolkit 社区插件：为中文 Claude Code 用户提供 HTTP MCP 连接与显式调用的公开资料研究 Skill，仓库含 `plugin.json`、`marketplace.json` 与 `SKILL.md`；MIT 只覆盖插件配置与文档，使用托管服务需自有百智账号与 Key、调用可能计费，单独复制 SKILL.md 不会注册 MCP',url:'https://github.com/ct-jaryn/baizhi-claude-code-plugin'},
     {name:'agent-arcade',stars:'13',desc:'把 Claude Code 变成小工作台的插件：项目看板（卡片可一键交给 Claude 并把结果写回）、所有会话共享的笔记本、可选的团队看板与聊天，agent 工作时还能玩 NES 游戏、读公版书；基于 Mods（function hooks）注册 `mcp__arcade__notes` 等工具，需 Claude Code 2.1.275+，团队看板与聊天需 GitHub 登录并经 Arcade 网站（Cloudflare）提供；AGPL-3.0，免费无广告与统计，可用 `claude plugin marketplace add ArbakovMaxim/agent-arcade` 安装',url:'https://github.com/ArbakovMaxim/agent-arcade'},
+    {name:'deja-vu',stars:'1.5K+',desc:'跨 Agent 的本地会话记忆引擎：直接索引 Claude Code / Codex / Cursor / OpenClaw / Gemini CLI / OpenCode 等 43 款编程 Agent 已经存在磁盘上的会话转录，用单个 Go 二进制在本地建立索引，零 LLM 调用、数据不出本机，提供 `deja-search`、`deja-reflect` 两个 Skill 与 Hooks / MCP 接入，另可做跨 Agent 交接与代码恢复；MIT 许可，含简体中文文档',url:'https://github.com/vshulcz/deja-vu'},
   ],
   finance: [
     {name:'wondelai/skills',stars:'2.6K+',desc:'把商业、营销、UX 与工程经典书框架整理成 50 个 Skills + 12 条引导路径，支持 Claude Code / Codex / Cursor 等；适合产品、增长和团队决策参考，框架不能替代真实数据和专业判断',url:'https://github.com/wondelai/skills'},
