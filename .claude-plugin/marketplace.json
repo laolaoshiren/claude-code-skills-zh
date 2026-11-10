@@ -1,0 +1,33 @@
+{
+  "name": "claude-code-skills-zh",
+  "description": "面向中文开发者的 Claude Code Skills 精选集：原创中文技能 + 按场景分类的第三方精选目录",
+  "owner": {
+    "name": "laolaoshiren",
+    "url": "https://github.com/laolaoshiren"
+  },
+  "plugins": [
+    {
+      "name": "zh-skills",
+      "source": "./",
+      "description": "20 个原创中文 Claude Code Skills：中文代码审查、中文 README 生成、API 测试、重构建议、性能分析、安全审计、依赖审计、数据库迁移、国际化、日志分析、错误翻译、ESLint 修复、测试生成、CI/CD 生成、环境变量管理、项目结构地图、变更日志、Git 工作流等",
+      "version": "1.0.0",
+      "author": {
+        "name": "laolaoshiren",
+        "url": "https://github.com/laolaoshiren"
+      },
+      "homepage": "https://claude-skills.bt199.com",
+      "repository": "https://github.com/laolaoshiren/claude-code-skills-zh",
+      "license": "MIT",
+      "category": "development",
+      "keywords": [
+        "chinese",
+        "zh-cn",
+        "claude-code",
+        "agent-skills",
+        "code-review",
+        "documentation",
+        "testing"
+      ]
+    }
+  ]
+}

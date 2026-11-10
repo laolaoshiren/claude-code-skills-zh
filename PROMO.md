@@ -40,7 +40,11 @@
 
 GitHub 地址：https://github.com/laolaoshiren/claude-code-skills-zh
 
-一键安装：
+一键安装（Claude Code 2.1+，推荐）：
+/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh
+
+或者手动复制：
 git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
 cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 
@@ -83,8 +87,8 @@ github.com/laolaoshiren/claude-code-skills-zh
 中文代码审查、安全审计、文档生成、API 测试、Git 自动化...
 
 一键安装 👇
-git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
-cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
+/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh
 
 地址：github.com/laolaoshiren/claude-code-skills-zh
 

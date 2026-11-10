@@ -979,6 +979,19 @@ def update_readme_badges(
         lambda match: f"{match.group(1)}{total_skills}{match.group(2)}",
         "README 首屏精选数量",
     )
+    # 「一句话事实」摘要块（中英双语）里的数量也必须跟随同步，否则会长期漂移。
+    readme = _replace_exact(
+        readme,
+        r'(\*\*)\d+(\+\*\* 个精选技能)',
+        lambda match: f"{match.group(1)}{total_skills}{match.group(2)}",
+        "README 事实摘要中文精选数量",
+    )
+    readme = _replace_exact(
+        readme,
+        r'(of )\d+(\+ Claude Code Skills, Agents and Plugins)',
+        lambda match: f"{match.group(1)}{total_skills}{match.group(2)}",
+        "README 事实摘要英文精选数量",
+    )
     today = _resolve_public_date(project_date).isoformat() if update_date else None
     readme = _replace_exact(
         readme,
