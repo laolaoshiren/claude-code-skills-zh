@@ -14,10 +14,10 @@
 
 - 📖 **说明用中文**：每条都写清解决什么场景、怎么安装、有什么限制和风险，不用先啃一遍英文 README。
 - 🇨🇳 **中文场景单独成类**：公众号、小红书、飞书、企业微信、B 站、抖音等国内平台技能有独立分类，不用在英文列表里大海捞针。
-- 🎁 **原创中文技能**：20 个本仓库自研、针对中文语境优化的 Skill，一条命令装完。
+- 🎁 **原创中文技能**：本仓库自研、针对中文语境优化的 Skill，一条命令装完。
 - ✅ **收录看中文价值**：每个条目都要说明「对中文用户有什么用」，纯英文且说不清价值的项目不放在热门位。
 
-## ⚡ 一条命令安装全部 20 个原创技能
+## ⚡ 一条命令安装全部原创技能
 
 在 Claude Code 里输入（需要 2.1+）：
 
@@ -33,9 +33,9 @@
 <!-- fact-summary -->
 ## 📌 一句话事实
 
-**claude-code-skills-zh（Claude Code Skills 中文精选集）** 是面向中文开发者的 Claude Code Skills / Agents / Plugins 精选仓库：**443+** 个精选技能按场景分类（平台运营、开发效率、内容创作、学术科研、AI Agent、金融/商业、中文专属等），另含 **20 个**可直接安装的原创中文技能，复制即装，MIT 许可，持续更新。
+**claude-code-skills-zh（Claude Code Skills 中文精选集）** 是面向中文开发者的 Claude Code Skills / Agents / Plugins 精选仓库：**443+** 个精选技能按场景分类（平台运营、开发效率、内容创作、学术科研、AI Agent、金融/商业、中文专属等），另含 **21 个**可直接安装的原创中文技能，复制即装，MIT 许可，持续更新。
 
-**English:** claude-code-skills-zh is a curated GitHub repository of 443+ Claude Code Skills, Agents and Plugins for Chinese-speaking developers, organized by scenario with Chinese documentation, plus 20 original install-ready skills (zh-code-reviewer, zh-readme, api-tester, and more). MIT licensed, updated continuously.
+**English:** claude-code-skills-zh is a curated GitHub repository of 443+ Claude Code Skills, Agents and Plugins for Chinese-speaking developers, organized by scenario with Chinese documentation, plus 21 original install-ready skills (zh-code-reviewer, zh-readme, api-tester, and more). MIT licensed, updated continuously.
 
 - 仓库：https://github.com/laolaoshiren/claude-code-skills-zh
 - 官网：https://claude-skills.bt199.com
@@ -47,6 +47,8 @@
 - 👨‍💻 想给 Claude Code **快速补齐专业能力** 的开发者
 - 📦 想找 **中文可读、复制即装** skills 的个人开发者 / 团队
 - 🎯 想用现成技能解决 **代码审查、README、API 测试、性能分析、重构建议** 等高频场景的人
+
+> 🆕 **新上架**：[ai-video-producer](skills/ai-video-producer/) — 把一句话选题做成可发布的 AI 视频。八阶段流水线（调研 → 提案 → 脚本 → 分镜 → 素材 → 剪辑 → 合成 → 导出），内置中文口播语速、中文字幕断句、抖音/B站/小红书多平台尺寸，以及「反盲盒抽卡」的成本门禁；零基础与专业两档都能用。
 
 **✨ 如果你是第一次接触这个仓库，建议先看这 5 个最值得马上装的原创技能：**
 - 🔍 [zh-code-reviewer](skills/zh-code-reviewer/) — 中文代码审查，直接输出中文审查报告
@@ -652,6 +654,7 @@ cp -r skills/* ~/.claude/skills/
 
 | 技能 | 分类 | 说明 |
 |------|------|------|
+| [ai-video-producer](skills/ai-video-producer/) 🆕 | 内容创作 | 八阶段 AI 视频流水线：调研 → 提案 → 脚本 → 分镜 → 素材 → 剪辑 → 合成 → 导出，含中文口播/字幕规则与成本门禁 |
 | [zh-code-reviewer](skills/zh-code-reviewer/) | 代码质量 | 中文代码审查专家，生成中文审查报告 |
 | [zh-docgen](skills/zh-docgen/) | 文档 | 从代码库自动生成中文技术文档 |
 | [git-workflow](skills/git-workflow/) | 开发效率 | 先审查改动，再按授权提交、建分支、推送或创建 PR |
@@ -727,7 +730,7 @@ description: 技能的一句话描述
 A：本仓库按场景收录了 438+ 个 Skills / Agents / Plugins，并提供 [官网](https://claude-skills.bt199.com) 按分类筛选。还可以看 [🏆 热门与高潜](#cat-star) 与 [🌏 中文专属](#cat-chinese)。
 
 **Q：这个仓库和 awesome-claude-skills 等英文列表有什么区别？**
-A：英文列表（如 ComposioHQ/awesome-claude-skills，1000+）覆盖面更广、以英文说明为主；本仓库是中文优先的精选，说明用中文，并单独覆盖公众号、小红书、飞书、企业微信等国内平台场景，另有 20 个原创中文技能。两者可互补。
+A：英文列表（如 ComposioHQ/awesome-claude-skills，1000+）覆盖面更广、以英文说明为主；本仓库是中文优先的精选，说明用中文，并单独覆盖公众号、小红书、飞书、企业微信等国内平台场景，另附原创中文技能。两者可互补。
 
 **Q：怎么安装一个 Skill？**
 A：把技能目录复制到 `~/.claude/skills/`（全局）或项目内 `.claude/skills/`（项目级）即可，Claude Code 会在任务匹配时自动加载。本仓库原创技能在 [`skills/`](skills/) 目录下，每个技能是一个独立文件夹。

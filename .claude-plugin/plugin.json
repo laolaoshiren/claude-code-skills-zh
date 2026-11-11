@@ -2,7 +2,7 @@
   "name": "zh-skills",
   "displayName": "Claude Code Skills 中文精选集 · 原创技能",
   "version": "1.0.0",
-  "description": "20 个原创中文 Claude Code Skills，覆盖代码审查、文档生成、测试、安全、性能、重构、CI/CD 等高频开发场景；全部中文说明，安装即用。",
+  "description": "原创中文 Claude Code Skills，覆盖 AI 视频制作、代码审查、文档生成、测试、安全、性能、重构、CI/CD 等场景；全部中文说明，安装即用。",
   "author": {
     "name": "laolaoshiren",
     "url": "https://github.com/laolaoshiren"

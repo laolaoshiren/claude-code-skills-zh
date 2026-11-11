@@ -1010,6 +1010,27 @@ def update_readme_badges(
     return readme
 
 
+def update_readme_original_count(readme: str, total_original: int) -> str:
+    """同步「一句话事实」摘要块中的原创技能数量（中英双语）。
+
+    该摘要块是给搜索引擎与 AI 检索工具读的事实陈述，数量必须准确；
+    历史上靠手写，新增技能后容易忘记更新，因此纳入同步流程。
+    """
+    readme = _replace_exact(
+        readme,
+        r'(另含 \*\*)\d+( 个\*\*可直接安装的原创中文技能)',
+        lambda match: f"{match.group(1)}{total_original}{match.group(2)}",
+        "README 事实摘要中文原创数量",
+    )
+    readme = _replace_exact(
+        readme,
+        r'(plus )\d+( original install-ready skills)',
+        lambda match: f"{match.group(1)}{total_original}{match.group(2)}",
+        "README 事实摘要英文原创数量",
+    )
+    return readme
+
+
 def update_promo_counts(
     promo: str,
     total_skills: int,
@@ -1123,6 +1144,9 @@ def build_sync_outputs(
         repo_stars,
         update_date=False,
     )
+    readme_without_date = update_readme_original_count(
+        readme_without_date, total_original
+    )
     # 即使最终 no-op，也要先验证首页锚点和 lastmod 唯一性。
     update_sitemap_lastmod(sitemap_content, update_date=False)
     validate_public_dates(readme_without_date, html_without_date, sitemap_content)
@@ -1153,6 +1177,7 @@ def build_sync_outputs(
         repo_stars,
         project_date=project_date,
     )
+    new_readme = update_readme_original_count(new_readme, total_original)
     new_sitemap = update_sitemap_lastmod(
         sitemap_content,
         project_date=project_date,

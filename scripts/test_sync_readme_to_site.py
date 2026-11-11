@@ -30,9 +30,9 @@ def _public_sync_fixture() -> tuple[str, str, str, str]:
 [![Skills](https://img.shields.io/badge/skills-3%2B-green.svg)](#original-skills)
 [![Updated](https://img.shields.io/badge/updated-2026--01--02-brightgreen.svg)](#maintenance-update)
 
-**合集名称** 是面向中文开发者的精选仓库：**3+** 个精选技能按场景分类，另含 **2 个**原创技能。
+**合集名称** 是面向中文开发者的精选仓库：**3+** 个精选技能按场景分类，另含 **2 个**可直接安装的原创中文技能。
 
-**English:** it is a curated list of 3+ Claude Code Skills, Agents and Plugins for Chinese-speaking developers.
+**English:** it is a curated list of 3+ Claude Code Skills, Agents and Plugins for Chinese-speaking developers, plus 2 original install-ready skills.
 """
     skills_js = "const skillsData = {};"
     html = f"""<meta name="description" content="最实用的 Claude Code Skills / Agents / Plugins 中文精选集，收录 3+ 高质量技能、Agent 和插件，2 个原创技能，适合 Claude Code、Codex、Gemini CLI、Cursor 用户复制即装。">
@@ -665,6 +665,18 @@ def test_readme_fact_summary_counts_are_synced() -> None:
     assert "of 3+ Claude" not in updated
 
 
+def test_readme_fact_summary_original_count_is_synced() -> None:
+    """事实摘要里的原创技能数量也必须跟随同步，避免新增技能后忘记改。"""
+    readme, _html, _sitemap, _js = _public_sync_fixture()
+
+    updated = sync_readme_to_site.update_readme_original_count(readme, 5)
+
+    assert "另含 **5 个**可直接安装的原创中文技能" in updated
+    assert "plus 5 original install-ready skills" in updated
+    assert "另含 **2 个**" not in updated
+    assert "plus 2 original" not in updated
+
+
 def test_update_promo_counts_refreshes_all_occurrences() -> None:
     """PROMO.md 的每处精选/原创数量都应被同步，且互不干扰。"""
     promo = """**标题：** [分享] Claude Code Skills 中文精选集 — 438+ 精选技能 + 20 个原创可安装技能
@@ -767,6 +779,7 @@ if __name__ == "__main__":
     test_checked_in_readme_is_a_user_facing_landing_page()
     test_checked_in_landing_pages_avoid_unsynced_ecosystem_stats()
     test_readme_fact_summary_counts_are_synced()
+    test_readme_fact_summary_original_count_is_synced()
     test_update_promo_counts_refreshes_all_occurrences()
     test_update_promo_counts_fails_closed_on_missing_anchor()
     test_update_promo_counts_fails_closed_on_duplicate_anchor()

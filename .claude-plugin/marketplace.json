@@ -9,7 +9,7 @@
     {
       "name": "zh-skills",
       "source": "./",
-      "description": "20 个原创中文 Claude Code Skills：中文代码审查、中文 README 生成、API 测试、重构建议、性能分析、安全审计、依赖审计、数据库迁移、国际化、日志分析、错误翻译、ESLint 修复、测试生成、CI/CD 生成、环境变量管理、项目结构地图、变更日志、Git 工作流等",
+      "description": "原创中文 Claude Code Skills：AI 视频制作、中文代码审查、中文 README 生成、API 测试、重构建议、性能分析、安全审计、依赖审计、数据库迁移、国际化、日志分析、错误翻译、ESLint 修复、测试生成、CI/CD 生成、环境变量管理、项目结构地图、变更日志、Git 工作流等",
       "version": "1.0.0",
       "author": {
         "name": "laolaoshiren",
