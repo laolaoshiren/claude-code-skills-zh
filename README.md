@@ -577,6 +577,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [ct-jaryn/baizhi-claude-code-plugin](https://github.com/ct-jaryn/baizhi-claude-code-plugin) | 百智云 Agent Toolkit 社区插件：为中文 Claude Code 用户提供 HTTP MCP 连接与显式调用的公开资料研究 Skill，仓库含 `plugin.json`、`marketplace.json` 与 `SKILL.md`；MIT 只覆盖插件配置与文档，使用托管服务需自有百智账号与 Key、调用可能计费，单独复制 SKILL.md 不会注册 MCP（0⭐）|
 | [agent-arcade](https://github.com/ArbakovMaxim/agent-arcade) | 把 Claude Code 变成小工作台的插件：项目看板（卡片可一键交给 Claude 并把结果写回）、所有会话共享的笔记本、可选的团队看板与聊天，agent 工作时还能玩 NES 游戏、读公版书；基于 Mods（function hooks）注册 `mcp__arcade__notes` 等工具，需 Claude Code 2.1.275+，团队看板与聊天需 GitHub 登录并经 Arcade 网站（Cloudflare）提供；AGPL-3.0，免费无广告与统计，可用 `claude plugin marketplace add ArbakovMaxim/agent-arcade` 安装（13⭐）|
 | [deja-vu](https://github.com/vshulcz/deja-vu) | 跨 Agent 的本地会话记忆引擎：直接索引 Claude Code / Codex / Cursor / OpenClaw / Gemini CLI / OpenCode 等 43 款编程 Agent 已经存在磁盘上的会话转录，用单个 Go 二进制在本地建立索引，零 LLM 调用、数据不出本机，提供 `deja-search`、`deja-reflect` 两个 Skill 与 Hooks / MCP 接入，另可做跨 Agent 交接与代码恢复；MIT 许可，含简体中文文档（1.5K⭐）|
+| [ClickHouse/loom](https://github.com/ClickHouse/loom) | 🧠 Claude Code / Codex 插件 + 自托管 MCP 服务器：多个 Agent 共享长期记忆，会话开始时加载上下文、通过 hooks 记录会话，代码索引回答“定义在哪、谁调用、改动影响什么”，数据存储在 ClickHouse（Apache-2.0）|
 
 <a id="cat-finance"></a>
 ### 💰 金融/商业
