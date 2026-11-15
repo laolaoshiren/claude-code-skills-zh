@@ -508,6 +508,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [OrkasVideoStudio](https://github.com/Orkas-AI/Orkas-VideoStudio) | 本地优先的视频制作 CLI + MCP：用可编辑 plan.json 时间线驱动 Claude Code / Codex 完成规划、编排、生成与自动组装，10 个官方 SKILL.md 可一键装入，MIT 许可；视频生成依赖 ffmpeg 等本地工具链（344⭐）|
 | [listening-script-kit](https://github.com/GODGOD126/listening-script-kit) | 长文听稿 Skill：把研究报告、学习长文和读书笔记改写成离开屏幕也能听懂的稿件，保留数字、来源归属、限定语和不确定性，输出纯文字、不合成音频；把 `skills/listening-script/` 复制到 `~/.claude/skills/` 即可用，MIT 许可，技能包不含脚本、不访问账号、无需 API Key，AI 输出仍需对照原文核查（0⭐）|
 | [writing-with-agents](https://github.com/Jeffallan/writing-with-agents) | 按 Betty Flowers「疯子 / 建筑师 / 木匠 / 法官」四阶段写作法拆分的 Claude Code 写作插件：10 个 Skill 覆盖创意发散、结构设计、成稿打磨、质量评审，另含 SEO 写作、内容策略、调研 intake 与知识沉淀；MIT 许可，可用 `npx skills add Jeffallan/writing-with-agents` 或 `/plugin marketplace add` 安装（38⭐）|
+| [youtube-transcript-skills](https://github.com/tubeagentkit/youtube-transcript-skills) | YouTube 字幕 / 文字稿 Skill：获取任意 YouTube 视频的完整字幕（支持任意字幕语言、时间戳与翻译），并可搜索视频、频道与播放列表，适合视频总结、笔记与内容二次创作；需要 GetYouTubeTranscript API Key（注册赠送 100 积分，之后付费） |
 
 <a id="cat-academic"></a>
 ### 🔬 学术科研
