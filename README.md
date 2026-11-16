@@ -33,9 +33,9 @@
 <!-- fact-summary -->
 ## 📌 一句话事实
 
-**claude-code-skills-zh（Claude Code Skills 中文精选集）** 是面向中文开发者的 Claude Code Skills / Agents / Plugins 精选仓库：**445+** 个精选技能按场景分类（平台运营、开发效率、内容创作、学术科研、AI Agent、金融/商业、中文专属等），另含 **21 个**可直接安装的原创中文技能，复制即装，MIT 许可，持续更新。
+**claude-code-skills-zh（Claude Code Skills 中文精选集）** 是面向中文开发者的 Claude Code Skills / Agents / Plugins 精选仓库：**445+** 个精选技能按场景分类（平台运营、开发效率、内容创作、学术科研、AI Agent、金融/商业、中文专属等），另含 **22 个**可直接安装的原创中文技能，复制即装，MIT 许可，持续更新。
 
-**English:** claude-code-skills-zh is a curated GitHub repository of 445+ Claude Code Skills, Agents and Plugins for Chinese-speaking developers, organized by scenario with Chinese documentation, plus 21 original install-ready skills (zh-code-reviewer, zh-readme, api-tester, and more). MIT licensed, updated continuously.
+**English:** claude-code-skills-zh is a curated GitHub repository of 445+ Claude Code Skills, Agents and Plugins for Chinese-speaking developers, organized by scenario with Chinese documentation, plus 22 original install-ready skills (zh-code-reviewer, zh-readme, api-tester, and more). MIT licensed, updated continuously.
 
 - 仓库：https://github.com/laolaoshiren/claude-code-skills-zh
 - 官网：https://claude-skills.bt199.com
@@ -677,6 +677,7 @@ cp -r skills/* ~/.claude/skills/
 | [env-manager](skills/env-manager/) | 开发效率 | 环境变量管理：扫描 .env 文件 + 校验 + 安全检查 + 生成模板 |
 | [ds-mapper](skills/ds-mapper/) | 理解代码库 | 项目结构地图：生成带注释的可视化目录树，快速理解任意仓库 |
 | [skill-curator](skills/skill-curator/) | 资源维护 | 核验 GitHub 候选 Skill，输出中文分类、描述、评分与风险证据 |
+| [specstream](skills/specstream/) | 检索与数据 | 实时网页搜索、正文提取与 MCP 接入：支持中文检索、Bocha/Tavily/Exa/Brave/Serper/SearXNG 兼容及无 Key 路由查询（需可选 SPECSTREAM_API_KEY 或 x402 按次付费）|
 
 ---
 
