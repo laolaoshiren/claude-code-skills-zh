@@ -1,10 +1,10 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 444+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 445+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-444%2B-green.svg)](#original-skills)
+[![Skills](https://img.shields.io/badge/skills-445%2B-green.svg)](#original-skills)
 [![Updated](https://img.shields.io/badge/updated-2026--11--16-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
@@ -33,9 +33,9 @@
 <!-- fact-summary -->
 ## 📌 一句话事实
 
-**claude-code-skills-zh（Claude Code Skills 中文精选集）** 是面向中文开发者的 Claude Code Skills / Agents / Plugins 精选仓库：**444+** 个精选技能按场景分类（平台运营、开发效率、内容创作、学术科研、AI Agent、金融/商业、中文专属等），另含 **21 个**可直接安装的原创中文技能，复制即装，MIT 许可，持续更新。
+**claude-code-skills-zh（Claude Code Skills 中文精选集）** 是面向中文开发者的 Claude Code Skills / Agents / Plugins 精选仓库：**445+** 个精选技能按场景分类（平台运营、开发效率、内容创作、学术科研、AI Agent、金融/商业、中文专属等），另含 **21 个**可直接安装的原创中文技能，复制即装，MIT 许可，持续更新。
 
-**English:** claude-code-skills-zh is a curated GitHub repository of 444+ Claude Code Skills, Agents and Plugins for Chinese-speaking developers, organized by scenario with Chinese documentation, plus 21 original install-ready skills (zh-code-reviewer, zh-readme, api-tester, and more). MIT licensed, updated continuously.
+**English:** claude-code-skills-zh is a curated GitHub repository of 445+ Claude Code Skills, Agents and Plugins for Chinese-speaking developers, organized by scenario with Chinese documentation, plus 21 original install-ready skills (zh-code-reviewer, zh-readme, api-tester, and more). MIT licensed, updated continuously.
 
 - 仓库：https://github.com/laolaoshiren/claude-code-skills-zh
 - 官网：https://claude-skills.bt199.com
@@ -631,6 +631,7 @@ cp -r claude-code-skills-zh/skills/* ~/.claude/skills/
 | [hermes-edu-skills](https://github.com/hezkvectory/hermes-edu-skills) | 面向中国教育场景的 170 个 Agent Skills：覆盖教材同步、备考、拍照答疑、错题复盘、亲子陪学和教师工具，Hermes 可直接安装并可导出到 Claude Code / Codex / Cursor；处理学生资料时需保护隐私，输出仍应由教师或家长核验（138⭐）|
 | [taiwan-translate-skill](https://github.com/Moksa1123/taiwan-translate-skill) | 台湾正体中文本地化 Skill：内置 2,300+ WordPress 官方词汇，支持 PO / POT 与双来源术语策略，可通过 npm 安装到 14 类 AI 工具；法律、医疗等专业文本仍需人工校对（15⭐）|
 | [shiji-tongjian-decisions](https://github.com/zhuyep/shiji-tongjian-decisions) | 用《史记》《资治通鉴》做人生抉择推演的中文 Skill：围绕去留、晋升、合作等场景，先定位处境再援引史例，引文可离线核验、不编造出处，附完整推演示例；MIT 许可，可用 `npx skills add zhuyep/shiji-tongjian-decisions --skill shiji-tongjian-decisions` 安装（4⭐）|
+| [antonailog/skills](https://github.com/antonailog/skills) | 19 个中文写的 Agent Skills 合集，覆盖知识整理、写作发布、Skill 与 Prompt、AI 编程与 AI 设计；其中「公众号发布」把 Markdown 推草稿箱并套排版主题、「小红书笔记」产出封面标题正文标签并归档、「飞书导出」与「播客笔记」「深度调研」都直接对国内工作流；每个技能附真实例子，`git clone` 后跑 `install.sh` 安装，Codex 加 `--target codex`。MIT 许可；部分技能需自备凭证（飞书应用、公众号与阿里云 OSS、可选 Gemini Key），详见仓库配置说明（2⭐）|
 
 ---
 
