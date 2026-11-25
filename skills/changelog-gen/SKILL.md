@@ -1,98 +1,101 @@
 ---
 name: changelog-gen
-description: Changelog 生成器 - 从 Git 历史自动生成 CHANGELOG
+description: 从真实 Git 提交历史生成结构化中文 CHANGELOG 或 Release Notes。用于用户要求生成更新日志、版本发布说明、整理发版变更清单或建议语义化版本号时；兼容 Conventional Commits 与中文自由提交历史，严禁编造不存在的 PR/Issue/CVE 编号，覆盖 CHANGELOG.md、打 git tag 或发布 Release 前必须取得确认。
 ---
 
 # Changelog 自动生成
 
-## 触发条件
-当用户要求生成 changelog、更新日志、版本记录、release notes 时激活此技能。
+## 触发边界
+
+- **适用**：基于真实 Git 历史提炼面向用户与开发者的中文 `CHANGELOG` / Release Notes，并给出 Semantic Versioning 版本号建议。
+- **不适用**：执行暂存、提交、推送、创建 PR 或 rebase → 请使用 `git-workflow`。
+
+## 核心原则
+
+1. **默认只读起草，落盘与发版先确认。** 用户只要求生成更新日志时，直接输出草稿；写入或覆盖 `CHANGELOG.md` 需先确认格式与目标位置，**严禁顺手执行 `git tag`、推送标签或创建 GitHub Release**。
+2. **零编造硬红线。** 只引用提交记录或关联元数据中真实存在的 PR/Issue 编号（如 `(#123)`）与 CVE 编号；提交历史中没有编号时直接省略，**严禁杜撰占位编号或夸大未测量的性能提升比例**。
+3. **跨平台中文防乱码。** Windows 环境下执行 `git log` 必须兼顾中文提交与中文路径（使用 `-c core.quotepath=false` 并显式声明 UTF-8 输出）。
 
 ## 工作流程
 
-### 第 1 步：获取 Git 历史
+### 第 1 步：确定真实提交范围
+
+优先确认上一个发布标签与目标范围（跨平台防中文转义）：
+
 ```bash
-# 先获取最近的 tag，再用 revision range 查询
+# 查看最近 tag（无 tag 时改用明确起止提交或全量历史）
 git describe --tags --abbrev=0
-git log --oneline <last-tag>..HEAD
 
-# 或指定范围
-git log --oneline v1.0.0..HEAD
-
-# 仓库没有 tag 时，明确选择起始提交或查看全部历史
-git log --oneline
+# 读取目标范围提交历史（Windows 兼容中文路径与 UTF-8 输出）
+git -c core.quotepath=false log --no-merges --pretty=format:"%h %ad %s" --date=short <last-tag>..HEAD
 ```
 
-### 第 2 步：分类提交
-按 Conventional Commits 分类：
+同时检查仓库是否已存在 `CHANGELOG.md`，若存在则沿用其原有标题层级、日期格式与分类风格。
 
-| 分类 | Type 标识 | 图标 |
-|------|----------|------|
-| 新功能 | `feat` | ✨ |
-| Bug 修复 | `fix` | 🐛 |
-| 文档 | `docs` | 📝 |
-| 重构 | `refactor` | ♻️ |
-| 性能优化 | `perf` | ⚡ |
-| 测试 | `test` | 🧪 |
-| 构建/工具 | `chore` | 🔧 |
-| Breaking Changes | 含 `BREAKING CHANGE:` 或 `!` | ⚠️ |
-| 安全修复 | `fix(security)` 或含 CVE | 🔒 |
-| 依赖更新 | `deps` 或 `chore(deps)` | 📦 |
+### 第 2 步：双模式分类提交
 
-### 第 3 步：版本号确定策略
+- **模式 A（仓库遵循 Conventional Commits）**：按 `feat`、`fix`、`perf`、`refactor`、`docs`、`test`、`chore`、`deps`、`fix(security)` 及 `BREAKING CHANGE:` / `!` 精准归类。
+- **模式 B（非规范提交或中文自由格式历史）**：读取对应提交标题与必要的 `git show --stat <sha>` 变更文件列表，按**面向用户可见影响**人工归纳为「破坏性变更 / 新功能 / 问题修复 / 性能与体验优化 / 文档与工程维护」；无法仅凭提交标题确认意图时查看真实 diff，不凭空猜测。
 
-遵循 Semantic Versioning 规则：
+| 分类 | Conventional 标识 / 归类依据 | 图标 |
+|------|------------------------------|------|
+| Breaking Changes | 含 `BREAKING CHANGE:`、`!` 或破坏兼容的接口/配置变更 | ⚠️ |
+| 安全修复 | `fix(security)` 或明确标注安全缺陷/真实 CVE | 🔒 |
+| 新功能 | `feat` 或面向用户的新增能力 | ✨ |
+| Bug 修复 | `fix` 或缺陷修复 | 🐛 |
+| 性能优化 | `perf` 或有实测依据的性能改进 | ⚡ |
+| 重构与体验 | `refactor`（仅保留对用户或二次开发有感知的改动） | ♻️ |
+| 文档更新 | `docs` | 📝 |
+| 依赖与构建 | `deps` / `chore(deps)` / CI 与工程脚本 | 📦 |
 
-| 变更类型 | 版本变化 | 示例 |
-|---------|---------|------|
-| Breaking Changes | 主版本 +1 | 1.2.0 → 2.0.0 |
-| 新功能 (feat) | 次版本 +1 | 1.2.0 → 1.3.0 |
-| Bug 修复 (fix) | 修订版本 +1 | 1.2.0 → 1.2.1 |
-| 安全修复 (fix(security)) | 修订版本 +1（紧急发布） | 1.2.0 → 1.2.1 |
+### 第 3 步：语义化版本号建议（SemVer）
 
-**判断依据**：
-- 提交信息含 `BREAKING CHANGE:` 或 type 后加 `!`（如 `feat!:`）→ 主版本
-- 存在 `feat` 提交 → 次版本
-- 仅 `fix`/`docs`/`chore` 等 → 修订版本
+结合真实提交内容给出建议版本号（若用户已指定版本号则以用户为准）：
 
-### 第 4 步：生成 CHANGELOG
+| 变更级别 | 版本规则 | 示例 |
+|----------|----------|------|
+| 存在 Breaking Changes | 主版本 +1 | `1.2.0` → `2.0.0` |
+| 存在新增功能（`feat`） | 次版本 +1 | `1.2.0` → `1.3.0` |
+| 仅修复、安全补丁或维护 | 修订版本 +1 | `1.2.0` → `1.2.1` |
+
+预发布版本使用 `-alpha.1`、`-beta.1`、`-rc.1` 后缀。
+
+### 第 4 步：生成并核对输出
+
+- 合并同一功能的琐碎过程提交（如“fix typo”、“wip”），让日志对读者有信息密度。
+- 按仓库风格在写入 `CHANGELOG.md` 前展示预览，确认后以 UTF-8 编码追加至文件顶部。
 
 ## 输出格式
 
 ```markdown
 # Changelog
 
-## [1.3.0] - 2026-06-17
+## [1.3.0] - 2026-11-25
 
 ### ⚠️ Breaking Changes
-- 移除废弃的 `/api/v1/users` 端点，统一使用 `/api/v2/users` (#130)
-
-### ✨ 新功能
-- 新增用户认证模块 (#123)
-- 支持 OAuth2 登录 (#124)
-- 新增批量导出功能 (#128)
+- **移除废弃接口 `/api/v1/users`**，统一迁移至 `/api/v2/users`（如有真实 PR 号再附 `(#130)`）
 
 ### 🔒 安全修复
-- 升级 lodash 修复原型污染漏洞 CVE-2025-XXXX (#129)
+- 修复某某鉴权校验遗漏（仅在提交真实注明时附 CVE 编号）
+
+### ✨ 新功能
+- 新增用户认证与 OAuth2 登录支持
+- 支持批量数据导出
 
 ### 🐛 Bug 修复
-- 修复分页查询偏移量错误 (#125)
-- 修复并发写入导致的数据竞争 (#127)
+- 修复分页查询偏移量边界错误
+- 修复并发写入导致的状态竞争
 
 ### ⚡ 性能优化
-- 优化大列表渲染性能，减少 50% 内存占用 (#126)
+- 优化大列表渲染逻辑，减少重复计算（仅在提交有实测数据时写具体比例）
 
-### 📝 文档
-- 更新 API 文档 (#131)
-
-### 📦 依赖更新
-- 升级 axios 1.6.0 → 1.7.0 (#132)
+### 📝 文档与维护
+- 更新安装与配置说明
+- 升级核心依赖版本
 ```
 
-## 注意事项
-- Breaking Changes 必须放在最前面，加粗突出显示
-- 每条记录关联 Issue/PR 编号，便于追溯
-- 安全修复需注明 CVE 编号（如有）
-- 版本号应与 git tag 保持一致
-- 如果是预发布版本，使用 `-beta.1`、`-rc.1` 后缀
-- 可维护一个 `CHANGELOG.md` 文件，每次 release 追加到顶部
+## 安全与质量注意事项
+
+- **Breaking Changes** 必须置于最前并加粗提醒，必要时附迁移指引。
+- 不暴露内部敏感路径、测试凭据或私有域名。
+- 没有实质改动的分类小节直接省略，不留空标题。

@@ -22,7 +22,7 @@ rg -n "owner/repo|项目名" README.md
 
 ### 2. 获取仓库事实
 
-优先使用已认证的 GitHub CLI 获取只读信息：
+优先使用已认证的 GitHub CLI 获取只读信息。核验单个仓库时可使用：
 
 ```bash
 gh repo view owner/repo \
@@ -35,7 +35,7 @@ gh api repos/owner/repo/contents/README.md \
   -H 'Accept: application/vnd.github.raw+json'
 ```
 
-若 `gh` 不可用，可使用公开网页或其他只读方式核验，但必须说明哪些事实未能确认。
+批量核验多个候选仓库时，优先合并为一次 `gh api graphql` 批量查询元数据与根目录结构，避免逐仓库、逐文件高频调用 API 触发限流或风控。若 `gh` 不可用，可使用公开网页或其他只读方式核验，但必须说明哪些事实未能确认。
 
 ### 3. 核验真实资产和安装路径
 
@@ -65,7 +65,7 @@ gh api repos/owner/repo/contents/README.md \
 
 建议分类只能从项目现有分类中选择：
 
-- 明星技能
+- 热门与高潜
 - 平台运营 / 自媒体 / 办公流量
 - 开发效率
 - 内容创作

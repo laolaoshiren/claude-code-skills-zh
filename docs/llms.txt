@@ -1,6 +1,6 @@
 # Claude Code Skills 中文精选集（claude-code-skills-zh）
 
-> 面向中文开发者的 Claude Code Skills / Agents / Plugins 精选仓库，按场景分类并提供中文说明，另含 20 个可直接安装的原创中文技能。MIT 许可，持续更新，由 laolaoshiren 维护。
+> 面向中文开发者的 Claude Code Skills / Agents / Plugins 精选仓库，收录 452+ 个精选技能，按场景分类并提供中文说明，另含 22 个可直接安装的原创中文技能。MIT 许可，持续更新，由 laolaoshiren 维护。
 
 ## 关键事实
 
@@ -8,31 +8,34 @@
 - 官网：https://claude-skills.bt199.com
 - 维护者：laolaoshiren
 - 许可：MIT（收录的第三方技能遵循各自原仓库许可）
-- 分类：热门与高潜、平台运营 / 自媒体、开发效率、内容创作、学术科研、AI Agent、金融 / 商业、中文专属
-- 适合人群：使用 Claude Code、Codex、Gemini CLI、Cursor 的中文开发者与团队
-- 安装方式：把技能目录复制到 `~/.claude/skills/`（全局）或项目内 `.claude/skills/`（项目级）
+- 分类：热门与高潜、平台运营 / 自媒体、开发效率、内容创作、学术科研、AI Agent、金融 / 商业、中文专属（官网与 README 均完整独立呈现 8 大分类并支持跨分类实时搜索）
+- 适合人群：使用 Claude Code、Codex、Gemini CLI、Cursor、OpenClaw 的中文开发者与团队
+- 推荐安装方式（Claude Code 2.1+）：`/plugin marketplace add laolaoshiren/claude-code-skills-zh` 后运行 `/plugin install zh-skills@claude-code-skills-zh`
+- 按需单技能与跨工具安装：运行 `npx skills add laolaoshiren/claude-code-skills-zh --skill <技能名>`，或复制技能目录至 `~/.claude/skills/`（Windows PowerShell 为 `$HOME\.claude\skills\`）、`~/.codex/skills/`、`.cursor/skills/`、`~/.gemini/skills/`、`~/.openclaw/skills/`
 
-当前精选数量与最近更新日期以 README 顶部徽章为准（由自动维护任务同步），此处不再重复硬编码，避免与实际数据脱节。
+精选数量与原创数量由 `scripts/sync_readme_to_site.py` 自动与 README / 官网同步，实时 Star 数与最近更新日期以 README 顶部动态徽章及官网统计栏为准。
 
-## 值得先装的 5 个原创技能
+## 值得先装的原创技能
 
-- zh-code-reviewer：中文代码审查，输出中文审查报告 — https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/zh-code-reviewer
-- zh-readme：先分析项目，再生成中文 README — https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/zh-readme
-- api-tester：依据真实契约生成并验证 API 测试 — https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/api-tester
+- skill-translator：将任意英文 SKILL.md / AGENTS.md / CLAUDE.md 无损转为自然中文触发版，内置安全风险与 Windows 兼容性预检 — https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/skill-translator
+- ai-video-producer：面向中文口播、字幕断句与抖音/B 站/小红书尺寸的八阶段 AI 视频流水线，含成本门禁 — https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/ai-video-producer
+- zh-code-reviewer：基于 git diff 的只读中文代码审查，输出阻塞缺陷/重要改进/可选建议分级报告 — https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/zh-code-reviewer
+- zh-readme：先分析项目，再生成面向中文开发者的高质量 README — https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/zh-readme
+- api-tester：依据真实 OpenAPI / 路由契约，在确认环境与授权后生成并验证 API 测试 — https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/api-tester
 - refactor-advisor：识别代码坏味道并给出可执行重构建议 — https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/refactor-advisor
 - perf-profiler：用可复现基线与 profiler 证据定位性能瓶颈 — https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/perf-profiler
 
 ## 主要链接
 
 - [GitHub 仓库](https://github.com/laolaoshiren/claude-code-skills-zh)：全部精选列表与原创技能源码
-- [官网](https://claude-skills.bt199.com)：按分类筛选浏览
-- [README](https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/README.md)：完整分类目录与安装说明
+- [官网](https://claude-skills.bt199.com)：8 大独立分类筛选、中文文档过滤与跨分类实时搜索
+- [README](https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/README.md)：完整分类目录、插件一键安装、Windows PowerShell 与跨工具安装指引
 - [项目维护手册](https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md)：收录标准、淘汰标准与验证流程
 
 ## 常见问题
 
-- 中文 Claude Code Skills 去哪找？本仓库是中文优先的精选来源，按场景分类，官网可按分类筛选。
-- 与 awesome-claude-skills 的区别？对方是英文大而全列表；本仓库是中文精选，额外覆盖公众号、小红书、飞书、企业微信等国内平台场景，并提供原创中文技能。
+- 中文 Claude Code Skills 去哪找？本仓库是中文优先的精选来源，按 8 大场景分类，官网支持跨分类关键词实时搜索。
+- 与 awesome-claude-skills 的区别？对方是英文大而全列表；本仓库是中文精选，额外覆盖公众号、小红书、飞书、企业微信等国内平台场景，并提供可直接安装的原创中文技能（含 `skill-translator`）。
 - 免费吗？MIT 许可，免费使用；第三方技能遵循各自原许可。
-- 怎么安装？把技能目录复制到 `~/.claude/skills/` 或项目内 `.claude/skills/`。
-- 发现失效条目怎么办？在 Issue 中反馈或提 PR，维护者按维护手册的淘汰标准复核。
+- 怎么安装？Claude Code 2.1+ 推荐运行 `/plugin marketplace add laolaoshiren/claude-code-skills-zh` 与 `/plugin install zh-skills@claude-code-skills-zh`；也可用 `npx skills add` 按需单装，或复制技能目录到 `~/.claude/skills/`（Windows 为 `$HOME\.claude\skills\`）。
+- 发现失效条目怎么办？在 Issue #1 中反馈或提 PR，维护者按维护手册的淘汰标准复核。

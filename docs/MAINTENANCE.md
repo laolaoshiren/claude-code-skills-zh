@@ -20,9 +20,9 @@
 
 - 检查开放 PR 和 Issue，优先处理新增资源推荐、断链、描述错误。
 - 搜索近期活跃的 Claude Code / Codex / Agent Skills 项目，补充 5-15 个高相关条目。
-- 运行 `python scripts/sync_readme_to_site.py --fetch-stars` 同步 README 徽章、官网数据、`docs/sitemap.xml` 日期、以及 `PROMO.md` 中的精选与原创数量。
+- 运行 `python scripts/sync_readme_to_site.py --fetch-stars` 同步 README 徽章与统计口径、官网数据（含独立展示的「🔬 学术科研」分类）、`docs/sitemap.xml` 日期、`PROMO.md` 与 `docs/llms.txt` 中的精选与原创数量。
 - 跑本地校验，确保 GitHub Actions 不报错。
-- 仓库已配置 `Auto Maintenance` GitHub Actions，每周自动同步 README / 官网统计并向 `PROMO.md` 对齐数量，同时执行 lint、链接和脚本回归检查。
+- 仓库已配置 `Auto Maintenance` GitHub Actions，每周自动同步 README / 官网统计并向 `PROMO.md` 与 `docs/llms.txt` 对齐数量，同时执行 lint、空白和脚本回归检查。
 
 每月维护：
 
@@ -169,7 +169,9 @@ README 是单一内容源。新增条目后必须运行同步脚本生成官网�
 python scripts/sync_readme_to_site.py --fetch-stars
 ```
 
-该命令会通过已认证的 `gh` CLI 批量读取全部精选 GitHub 仓库及本仓库的实时 Star，并统一同仓库跨分类条目的显示值。单个仓库查询失败时保留 README 中已有数字并输出警告，不得用估算值补齐。
+该命令会通过已认证的 `gh` CLI 批量读取全部精选 GitHub 仓库及本仓库的实时 Star，并统一同仓库跨分类条目及「同类仓库对比」表的显示值。单个仓库查询失败时保留 README 中已有数字并输出警告，不得用估算值补齐。
+
+官网 `docs/index.html` 与 README 保持 8 个分类一致，将「🔬 学术科研」作为独立分类（`academic`）展示，不再合并进「💻 开发效率」（`dev`）。同步脚本同时会保留项目名后的 `🇨🇳` 中文文档标识（输出 `zhDoc: true` 供前端渲染与筛选），并剥离描述中的成对 `**...**` 与反引号语法，避免纯文本渲染出现裸 Markdown 符号。
 
 README badge、官网统计和 sitemap 的公开日期统一按 Asia/Shanghai（UTC+8）计算，不能直接使用 GitHub Runner 的 UTC 日期。
 
@@ -189,16 +191,24 @@ README 是面向用户的项目首页，只保留项目价值、安装入口、�
 
 ## 原创 Skills 迭代方向
 
-已落地：
+已落地（22 个原创技能）：
 
-- `skill-curator`：核验 GitHub 候选仓库的真实资产、安装路径、重复项和风险，输出中文收录建议。
+- **本地化与文档**：
+  - `skill-translator`：将英文 `SKILL.md`、`AGENTS.md`、`CLAUDE.md` 本地化为自然简体中文版本，完整保留结构与代码并预检安全及 Windows 兼容性。
+  - `zh-readme`、`zh-docgen`、`changelog-gen`、`i18n-helper`：覆盖中文 README、技术文档、CHANGELOG 与国际化改造。
+- **内容创作与资源维护**：
+  - `ai-video-producer`：八阶段 AI 视频流水线（调研 → 提案 → 脚本 → 分镜 → 素材 → 剪辑 → 合成 → 导出），内置中文口播/字幕规则与成本门禁。
+  - `skill-curator`：核验 GitHub 候选仓库的真实资产、安装路径、重复项和风险，输出中文收录建议。
+- **代码质量、测试与调试**：
+  - `zh-code-reviewer`、`refactor-advisor`、`api-tester`、`test-generator`、`perf-profiler`、`log-analyzer`、`error-translator`、`eslint-fix`。
+- **安全、工程与运维**：
+  - `security-audit`、`dep-auditor`、`git-workflow`、`db-migrator`、`github-actions-gen`、`env-manager`、`ds-mapper`。
 
 优先补这类原创技能：
 
 - `repo-maintainer`：面向开源项目的日常维护助手，处理断链、README、release notes、PR triage。
 - `github-pages-sync`：检查 README 与官网是否一致，避免 SEO 和 badge 过期。
 - `awesome-list-auditor`：检查 awesome list 的重复、断链、分类漂移和描述质量。
-- `skill-translator`：把英文 `SKILL.md` 翻译成自然中文并保留结构。
 
 新增原创 skill 前，要确保它能在真实仓库中触发，并且 `description` 足够明确。
 
@@ -258,7 +268,7 @@ Python 测试**。Windows 控制台默认使用 GBK/CP936，脚本必须能在�
 - 运行 `scripts/sync_readme_to_site.py --fetch-stars`，同步 README badge、官网统计、精选条目 Star 和站点数据。
 - 同步脚本只接受 `http` / `https` 资源地址；生成数据需要转义脚本边界字符，官网卡片使用 DOM API 和 `textContent` 渲染，不得重新改回拼接 `innerHTML`。
 - 运行 markdownlint 和 `git diff --check`。
-- 如果 README、`docs/index.html` 或 `docs/sitemap.xml` 有自动同步差异，直接提交 `docs: auto maintenance sync`。
+- 如果 `README.md`、`docs/index.html`、`docs/sitemap.xml`、`PROMO.md` 或 `docs/llms.txt` 有自动同步差异，直接提交 `docs: auto maintenance sync`。
 
 README 外部链接由独立的 `Link Check` workflow 检查：只在 PR 改动 README、每周定时或手动触发时运行，且并发与重试保持低值。一次检查会访问 README 中约 500 个外部链接，因此不在每次 push 时运行。链接波动或第三方图片接口故障不应阻断已经完成的统计同步提交。
 

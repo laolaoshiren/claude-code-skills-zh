@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import contextlib
 import datetime
+import inspect
 import io
 import json
 import os
@@ -23,7 +24,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 SCRIPT_PATH = REPO_ROOT / "scripts" / "sync_readme_to_site.py"
 
 
-def _public_sync_fixture() -> tuple[str, str, str, str]:
+def _public_sync_fixture() -> tuple[str, str, str, str, str, str]:
     """返回数量已一致、但公开日期较旧的最小同步输入。"""
     readme = """> 🚀 最实用的合集 | 精选 3+ | 按场景分类 | 持续更新
 
@@ -33,11 +34,24 @@ def _public_sync_fixture() -> tuple[str, str, str, str]:
 **合集名称** 是面向中文开发者的精选仓库：**3+** 个精选技能按场景分类，另含 **2 个**可直接安装的原创中文技能。
 
 **English:** it is a curated list of 3+ Claude Code Skills, Agents and Plugins for Chinese-speaking developers, plus 2 original install-ready skills.
+
+## 📊 同类仓库对比
+
+| 仓库 | Stars | 规模 | 语言 | 定位 |
+|---|---|---|---|---|
+| [anthropics/skills](https://github.com/anthropics/skills) | 180K | 官方技能集 | 英文 | Anthropic 官方出品 |
+| **claude-code-skills-zh（本仓库）** | 见[顶部徽章](https://github.com/laolaoshiren/claude-code-skills-zh) | 3+ 精选 + 2 原创 | **中文** | 中文精选与原创技能 |
+
+## ❓ 常见问题（FAQ）
+
+A：本仓库按场景收录了 3+ 个 Skills / Agents / Plugins，并提供官网筛选。
 """
     skills_js = "const skillsData = {};"
     html = f"""<meta name="description" content="最实用的 Claude Code Skills / Agents / Plugins 中文精选集，收录 3+ 高质量技能、Agent 和插件，2 个原创技能，适合 Claude Code、Codex、Gemini CLI、Cursor 用户复制即装。">
 <meta property="og:description" content="收录 3+ Claude Code Skills / Agents / Plugins，按场景分类，中文说明，复制即装，持续更新。">
 <meta name="twitter:description" content="3+ 高质量 Claude Code 技能、Agent、插件中文精选，复制即装。">
+<script type="application/ld+json">{{"text": "按场景收录 3+ 个 Claude Code Skills / Agents / Plugins，并附带 2 个可直接安装的原创中文技能。"}}</script>
+<a class="nav-star">⭐ GitHub <span class="nav-star-count">9</span></a>
 <span class="badge green">✅ 3+ 精选技能</span>
 <span class="badge purple">🎁 2 个原创技能</span>
 <span class="badge orange">⭐ 9 Stars</span>
@@ -54,7 +68,18 @@ def _public_sync_fixture() -> tuple[str, str, str, str]:
   </url>
 </urlset>
 """
-    return readme, html, sitemap, skills_js
+    promo = """**标题：** [分享] Claude Code Skills 中文精选集 — 3+ 精选技能 + 2 个原创可安装技能
+还整理了 3+ 第三方精选资源，按场景分类。
+**标题：** Claude Code Skills 入门指南：2 个面向中文开发者的实用 AI 技能
+我整理了一份中文精选集，还写了 2 个实用的原创技能：
+✅ 3+ 精选资源列表
+✅ 2 个原创可安装技能
+不只列出了 3+ 优质资源，还带了 2 个原创技能可以直接装：
+不只列了 3+ 好用的资源，还带了 2 个原创技能可以直接装：
+"""
+    llms = """> 面向中文开发者的精选仓库，收录 3+ 个精选技能，另含 2 个可直接安装的原创中文技能。
+"""
+    return readme, html, sitemap, promo, llms, skills_js
 
 
 def _expect_runtime_error(callback, expected_text: str | None = None) -> None:
@@ -232,15 +257,19 @@ def test_replace_skills_data_fails_closed() -> None:
 
 
 def test_crlf_site_data_is_a_byte_preserving_noop() -> None:
-    readme, html, sitemap, skills_js = _public_sync_fixture()
+    readme, html, sitemap, promo, llms, skills_js = _public_sync_fixture()
     readme = readme.replace("\n", "\r\n")
     html = html.replace("\n", "\r\n")
     sitemap = sitemap.replace("\n", "\r\n")
+    promo = promo.replace("\n", "\r\n")
+    llms = llms.replace("\n", "\r\n")
 
     outputs = sync_readme_to_site.build_sync_outputs(
         readme,
         html,
         sitemap,
+        promo,
+        llms,
         skills_js=skills_js,
         total_skills=3,
         repo_stars=9,
@@ -248,20 +277,24 @@ def test_crlf_site_data_is_a_byte_preserving_noop() -> None:
         project_date=datetime.date(2026, 7, 16),
     )
 
-    new_readme, new_html, new_sitemap, material_changed = outputs
+    new_readme, new_html, new_sitemap, new_promo, new_llms, material_changed = outputs
     assert material_changed is False
     assert new_readme == readme
     assert new_html == html
     assert new_sitemap == sitemap
+    assert new_promo == promo
+    assert new_llms == llms
 
 
 def test_date_only_difference_is_a_byte_preserving_noop() -> None:
-    readme, html, sitemap, skills_js = _public_sync_fixture()
+    readme, html, sitemap, promo, llms, skills_js = _public_sync_fixture()
 
     outputs = sync_readme_to_site.build_sync_outputs(
         readme,
         html,
         sitemap,
+        promo,
+        llms,
         skills_js=skills_js,
         total_skills=3,
         repo_stars=9,
@@ -269,28 +302,32 @@ def test_date_only_difference_is_a_byte_preserving_noop() -> None:
         project_date=datetime.date(2026, 7, 15),
     )
 
-    new_readme, new_html, new_sitemap, material_changed = outputs
+    new_readme, new_html, new_sitemap, new_promo, new_llms, material_changed = outputs
     assert material_changed is False
     assert new_readme == readme
     assert new_html == html
     assert new_sitemap == sitemap
+    assert new_promo == promo
+    assert new_llms == llms
     assert "2026--01--02" in new_readme
     assert new_html.count("2026-01-02") == 2
 
 
 def test_material_change_updates_all_public_dates_together() -> None:
-    readme, html, sitemap, skills_js = _public_sync_fixture()
+    readme, html, sitemap, promo, llms, skills_js = _public_sync_fixture()
     public_date = datetime.date(2026, 7, 15)
 
-    new_readme, new_html, new_sitemap, material_changed = (
+    new_readme, new_html, new_sitemap, new_promo, new_llms, material_changed = (
         sync_readme_to_site.build_sync_outputs(
             readme,
             html,
             sitemap,
+            promo,
+            llms,
             skills_js=skills_js,
             total_skills=4,
             repo_stars=10,
-            total_original=2,
+            total_original=3,
             project_date=public_date,
         )
     )
@@ -298,16 +335,25 @@ def test_material_change_updates_all_public_dates_together() -> None:
     assert material_changed is True
     assert "精选 4+" in new_readme
     assert "skills-4%2B" in new_readme
+    assert "4+ 精选 + 3 原创" in new_readme
+    assert "收录了 4+ 个 Skills / Agents / Plugins" in new_readme
     assert "updated-2026--07--15" in new_readme
     assert new_html.count("2026-07-15") == 2
     assert "✅ 4+ 精选技能" in new_html
     assert "⭐ 10 Stars" in new_html
+    assert '<span class="nav-star-count">10</span>' in new_html
+    assert "按场景收录 4+ 个 Claude Code Skills / Agents / Plugins" in new_html
+    assert "并附带 3 个可直接安装的原创中文技能" in new_html
     assert "<lastmod>2026-07-15</lastmod>" in new_sitemap
     assert "2026-01-02" not in new_sitemap
+    assert "入门指南：3 个面向中文开发者的实用 AI 技能" in new_promo
+    assert "还写了 3 个实用的原创技能" in new_promo
+    assert "收录 4+ 个精选技能" in new_llms
+    assert "另含 3 个可直接安装的原创中文技能" in new_llms
 
 
 def test_public_anchors_are_strictly_unique() -> None:
-    readme, html, sitemap, _skills_js = _public_sync_fixture()
+    readme, html, sitemap, _promo, _llms, _skills_js = _public_sync_fixture()
 
     _expect_runtime_error(
         lambda: sync_readme_to_site.update_html_meta(
@@ -360,7 +406,7 @@ def test_public_anchors_are_strictly_unique() -> None:
 
 
 def test_inconsistent_public_dates_fail_closed() -> None:
-    readme, html, sitemap, skills_js = _public_sync_fixture()
+    readme, html, sitemap, promo, llms, skills_js = _public_sync_fixture()
     drifted_html = html.replace("🔄 更新于 2026-01-02", "🔄 更新于 2026-01-03")
 
     _expect_runtime_error(
@@ -368,6 +414,8 @@ def test_inconsistent_public_dates_fail_closed() -> None:
             readme,
             drifted_html,
             sitemap,
+            promo,
+            llms,
             skills_js=skills_js,
             total_skills=3,
             repo_stars=9,
@@ -654,34 +702,43 @@ def test_checked_in_landing_pages_avoid_unsynced_ecosystem_stats() -> None:
 
 
 def test_readme_fact_summary_counts_are_synced() -> None:
-    """「一句话事实」中英双语的精选数量必须跟随同步，避免长期漂移。"""
-    readme, _html, _sitemap, _js = _public_sync_fixture()
+    """「一句话事实」、同类仓库对比表和 FAQ 的精选数量必须跟随同步，避免长期漂移。"""
+    readme, _html, _sitemap, _promo, _llms, _js = _public_sync_fixture()
 
     updated = sync_readme_to_site.update_readme_badges(readme, 7, 9)
 
     assert "**7+** 个精选技能" in updated
     assert "of 7+ Claude Code Skills, Agents and Plugins" in updated
+    assert "7+ 精选 + 2 原创" in updated
+    assert "收录了 7+ 个 Skills / Agents / Plugins" in updated
     assert "**3+**" not in updated
     assert "of 3+ Claude" not in updated
+    assert "3+ 精选" not in updated
+    assert "收录了 3+ 个 Skills" not in updated
 
 
 def test_readme_fact_summary_original_count_is_synced() -> None:
-    """事实摘要里的原创技能数量也必须跟随同步，避免新增技能后忘记改。"""
-    readme, _html, _sitemap, _js = _public_sync_fixture()
+    """事实摘要与同类仓库对比表里的原创技能数量必须跟随同步，避免新增技能后忘记改。"""
+    readme, _html, _sitemap, _promo, _llms, _js = _public_sync_fixture()
 
     updated = sync_readme_to_site.update_readme_original_count(readme, 5)
 
     assert "另含 **5 个**可直接安装的原创中文技能" in updated
     assert "plus 5 original install-ready skills" in updated
+    assert "3+ 精选 + 5 原创" in updated
     assert "另含 **2 个**" not in updated
     assert "plus 2 original" not in updated
+    assert "+ 2 原创" not in updated
 
 
 def test_update_promo_counts_refreshes_all_occurrences() -> None:
-    """PROMO.md 的每处精选/原创数量都应被同步，且互不干扰。"""
+    """PROMO.md 的每处精选/原创数量（含第 2 节掘金发文）都应被同步，且互不干扰。"""
     promo = """**标题：** [分享] Claude Code Skills 中文精选集 — 438+ 精选技能 + 20 个原创可安装技能
 
 还整理了 438+ 第三方精选资源，按场景分类。
+
+**标题：** Claude Code Skills 入门指南：20 个面向中文开发者的实用 AI 技能
+我整理了一份中文精选集，还写了 20 个实用的原创技能：
 
 ✅ 438+ 精选资源列表
 ✅ 20 个原创可安装技能
@@ -690,14 +747,16 @@ def test_update_promo_counts_refreshes_all_occurrences() -> None:
 
 不只列了 438+ 好用的资源，还带了 20 个原创技能可以直接装：
 """
-    updated = sync_readme_to_site.update_promo_counts(promo, 445, 21)
+    updated = sync_readme_to_site.update_promo_counts(promo, 445, 22)
 
     # 标题 1 处 + 正文 4 处 = 5 处精选数量
     assert updated.count("445+") == 5
     assert "438+" not in updated
-    # 标题 1 处 + 正文 3 处 = 4 处原创数量
-    assert updated.count("21 个原创") == 4
-    assert "20 个原创" not in updated
+    # V2EX 标题 + 掘金标题 + 掘金正文 + 推文 + 知乎 + 微信群 = 6 处原创数量
+    assert "入门指南：22 个面向中文开发者的实用 AI 技能" in updated
+    assert "还写了 22 个实用的原创技能" in updated
+    assert updated.count("22 个原创") == 4
+    assert "20 个" not in updated
     # 除数字外不应改动其他文字
     assert "第三方精选资源" in updated
     assert "好用的资源" in updated
@@ -707,7 +766,7 @@ def test_update_promo_counts_fails_closed_on_missing_anchor() -> None:
     """锚点缺失时必须抛错，不能静默留下过期数字。"""
     broken = "**标题：** [分享] Claude Code Skills 中文精选集 — 438+ 精选技能\n"
     _expect_runtime_error(
-        lambda: sync_readme_to_site.update_promo_counts(broken, 445, 21),
+        lambda: sync_readme_to_site.update_promo_counts(broken, 445, 22),
     )
 
 
@@ -718,8 +777,261 @@ def test_update_promo_counts_fails_closed_on_duplicate_anchor() -> None:
         "✅ 438+ 精选资源列表\n"
     )
     _expect_runtime_error(
-        lambda: sync_readme_to_site.update_promo_counts(duplicated, 445, 21),
+        lambda: sync_readme_to_site.update_promo_counts(duplicated, 445, 22),
     )
+
+
+def test_academic_category_is_independent_and_synced() -> None:
+    """学术科研分类必须独立输出，不再静默并入 dev，且支持 Star 刷新。"""
+    assert sync_readme_to_site.CATEGORY_ORDER == [
+        "star",
+        "platform",
+        "dev",
+        "creative",
+        "academic",
+        "agent",
+        "finance",
+        "chinese",
+    ]
+    readme = """### 💻 开发效率
+
+| 技能 | 说明 |
+|------|------|
+| [dev-tool](https://github.com/org/dev-tool) | 开发工具（10⭐）|
+
+### 🔬 学术科研
+
+| 技能 | 说明 |
+|------|------|
+| [paper-tool](https://github.com/org/paper-tool) | 论文检索（20⭐）|
+"""
+    parsed = sync_readme_to_site.parse_readme(readme)
+    assert [item["name"] for item in parsed["dev"]] == ["dev-tool"]
+    assert [item["name"] for item in parsed["academic"]] == ["paper-tool"]
+
+    js = sync_readme_to_site.generate_skills_js(parsed)
+    assert "  academic: [\n    {name:'paper-tool',stars:'20',desc:'论文检索',url:'https://github.com/org/paper-tool'},\n  ]," in js
+    assert "paper-tool" not in js.split("  dev: [", 1)[1].split("  ],", 1)[0]
+
+    refreshed = sync_readme_to_site.refresh_readme_stars(readme, {"org/paper-tool": 2500})
+    assert "论文检索（2.5K⭐）" in refreshed
+
+
+def test_zh_doc_flag_preserved_only_when_marked_after_link() -> None:
+    """项目名列在 [name](url) 后含 🇨🇳 时输出 zhDoc:true，且 name 保持纯名称。"""
+    readme = """### 🏆 热门与高潜技能
+
+| 技能 | 说明 | ⭐ |
+|------|------|-----|
+| [ClawX](https://github.com/ValueCell-ai/ClawX) 🇨🇳 | 可视化桌面体验 | 7.6K+ |
+| [superpowers-zh](https://github.com/jnMetaCode/superpowers-zh) | 🇨🇳 完整汉化技能 | 8.5K+ |
+
+### 🤖 AI Agent
+
+| 技能 | 说明 |
+|------|------|
+| [deja-vu](https://github.com/vshulcz/deja-vu) 🇨🇳 | 本地会话记忆（1.5K⭐）|
+"""
+    parsed = sync_readme_to_site.parse_readme(readme)
+    clawx = parsed["star"][0]
+    superpowers_zh = parsed["star"][1]
+    dejavu = parsed["agent"][0]
+
+    assert clawx["name"] == "ClawX"
+    assert clawx.get("zhDoc") is True
+    assert superpowers_zh["name"] == "superpowers-zh"
+    assert "zhDoc" not in superpowers_zh
+    assert dejavu["name"] == "deja-vu"
+    assert dejavu.get("zhDoc") is True
+
+    js = sync_readme_to_site.generate_skills_js(parsed)
+    assert "{name:'ClawX',stars:'7.6K+',desc:'可视化桌面体验',url:'https://github.com/ValueCell-ai/ClawX',zhDoc:true,tag:'star'}," in js
+    assert "{name:'superpowers-zh',stars:'8.5K+',desc:'🇨🇳 完整汉化技能',url:'https://github.com/jnMetaCode/superpowers-zh',tag:'star'}," in js
+    assert "{name:'deja-vu',stars:'1.5K+',desc:'本地会话记忆',url:'https://github.com/vshulcz/deja-vu',zhDoc:true}," in js
+
+
+def test_strip_inline_markdown_cleans_bold_and_backticks_while_keeping_escaping() -> None:
+    """写入 skillsData 的 desc 应剥离成对 **...** 与 `...`，并保留脚本边界转义。"""
+    assert (
+        sync_readme_to_site.strip_inline_markdown(
+            "含 **中文官网** 与 **`SKILL.md`**，支持 `npx skills add a/b`，保留 skills/**/*.md 与 2 ** 3"
+        )
+        == "含 中文官网 与 SKILL.md，支持 npx skills add a/b，保留 skills/**/*.md 与 2 ** 3"
+    )
+    js = sync_readme_to_site.generate_skills_js(
+        {
+            "dev": [
+                {
+                    "name": "md-test",
+                    "stars": "12",
+                    "desc": "提供 **中文文档**，命令 `echo </script>&1`",
+                    "url": "https://github.com/org/md-test",
+                }
+            ]
+        }
+    )
+    assert "**" not in js
+    assert "`" not in js
+    assert "</script>" not in js
+    assert "提供 中文文档，命令 echo \\u003C/script\\u003E\\u00261" in js
+
+
+def test_refresh_readme_stars_syncs_comparison_table_external_repos() -> None:
+    """同类仓库对比表中的外部仓库随 --fetch-stars 同步，但永不覆写本仓动态徽章。"""
+    readme = """## 📊 同类仓库对比
+
+| 仓库 | Stars | 规模 | 语言 | 定位 |
+|---|---|---|---|---|
+| [anthropics/skills](https://github.com/anthropics/skills) | 182.7K | 官方技能集 | 英文 | Anthropic 官方出品 |
+| [ComposioHQ/awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) | 77.6K | 1000+ | 英文 | 英文精选列表 |
+| [missing/repo](https://github.com/missing/repo) | 12.3K | 100 | 英文 | 未拉取到时保留旧值 |
+| **claude-code-skills-zh（本仓库）** | 见[顶部徽章](https://github.com/laolaoshiren/claude-code-skills-zh) | 445+ 精选 + 22 原创 | **中文** | 中文精选 |
+
+### 🏆 热门与高潜技能
+
+| 技能 | 说明 | ⭐ |
+|------|------|-----|
+| [anthropic-skills](https://github.com/anthropics/skills) | 官方仓库 | 182.7K+ |
+"""
+    updated = sync_readme_to_site.refresh_readme_stars(
+        readme,
+        {
+            "anthropics/skills": 191234,
+            "ComposioHQ/awesome-claude-skills": 79140,
+            sync_readme_to_site.GITHUB_REPO: 999,
+        },
+    )
+
+    assert "| [anthropics/skills](https://github.com/anthropics/skills) | 191.2K |" in updated
+    assert "| [ComposioHQ/awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) | 79.1K |" in updated
+    assert "| [missing/repo](https://github.com/missing/repo) | 12.3K |" in updated
+    assert "见[顶部徽章](https://github.com/laolaoshiren/claude-code-skills-zh)" in updated
+    assert "| [anthropic-skills](https://github.com/anthropics/skills) | 官方仓库 | 191.2K+ |" in updated
+
+
+def test_update_llms_counts_syncs_curated_and_original_and_fails_closed() -> None:
+    """docs/llms.txt 的原创数量与精选数量应同步更新，缺失或重复锚点均须 fail-closed。"""
+    llms_with_both = (
+        "> 收录 445+ 个 Claude Code Skills / Agents / Plugins，另含 20 个可直接安装的原创中文技能。\n"
+    )
+    updated = sync_readme_to_site.update_llms_counts(llms_with_both, 453, 22)
+    assert "收录 453+ 个 Claude Code Skills / Agents / Plugins" in updated
+    assert "另含 22 个可直接安装的原创中文技能" in updated
+
+    llms_curated_short = (
+        "> 面向中文开发者的精选仓库，收录 445+ 个精选技能，另含 20 个可直接安装的原创中文技能。\n"
+    )
+    updated_short = sync_readme_to_site.update_llms_counts(llms_curated_short, 453, 22)
+    assert "收录 453+ 个精选技能" in updated_short
+    assert "另含 22 个可直接安装的原创中文技能" in updated_short
+
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.update_llms_counts(
+            "> 面向中文开发者的精选仓库，另含 20 个可直接安装的原创中文技能。\n", 453, 22
+        ),
+        "实际找到 0 处",
+    )
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.update_llms_counts("无任何数量锚点", 453, 22),
+        "实际找到 0 处",
+    )
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.update_llms_counts(
+            "收录 445+ 个精选技能，又收录 445+ 个精选技能，另含 20 个可直接安装的原创中文技能。",
+            453,
+            22,
+        ),
+        "实际找到 2 处",
+    )
+
+
+def test_promo_or_llms_only_change_triggers_material_changed() -> None:
+    """仅 PROMO.md 或仅 docs/llms.txt 发生数量修正时，必须计入 material_changed 并推进日期。"""
+    readme, html, sitemap, promo, llms, skills_js = _public_sync_fixture()
+    public_date = datetime.date(2026, 7, 15)
+
+    drifted_promo = promo.replace("入门指南：2 个面向中文开发者的实用 AI 技能", "入门指南：1 个面向中文开发者的实用 AI 技能")
+    new_readme, new_html, new_sitemap, new_promo, new_llms, changed = (
+        sync_readme_to_site.build_sync_outputs(
+            readme,
+            html,
+            sitemap,
+            drifted_promo,
+            llms,
+            skills_js=skills_js,
+            total_skills=3,
+            repo_stars=9,
+            total_original=2,
+            project_date=public_date,
+        )
+    )
+    assert changed is True
+    assert new_promo == promo
+    assert new_llms == llms
+    assert "updated-2026--07--15" in new_readme
+    assert new_html.count("2026-07-15") == 2
+    assert "<lastmod>2026-07-15</lastmod>" in new_sitemap
+
+    drifted_llms = llms.replace("另含 2 个可直接安装的原创中文技能", "另含 1 个可直接安装的原创中文技能")
+    _r2, _h2, _s2, _p2, new_llms_2, changed_2 = (
+        sync_readme_to_site.build_sync_outputs(
+            readme,
+            html,
+            sitemap,
+            promo,
+            drifted_llms,
+            skills_js=skills_js,
+            total_skills=3,
+            repo_stars=9,
+            total_original=2,
+            project_date=public_date,
+        )
+    )
+    assert changed_2 is True
+    assert new_llms_2 == llms
+
+
+def test_html_optional_nav_stars_and_jsonld_faq_anchors() -> None:
+    """导航栏星数与 JSON-LD FAQ 数量在存在时自动同步、缺失时兼容、重复时 fail-closed。"""
+    _readme, html, _sitemap, _promo, _llms, _js = _public_sync_fixture()
+
+    updated_badges = sync_readme_to_site.update_html_badges(html, 10, 5, 927)
+    assert '<span class="nav-star-count">927</span>' in updated_badges
+
+    updated_meta = sync_readme_to_site.update_html_meta(html, 10, 5)
+    assert "按场景收录 10+ 个 Claude Code Skills / Agents / Plugins" in updated_meta
+    assert "并附带 5 个可直接安装的原创中文技能" in updated_meta
+
+    html_without_optional = html.replace('<span class="nav-star-count">9</span>', "")
+    html_without_optional = re.sub(r'<script type="application/ld\+json">.*?</script>', "", html_without_optional)
+    sync_readme_to_site.update_html_badges(html_without_optional, 10, 5, 927)
+    sync_readme_to_site.update_html_meta(html_without_optional, 10, 5)
+
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.update_html_badges(
+            html + '<span class="nav-star-count">9</span>',
+            10,
+            5,
+            927,
+        ),
+        "期望至多 1 处",
+    )
+
+
+def test_sync_script_hygiene_no_raw_control_chars_or_stale_original_default() -> None:
+    """源码不得残留裸控制字符，且 update_html_stats 不得写死过期原创数量默认值。"""
+    source = SCRIPT_PATH.read_bytes()
+    assert b"\x02" not in source
+    assert b"\x08" not in source
+
+    param = inspect.signature(sync_readme_to_site.update_html_stats).parameters["total_original"]
+    assert param.default is inspect.Parameter.empty
+
+    _readme, html, _sitemap, _promo, _llms, _js = _public_sync_fixture()
+    dirty_html = "\x02" + html + "\x08"
+    cleaned = sync_readme_to_site.update_html_badges(dirty_html, 3, 2, 9)
+    assert "\x02" not in cleaned
+    assert "\x08" not in cleaned
 
 
 def test_original_skill_sets_and_promo_counts_are_consistent() -> None:
@@ -740,6 +1052,7 @@ def test_original_skill_sets_and_promo_counts_are_consistent() -> None:
     html_names = set(re.findall(r"<h3>([a-z0-9-]+)</h3>", original_html))
 
     promo = (REPO_ROOT / "PROMO.md").read_text(encoding="utf-8")
+    llms = (REPO_ROOT / "docs" / "llms.txt").read_text(encoding="utf-8")
     total_curated = sync_readme_to_site.count_total_skills(
         sync_readme_to_site.parse_readme(readme)
     )
@@ -748,6 +1061,9 @@ def test_original_skill_sets_and_promo_counts_are_consistent() -> None:
     assert html_names == skill_names
     assert f"{total_curated}+ 精选" in promo
     assert f"{len(skill_names)} 个原创" in promo
+    assert f"{len(skill_names)} 个面向中文开发者的实用 AI 技能" in promo
+    assert f"{len(skill_names)} 个实用的原创技能" in promo
+    assert f"{len(skill_names)} 个可直接安装的原创中文技能" in llms
 
 
 if __name__ == "__main__":
@@ -783,5 +1099,13 @@ if __name__ == "__main__":
     test_update_promo_counts_refreshes_all_occurrences()
     test_update_promo_counts_fails_closed_on_missing_anchor()
     test_update_promo_counts_fails_closed_on_duplicate_anchor()
+    test_academic_category_is_independent_and_synced()
+    test_zh_doc_flag_preserved_only_when_marked_after_link()
+    test_strip_inline_markdown_cleans_bold_and_backticks_while_keeping_escaping()
+    test_refresh_readme_stars_syncs_comparison_table_external_repos()
+    test_update_llms_counts_syncs_curated_and_original_and_fails_closed()
+    test_promo_or_llms_only_change_triggers_material_changed()
+    test_html_optional_nav_stars_and_jsonld_faq_anchors()
+    test_sync_script_hygiene_no_raw_control_chars_or_stale_original_default()
     test_original_skill_sets_and_promo_counts_are_consistent()
     print("PASS: sync_readme_to_site.py regression tests")

@@ -1,6 +1,6 @@
 {
   "name": "claude-code-skills-zh",
-  "description": "面向中文开发者的 Claude Code Skills 精选集：原创中文技能 + 按场景分类的第三方精选目录",
+  "description": "面向中文开发者的 Claude Code Skills 精选集：22 个原创中文技能 + 按场景分类的第三方精选目录",
   "owner": {
     "name": "laolaoshiren",
     "url": "https://github.com/laolaoshiren"
@@ -9,8 +9,8 @@
     {
       "name": "zh-skills",
       "source": "./",
-      "description": "原创中文 Claude Code Skills：AI 视频制作、中文代码审查、中文 README 生成、API 测试、重构建议、性能分析、安全审计、依赖审计、数据库迁移、国际化、日志分析、错误翻译、ESLint 修复、测试生成、CI/CD 生成、环境变量管理、项目结构地图、变更日志、Git 工作流等",
-      "version": "1.0.0",
+      "description": "22 个原创中文 Agent Skills：英文 Skill 本地化与安全预检（skill-translator）、AI 视频制作、中文代码审查、中文技术文档生成、中文 README 生成、API 测试、单元测试生成、重构建议、性能分析、源码安全审计、依赖审计、数据库迁移、国际化、日志分析、错误翻译、ESLint 修复、CI/CD 生成、环境变量管理、项目结构地图、变更日志、Git 工作流、Skill 收录评估",
+      "version": "1.1.0",
       "author": {
         "name": "laolaoshiren",
         "url": "https://github.com/laolaoshiren"
@@ -23,10 +23,19 @@
         "chinese",
         "zh-cn",
         "claude-code",
+        "codex",
+        "cursor",
+        "gemini-cli",
         "agent-skills",
+        "skill-translator",
         "code-review",
         "documentation",
-        "testing"
+        "testing",
+        "security",
+        "refactoring",
+        "performance",
+        "ci-cd",
+        "video"
       ]
     }
   ]

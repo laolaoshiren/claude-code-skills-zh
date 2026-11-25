@@ -54,7 +54,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          if git diff --quiet -- README.md docs/index.html docs/sitemap.xml; then
+          if git diff --quiet -- README.md docs/index.html docs/sitemap.xml PROMO.md docs/llms.txt; then
             echo "No automatic maintenance changes."
             echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
@@ -62,7 +62,7 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- README.md docs/index.html docs/sitemap.xml
+          git add -- README.md docs/index.html docs/sitemap.xml PROMO.md docs/llms.txt
           git diff --cached --check
           git commit -m "docs: auto maintenance sync"
           echo "changed=true" >> "$GITHUB_OUTPUT"

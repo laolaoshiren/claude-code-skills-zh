@@ -49,8 +49,9 @@ const ZH_SIGNALS = [
 const CATEGORY_LABELS = {
   star: "🏆 热门与高潜",
   platform: "📣 平台运营 / 自媒体",
-  dev: "💻 开发效率（含学术科研）",
+  dev: "💻 开发效率",
   creative: "🎨 内容创作",
+  academic: "🔬 学术科研",
   agent: "🤖 AI Agent",
   finance: "💰 金融 / 商业",
   chinese: "🌏 中文专属",
@@ -77,7 +78,7 @@ function parseEntries(readme) {
     const line = raw.trim();
     const key = classifyHeader(line);
     if (key !== null) {
-      cur = key === "academic" ? "dev" : key;
+      cur = key;
       return;
     }
     if (line.startsWith("## ") || (line.startsWith("### ") && cur !== null)) {

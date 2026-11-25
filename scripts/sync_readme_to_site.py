@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
-sync_readme_to_site.py — 自动从 README.md 提取技能数据并同步到 docs/index.html
+sync_readme_to_site.py — 自动从 README.md 提取技能数据并同步到官网与公开文件
 
 功能：
-1. 解析 README.md 中所有分类表格
-2. 生成 JavaScript skillsData 对象
-3. 统计实际技能数量
-4. 可选：获取 GitHub star 数（通过 API）
-5. 更新 docs/index.html 中的数据和统计数字
-6. 更新 sitemap 最近修改日期
+1. 解析 README.md 中全部 8 个独立分类表格（含 🔬 学术科研）
+2. 生成 JavaScript skillsData 对象（保留 zhDoc 标记并清理裸 Markdown 语法）
+3. 统计实际精选技能与原创技能数量
+4. 可选：获取 GitHub star 数（通过 gh GraphQL 批量 API），同步精选目录与同类对比表
+5. 更新 README.md、docs/index.html、docs/sitemap.xml、PROMO.md 与 docs/llms.txt
 
 用法：
     python scripts/sync_readme_to_site.py [--fetch-stars] [--dry-run]
@@ -43,6 +42,7 @@ README_PATH = REPO_ROOT / "README.md"
 HTML_PATH = REPO_ROOT / "docs" / "index.html"
 SITEMAP_PATH = REPO_ROOT / "docs" / "sitemap.xml"
 PROMO_PATH = REPO_ROOT / "PROMO.md"
+LLMS_PATH = REPO_ROOT / "docs" / "llms.txt"
 GITHUB_REPO = "laolaoshiren/claude-code-skills-zh"
 SITE_HOME_URL = "https://claude-skills.bt199.com/"
 GITHUB_GRAPHQL_BATCH_SIZE = 50
@@ -51,6 +51,7 @@ CATEGORY_ORDER = [
     "platform",
     "dev",
     "creative",
+    "academic",
     "agent",
     "finance",
     "chinese",
@@ -77,6 +78,21 @@ def _replace_exact(
     updated, count = re.subn(pattern, replacement, content, flags=flags)
     if count != 1:
         raise RuntimeError(f"{label} 替换失败：期望 1 处，实际找到 {count} 处")
+    return updated
+
+
+def _replace_optional_unique(
+    content: str,
+    pattern: str,
+    replacement,
+    label: str,
+    *,
+    flags: int = 0,
+) -> str:
+    """替换可选唯一锚点：0 处保持原样，1 处替换，超过 1 处拒绝写入。"""
+    updated, count = re.subn(pattern, replacement, content, flags=flags)
+    if count > 1:
+        raise RuntimeError(f"{label} 替换失败：期望至多 1 处，实际找到 {count} 处")
     return updated
 
 
@@ -155,6 +171,14 @@ def current_project_date(now: datetime.datetime | None = None) -> datetime.date:
     if current.tzinfo is None:
         raise ValueError("now 必须包含时区信息")
     return current.astimezone(PROJECT_TIMEZONE).date()
+
+
+def strip_inline_markdown(text: str) -> str:
+    """剥离成对的 **...** 与 `...` 行内 Markdown 语法，返回纯文本。"""
+    cleaned = re.sub(r"\*\*(\S(?:(?!\*\*).)*?\S|\S)\*\*", r"\1", text)
+    cleaned = re.sub(r"``\s*([^`]+(?:`[^`]+)*?)\s*``", r"\1", cleaned)
+    cleaned = re.sub(r"`([^`\r\n]+)`", r"\1", cleaned)
+    return cleaned
 
 
 def escape_js_string(s: str) -> str:
@@ -325,7 +349,7 @@ def parse_stars_from_desc(desc: str) -> tuple[str, str]:
 def parse_readme(readme_content: str) -> dict[str, list[dict]]:
     """
     解析 README.md 中所有分类表格，返回 {js_key: [skill_obj, ...]}
-    学术科研 ('academic') 会映射到 'dev'
+    8 个分类（含 academic）均独立输出，不再静默合并。
     """
     lines = readme_content.split("\n")
     sections: dict[str, list[list[str]]] = {}  # js_key → list of table rows
@@ -338,9 +362,7 @@ def parse_readme(readme_content: str) -> dict[str, list[dict]]:
         # 检查是否是目标分类标题
         header_key = classify_header(stripped)
         if header_key is not None:
-            # 学术科研合并到 dev
-            mapped_key = "dev" if header_key == "academic" else header_key
-            current_key = mapped_key
+            current_key = header_key
             in_table = False
             sections.setdefault(current_key, [])
             continue
@@ -400,6 +422,7 @@ def parse_skill_row(cells: list[str], category: str) -> dict | None:
 
     name = link_match.group(1).strip()
     url = link_match.group(2).strip()
+    zh_doc = "🇨🇳" in name_cell[link_match.end():]
     url = extract_github_url(url)
     try:
         url = validate_http_url(url)
@@ -423,16 +446,19 @@ def parse_skill_row(cells: list[str], category: str) -> dict | None:
         desc_cell, stars_raw = parse_stars_from_desc(desc_cell)
         stars = format_stars(stars_raw)
 
-    desc = desc_cell.strip()
+    desc = strip_inline_markdown(desc_cell.strip())
     if not name or not url:
         return None
 
-    return {
+    skill: dict = {
         "name": name,
         "stars": stars,
         "desc": desc,
         "url": url,
     }
+    if zh_doc:
+        skill["zhDoc"] = True
+    return skill
 
 
 # ── GitHub Star 批量刷新 ──────────────────────────────────────────────────
@@ -594,7 +620,7 @@ def _replace_cell_value(cell: str, value: str) -> str:
 
 
 def refresh_readme_stars(readme: str, star_counts: dict[str, int]) -> str:
-    """仅更新 README 精选分类表格中成功获取的 GitHub Star。"""
+    """更新 README 精选分类表格与同类仓库对比表中成功获取的 GitHub Star。"""
     normalized_counts = {
         normalize_repo_slug(repo): stars
         for repo, stars in star_counts.items()
@@ -603,7 +629,9 @@ def refresh_readme_stars(readme: str, star_counts: dict[str, int]) -> str:
     if not normalized_counts:
         return readme
 
+    own_repo_slug = normalize_repo_slug(GITHUB_REPO)
     current_category: str | None = None
+    in_comparison_section = False
     updated_lines: list[str] = []
 
     for line in readme.splitlines(keepends=True):
@@ -613,11 +641,32 @@ def refresh_readme_stars(readme: str, star_counts: dict[str, int]) -> str:
 
         header_category = classify_header(stripped)
         if header_category is not None:
-            current_category = "dev" if header_category == "academic" else header_category
+            current_category = header_category
+            in_comparison_section = False
+        elif stripped.startswith("## ") and "同类仓库对比" in stripped:
+            current_category = None
+            in_comparison_section = True
         elif stripped.startswith("## ") or stripped.startswith("### "):
             current_category = None
+            in_comparison_section = False
 
-        if current_category is not None and stripped.startswith("|"):
+        if in_comparison_section and stripped.startswith("|"):
+            cells = body.split("|")
+            if len(cells) >= 4 and "顶部徽章" not in cells[2]:
+                link_match = re.search(r"\[[^\]]+\]\(([^)]+)\)", cells[1])
+                repo = extract_github_repo(link_match.group(1)) if link_match else None
+                repo_slug = normalize_repo_slug(repo) if repo else None
+                stars = (
+                    normalized_counts.get(repo_slug)
+                    if repo_slug and repo_slug != own_repo_slug
+                    else None
+                )
+                if stars is not None:
+                    cells[2] = _replace_cell_value(
+                        cells[2], format_star_count(stars, popular=False)
+                    )
+                    body = "|".join(cells)
+        elif current_category is not None and stripped.startswith("|"):
             cells = body.split("|")
             if len(cells) >= 4:
                 link_match = re.search(r"\[[^\]]+\]\(([^)]+)\)", cells[1])
@@ -655,7 +704,7 @@ def generate_skills_js(skills_data: dict[str, list[dict]]) -> str:
         for item in items:
             name = escape_js_string(item["name"])
             stars = escape_js_string(item.get("stars", ""))
-            desc = escape_js_string(item["desc"])
+            desc = escape_js_string(strip_inline_markdown(item["desc"]))
             url = escape_js_string(validate_http_url(item["url"]))
 
             parts = [f"name:'{name}'"]
@@ -663,6 +712,8 @@ def generate_skills_js(skills_data: dict[str, list[dict]]) -> str:
                 parts.append(f"stars:'{stars}'")
             parts.append(f"desc:'{desc}'")
             parts.append(f"url:'{url}'")
+            if item.get("zhDoc"):
+                parts.append("zhDoc:true")
 
             # star 分类加 tag
             if key == "star":
@@ -721,11 +772,20 @@ def _resolve_public_date(project_date: datetime.date | None) -> datetime.date:
     return project_date if project_date is not None else current_project_date()
 
 
+def count_original_skills(skills_root: Path | None = None) -> int:
+    """统计 skills/ 目录下包含 SKILL.md 的原创技能数量。"""
+    root = skills_root or (REPO_ROOT / "skills")
+    return sum(
+        1 for skill_dir in root.iterdir()
+        if skill_dir.is_dir() and (skill_dir / "SKILL.md").is_file()
+    )
+
+
 def update_html_stats(
     html: str,
     total_skills: int,
     repo_stars: int,
-    total_original: int = 20,
+    total_original: int,
     *,
     project_date: datetime.date | None = None,
     update_date: bool = True,
@@ -866,9 +926,9 @@ def update_html_badges(
     project_date: datetime.date | None = None,
     update_date: bool = True,
 ) -> str:
-    """更新 HTML 中 hero 区域的 badge 数字"""
-    # 先清理控制字符
-    html = html.replace('', '')
+    """更新 HTML 中 hero 区域与导航栏的 badge 数字"""
+    # 先清理历史残留的控制字符（使用显式转义，避免源码出现裸控制字节）
+    html = html.replace("\x02", "").replace("\x08", "")
     today = _resolve_public_date(project_date).isoformat() if update_date else None
     replacements = [
         (
@@ -898,11 +958,17 @@ def update_html_badges(
     ]
     for pattern, replacement, label in replacements:
         html = _replace_exact(html, pattern, replacement, label)
+    html = _replace_optional_unique(
+        html,
+        r'(<span class="nav-star-count">)\d+(</span>)',
+        lambda match: f"{match.group(1)}{repo_stars}{match.group(2)}",
+        "HTML 导航栏 GitHub Stars",
+    )
     return html
 
 
 def update_html_meta(html: str, total_skills: int, total_original: int) -> str:
-    """更新 HTML head 中面向搜索和社交分享的描述文案"""
+    """更新 HTML head 中面向搜索、社交分享和 JSON-LD FAQ 的描述文案"""
     replacements = {
         r'<meta name="description" content="[^"]*">':
             f'<meta name="description" content="最实用的 Claude Code Skills / Agents / Plugins 中文精选集，收录 {total_skills}+ 高质量技能、Agent 和插件，{total_original} 个原创技能，适合 Claude Code、Codex、Gemini CLI、Cursor 用户复制即装。">',
@@ -919,6 +985,22 @@ def update_html_meta(html: str, total_skills: int, total_original: int) -> str:
             lambda _match, value=replacement: value,
             f"HTML meta {pattern}",
         )
+
+    optional_faq_replacements = [
+        (
+            r'(按场景收录 )\d+(\+ 个 Claude Code Skills / Agents / Plugins)',
+            lambda match: f"{match.group(1)}{total_skills}{match.group(2)}",
+            "HTML JSON-LD FAQ 精选数量",
+        ),
+        (
+            r'(并附带 )\d+( 个可直接安装的原创中文技能)',
+            lambda match: f"{match.group(1)}{total_original}{match.group(2)}",
+            "HTML JSON-LD FAQ 原创数量",
+        ),
+    ]
+    for pattern, replacement, label in optional_faq_replacements:
+        html = _replace_optional_unique(html, pattern, replacement, label)
+
     return html
 
 
@@ -992,6 +1074,18 @@ def update_readme_badges(
         lambda match: f"{match.group(1)}{total_skills}{match.group(2)}",
         "README 事实摘要英文精选数量",
     )
+    readme = _replace_exact(
+        readme,
+        r'(?m)^(\|\s*\*\*claude-code-skills-zh（本仓库）\*\*[^|\r\n]*\|[^|\r\n]*\|\s*)\d+(\+\s*精选\s*\+\s*\d+\s*原创\s*\|)',
+        lambda match: f"{match.group(1)}{total_skills}{match.group(2)}",
+        "README 同类仓库对比表精选数量",
+    )
+    readme = _replace_exact(
+        readme,
+        r'(收录了 )\d+(\+ 个 Skills / Agents / Plugins)',
+        lambda match: f"{match.group(1)}{total_skills}{match.group(2)}",
+        "README FAQ 精选数量",
+    )
     today = _resolve_public_date(project_date).isoformat() if update_date else None
     readme = _replace_exact(
         readme,
@@ -1011,11 +1105,7 @@ def update_readme_badges(
 
 
 def update_readme_original_count(readme: str, total_original: int) -> str:
-    """同步「一句话事实」摘要块中的原创技能数量（中英双语）。
-
-    该摘要块是给搜索引擎与 AI 检索工具读的事实陈述，数量必须准确；
-    历史上靠手写，新增技能后容易忘记更新，因此纳入同步流程。
-    """
+    """同步「一句话事实」摘要块与同类仓库对比表中的原创技能数量。"""
     readme = _replace_exact(
         readme,
         r'(另含 \*\*)\d+( 个\*\*可直接安装的原创中文技能)',
@@ -1027,6 +1117,12 @@ def update_readme_original_count(readme: str, total_original: int) -> str:
         r'(plus )\d+( original install-ready skills)',
         lambda match: f"{match.group(1)}{total_original}{match.group(2)}",
         "README 事实摘要英文原创数量",
+    )
+    readme = _replace_exact(
+        readme,
+        r'(?m)^(\|\s*\*\*claude-code-skills-zh（本仓库）\*\*[^|\r\n]*\|[^|\r\n]*\|\s*\d+\+\s*精选\s*\+\s*)\d+(\s*原创\s*\|)',
+        lambda match: f"{match.group(1)}{total_original}{match.group(2)}",
+        "README 同类仓库对比表原创数量",
     )
     return readme
 
@@ -1077,6 +1173,16 @@ def update_promo_counts(
             "PROMO V2EX 标题原创数量",
         ),
         (
+            r'(Claude Code Skills 入门指南：)\d+( 个面向中文开发者的实用 AI 技能)',
+            total_original,
+            "PROMO 掘金标题原创数量",
+        ),
+        (
+            r'(还写了 )\d+( 个实用的原创技能)',
+            total_original,
+            "PROMO 掘金正文原创数量",
+        ),
+        (
             r'(✅ )\d+( 个原创可安装技能)',
             total_original,
             "PROMO 推文原创数量",
@@ -1102,10 +1208,33 @@ def update_promo_counts(
     return promo
 
 
+def update_llms_counts(
+    llms: str,
+    total_skills: int,
+    total_original: int,
+) -> str:
+    """同步 docs/llms.txt 中的精选数量与原创数量，缺失或重复均 fail-closed。"""
+    llms = _replace_exact(
+        llms,
+        r'(?<!\d)\d+( 个可直接安装的原创中文技能)',
+        lambda match: f"{total_original}{match.group(1)}",
+        "llms.txt 原创技能数量",
+    )
+    llms = _replace_exact(
+        llms,
+        r'((?:收录(?:了)?\s*)|(?:精选\s*))?(?<!\d)\d+(\+\s*(?:个\s*)?(?:精选(?:技能|资源)?|Claude Code Skills\s*/\s*Agents\s*/\s*Plugins|Skills\s*/\s*Agents\s*/\s*Plugins))',
+        lambda match: f"{match.group(1) or ''}{total_skills}{match.group(2)}",
+        "llms.txt 精选技能数量",
+    )
+    return llms
+
+
 def build_sync_outputs(
     readme_content: str,
     html_content: str,
     sitemap_content: str,
+    promo_content: str,
+    llms_content: str,
     *,
     proposed_readme_content: str | None = None,
     skills_js: str,
@@ -1113,7 +1242,7 @@ def build_sync_outputs(
     repo_stars: int,
     total_original: int,
     project_date: datetime.date,
-) -> tuple[str, str, str, bool]:
+) -> tuple[str, str, str, str, str, bool]:
     """先生成并校验非日期结果，仅在有实质变化时统一推进公开日期。"""
     readme_source = (
         proposed_readme_content
@@ -1147,15 +1276,27 @@ def build_sync_outputs(
     readme_without_date = update_readme_original_count(
         readme_without_date, total_original
     )
+    new_promo = update_promo_counts(promo_content, total_skills, total_original)
+    new_llms = update_llms_counts(llms_content, total_skills, total_original)
     # 即使最终 no-op，也要先验证首页锚点和 lastmod 唯一性。
     update_sitemap_lastmod(sitemap_content, update_date=False)
     validate_public_dates(readme_without_date, html_without_date, sitemap_content)
 
     material_changed = (
-        html_without_date != html_content or readme_without_date != readme_content
+        html_without_date != html_content
+        or readme_without_date != readme_content
+        or new_promo != promo_content
+        or new_llms != llms_content
     )
     if not material_changed:
-        return readme_content, html_content, sitemap_content, False
+        return (
+            readme_content,
+            html_content,
+            sitemap_content,
+            promo_content,
+            llms_content,
+            False,
+        )
 
     new_html = update_html_stats(
         html_without_date,
@@ -1183,7 +1324,7 @@ def build_sync_outputs(
         project_date=project_date,
     )
     validate_public_dates(new_readme, new_html, new_sitemap)
-    return new_readme, new_html, new_sitemap, True
+    return new_readme, new_html, new_sitemap, new_promo, new_llms, True
 
 
 # ── 主逻辑 ─────────────────────────────────────────────────────────────────────
@@ -1193,7 +1334,7 @@ def main():
     dry_run = "--dry-run" in sys.argv
     project_date = current_project_date()
 
-    print("🔄 sync_readme_to_site.py — 同步 README.md → docs/index.html")
+    print("🔄 sync_readme_to_site.py — 同步 README.md → docs/index.html / PROMO.md / docs/llms.txt")
     print()
 
     # 1. 读取文件
@@ -1209,6 +1350,9 @@ def main():
 
     print("📖 读取 PROMO.md ...")
     promo_content = read_file(PROMO_PATH)
+
+    print("📖 读取 docs/llms.txt ...")
+    llms_content = read_file(LLMS_PATH)
 
     # 2. 解析 README 中的分类表格
     print("🔍 解析 README 分类表格 ...")
@@ -1243,33 +1387,29 @@ def main():
         print(f"     {key}: {len(items)} 个")
 
     # 4. 计算原创技能数量
-    skills_root = REPO_ROOT / "skills"
-    original_count = sum(
-        1 for skill_dir in skills_root.iterdir()
-        if skill_dir.is_dir() and (skill_dir / "SKILL.md").is_file()
-    )
+    original_count = count_original_skills()
 
     # 5. 生成 JavaScript
     print("📝 生成 skillsData JavaScript ...")
     skills_js = generate_skills_js(skills_data)
 
-    # 6. 先在内存生成并严格校验三文件结果。
-    print("🔧 在内存生成并校验 README、官网与 sitemap ...")
-    new_readme, new_html, new_sitemap, material_changed = build_sync_outputs(
-        original_readme_content,
-        html_content,
-        sitemap_content,
-        proposed_readme_content=readme_content,
-        skills_js=skills_js,
-        total_skills=total_skills,
-        repo_stars=repo_stars,
-        total_original=original_count,
-        project_date=project_date,
+    # 6. 先在内存生成并严格校验五文件结果。
+    print("🔧 在内存生成并校验 README、官网、sitemap、PROMO 与 llms.txt ...")
+    new_readme, new_html, new_sitemap, new_promo, new_llms, material_changed = (
+        build_sync_outputs(
+            original_readme_content,
+            html_content,
+            sitemap_content,
+            promo_content,
+            llms_content,
+            proposed_readme_content=readme_content,
+            skills_js=skills_js,
+            total_skills=total_skills,
+            repo_stars=repo_stars,
+            total_original=original_count,
+            project_date=project_date,
+        )
     )
-
-    # 6b. 同步 PROMO.md 的推广口径；不含日期，因此不影响 material_changed。
-    print("🔧 同步 PROMO.md 的精选与原创数量 ...")
-    new_promo = update_promo_counts(promo_content, total_skills, original_count)
 
     if dry_run:
         print("\n--- 预览 skillsData ---")
@@ -1287,6 +1427,7 @@ def main():
             HTML_PATH: new_html,
             SITEMAP_PATH: new_sitemap,
             PROMO_PATH: new_promo,
+            LLMS_PATH: new_llms,
         }
     )
     if changed_paths:
@@ -1298,6 +1439,7 @@ def main():
     print()
     print("🎉 同步完成！")
     print(f"   精选技能: {total_skills}+")
+    print(f"   原创技能: {original_count}")
     print(f"   GitHub Stars: {repo_stars}")
     public_date = project_date.isoformat() if material_changed else "保持不变"
     print(f"   最近更新: {public_date}")
