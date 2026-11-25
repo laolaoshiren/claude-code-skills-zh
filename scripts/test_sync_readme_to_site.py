@@ -14,6 +14,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+from html.parser import HTMLParser
 from pathlib import Path
 from unittest.mock import patch
 
@@ -650,19 +651,54 @@ def test_checked_in_site_renders_skill_data_with_safe_dom_apis() -> None:
     render_block = html.split("function renderSkills(tab) {", 1)[1]
     render_block = render_block.split("// Tab switching", 1)[0]
 
+    assert "innerHTML" not in html
     assert "container.innerHTML" not in render_block
+    assert "document.createElement('article')" in render_block
+    assert "link.className = 'skill-title-link'" in render_block
     assert "link.textContent = s.name" in render_block
     assert "desc.textContent = s.desc" in render_block
     assert "link.rel = 'noopener noreferrer'" in render_block
+    assert "isSafeDetailUrl(s.detailUrl)" in render_block
+    assert "detailLink.className = 'skill-detail-btn'" in render_block
+    assert "ghLink.className = 'skill-gh-link'" in render_block
+    assert "ghLink.rel = 'noopener noreferrer'" in render_block
     assert "container.replaceChildren(fragment)" in render_block
+    assert (
+        '<a class="original-detail-link" href="/skills/skill-translator/">📖 详解页</a>'
+        in html
+    )
+
+    class _NestedAnchorChecker(HTMLParser):
+        def __init__(self) -> None:
+            super().__init__()
+            self.anchor_depth = 0
+            self.nested_found = False
+
+        def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+            if tag.lower() == "a":
+                self.anchor_depth += 1
+                if self.anchor_depth > 1:
+                    self.nested_found = True
+
+        def handle_endtag(self, tag: str) -> None:
+            if tag.lower() == "a" and self.anchor_depth > 0:
+                self.anchor_depth -= 1
+
+    checker = _NestedAnchorChecker()
+    checker.feed(html)
+    checker.close()
+    assert checker.nested_found is False
 
 
 def test_checked_in_site_data_matches_readme() -> None:
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
     html = (REPO_ROOT / "docs" / "index.html").read_text(encoding="utf-8")
+    detail_pages = sync_readme_to_site.discover_detail_pages(REPO_ROOT / "docs")
+    detail_url_map = sync_readme_to_site.build_detail_url_map(detail_pages)
 
     expected = sync_readme_to_site.generate_skills_js(
-        sync_readme_to_site.parse_readme(readme)
+        sync_readme_to_site.parse_readme(readme),
+        detail_url_map=detail_url_map,
     )
     match = re.search(r"const skillsData = \{.*?\};", html, flags=re.DOTALL)
 
@@ -1066,6 +1102,329 @@ def test_original_skill_sets_and_promo_counts_are_consistent() -> None:
     assert f"{len(skill_names)} 个可直接安装的原创中文技能" in llms
 
 
+def test_discover_detail_pages_extracts_metadata_and_sorts_deterministically() -> None:
+    """discover_detail_pages 应扫描 skills/p/c 三个目录、规范化元数据并按路径确定性排序。"""
+    with tempfile.TemporaryDirectory() as temporary_directory:
+        docs_dir = Path(temporary_directory)
+        (docs_dir / "skills" / "skill-translator").mkdir(parents=True)
+        (docs_dir / "p" / "baoyu-skills").mkdir(parents=True)
+        (docs_dir / "p" / "archify").mkdir(parents=True)
+        (docs_dir / "c" / "dev-workflow").mkdir(parents=True)
+        (docs_dir / "p" / "ignored-dir").mkdir(parents=True)
+        (docs_dir / "p" / "ignored-dir" / "notes.html").write_text("<title>ignore</title>", encoding="utf-8")
+
+        (docs_dir / "skills" / "skill-translator" / "index.html").write_text(
+            """<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<title>skill-translator 中文详解 | Claude Code Skills</title>
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/skill-translator/">
+<meta name="original-skill" content="skill-translator">
+</head><body><h1>正文</h1></body></html>""",
+            encoding="utf-8",
+        )
+        (docs_dir / "p" / "baoyu-skills" / "index.html").write_text(
+            """<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<title>baoyu-skills 中文详解与安装指南</title>
+<meta content="https://github.com/JimLiu/baoyu-skills/" name="skill-repo">
+<link href="https://claude-skills.bt199.com/p/baoyu-skills/" rel="canonical">
+</head><body></body></html>""",
+            encoding="utf-8",
+        )
+        (docs_dir / "p" / "archify" / "index.html").write_text(
+            """<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<title>archify 交互架构图中文指南</title>
+<meta name="skill-repo" content="https://github.com/tt-a1i/archify">
+<link rel="canonical" href="https://claude-skills.bt199.com/p/archify/">
+</head><body></body></html>""",
+            encoding="utf-8",
+        )
+        (docs_dir / "c" / "dev-workflow" / "index.html").write_text(
+            """<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<title>开发效率专题 | Claude Code Skills</title>
+</head><body></body></html>""",
+            encoding="utf-8",
+        )
+
+        pages = sync_readme_to_site.discover_detail_pages(docs_dir)
+        assert [p["path"] for p in pages] == [
+            "/c/dev-workflow/",
+            "/p/archify/",
+            "/p/baoyu-skills/",
+            "/skills/skill-translator/",
+        ]
+        by_path = {p["path"]: p for p in pages}
+        assert by_path["/p/baoyu-skills/"]["skill_repo"] == "https://github.com/jimliu/baoyu-skills"
+        assert by_path["/p/baoyu-skills/"]["title"] == "baoyu-skills 中文详解与安装指南"
+        assert by_path["/p/archify/"]["skill_repo"] == "https://github.com/tt-a1i/archify"
+        assert by_path["/skills/skill-translator/"]["original_skill"] == "skill-translator"
+        assert by_path["/skills/skill-translator/"]["skill_repo"] is None
+        assert by_path["/c/dev-workflow/"]["url"] == "https://claude-skills.bt199.com/c/dev-workflow/"
+
+        url_map = sync_readme_to_site.build_detail_url_map(pages)
+        assert url_map == {
+            "https://github.com/jimliu/baoyu-skills": "/p/baoyu-skills/",
+            "https://github.com/tt-a1i/archify": "/p/archify/",
+        }
+
+        # 外站 canonical 必须 fail-closed
+        (docs_dir / "p" / "bad-canonical").mkdir(parents=True)
+        (docs_dir / "p" / "bad-canonical" / "index.html").write_text(
+            '<head><link rel="canonical" href="https://evil.example/p/x/"></head>',
+            encoding="utf-8",
+        )
+        try:
+            sync_readme_to_site.discover_detail_pages(docs_dir)
+        except ValueError as exc:
+            assert "canonical" in str(exc)
+        else:
+            raise AssertionError("cross-origin canonical should fail closed")
+        (docs_dir / "p" / "bad-canonical" / "index.html").unlink()
+
+        # 重复 skill-repo 必须 fail-closed
+        (docs_dir / "p" / "dup-archify").mkdir(parents=True)
+        (docs_dir / "p" / "dup-archify" / "index.html").write_text(
+            '<head><meta name="skill-repo" content="https://github.com/TT-A1I/ARCHIFY"></head>',
+            encoding="utf-8",
+        )
+        _expect_runtime_error(
+            lambda: sync_readme_to_site.discover_detail_pages(docs_dir),
+            "重复",
+        )
+
+
+def test_generate_skills_js_injects_detail_url_and_validates_safe_paths() -> None:
+    """generate_skills_js 应按规范化 GitHub URL 注入 detailUrl，并拒绝任何非安全站内路径。"""
+    skills_data = {
+        "star": [
+            {
+                "name": "JimLiu/baoyu-skills",
+                "stars": "27.9K+",
+                "desc": "宝玉技能集",
+                "url": "https://github.com/JimLiu/baoyu-skills",
+                "zhDoc": True,
+            },
+            {
+                "name": "subpath-item",
+                "stars": "1K+",
+                "desc": "子路径不应误匹配根仓详情页",
+                "url": "https://github.com/JimLiu/baoyu-skills/tree/main/skills/foo",
+            },
+        ],
+        "dev": [
+            {
+                "name": "tt-a1i/archify",
+                "stars": "99.7K+",
+                "desc": "交互架构图",
+                "url": "https://github.com/TT-A1I/Archify/",
+            },
+        ],
+    }
+    js = sync_readme_to_site.generate_skills_js(
+        skills_data,
+        detail_url_map={
+            "https://github.com/jimliu/baoyu-skills": "/p/baoyu-skills/",
+            "https://github.com/tt-a1i/archify": "/p/archify/",
+        },
+    )
+    assert "name:'JimLiu/baoyu-skills',stars:'27.9K+',desc:'宝玉技能集',url:'https://github.com/JimLiu/baoyu-skills',zhDoc:true,detailUrl:'/p/baoyu-skills/',tag:'star'" in js
+    assert "name:'subpath-item',stars:'1K+',desc:'子路径不应误匹配根仓详情页',url:'https://github.com/JimLiu/baoyu-skills/tree/main/skills/foo',tag:'star'" in js
+    assert "name:'tt-a1i/archify',stars:'99.7K+',desc:'交互架构图',url:'https://github.com/TT-A1I/Archify/',detailUrl:'/p/archify/'" in js
+
+    for unsafe_path in [
+        "//evil.com/p/x/",
+        "https://evil.com/p/x/",
+        "javascript:alert(1)",
+        "p/baoyu-skills/",
+        "/p/../etc/passwd",
+        "/p/baoyu?x=1",
+        "/p/baoyu#frag",
+        "/p/baoyu' onclick='alert(1)",
+        "/",
+        "",
+    ]:
+        try:
+            sync_readme_to_site.generate_skills_js(
+                {"dev": [{"name": "x", "stars": "1", "desc": "d", "url": "https://github.com/a/b"}]},
+                detail_url_map={"https://github.com/a/b": unsafe_path},
+            )
+        except ValueError as exc:
+            assert "详情页路径" in str(exc)
+        else:
+            raise AssertionError(f"unsafe detail path should fail closed: {unsafe_path!r}")
+
+
+def test_sync_sitemap_xml_generates_multipage_and_is_idempotent() -> None:
+    """多页 sitemap.xml 应生成首页(1.0/weekly)+详情页(0.8/monthly)，且无实质变化时完全幂等。"""
+    initial_sitemap = """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://claude-skills.bt199.com/</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
+"""
+    pages_v1 = [
+        {"path": "/skills/skill-translator/", "title": "skill-translator"},
+        {"path": "/p/baoyu-skills/", "title": "baoyu-skills"},
+    ]
+    day1 = datetime.date(2026, 7, 15)
+    generated_v1 = sync_readme_to_site.sync_sitemap_xml(
+        initial_sitemap, pages_v1, project_date=day1, update_date=True
+    )
+
+    assert "<loc>https://claude-skills.bt199.com/</loc>" in generated_v1
+    assert "<changefreq>weekly</changefreq>" in generated_v1
+    assert "<priority>1.0</priority>" in generated_v1
+    assert "<loc>https://claude-skills.bt199.com/p/baoyu-skills/</loc>" in generated_v1
+    assert "<loc>https://claude-skills.bt199.com/skills/skill-translator/</loc>" in generated_v1
+    assert generated_v1.count("<changefreq>monthly</changefreq>") == 2
+    assert generated_v1.count("<priority>0.8</priority>") == 2
+    assert generated_v1.count("<lastmod>2026-07-15</lastmod>") == 3
+    assert generated_v1.index("/p/baoyu-skills/") < generated_v1.index("/skills/skill-translator/")
+
+    # 第二天无变化：update_date=False 必须字节完全一致（不改动任何 lastmod）
+    day2 = datetime.date(2026, 7, 16)
+    noop_check = sync_readme_to_site.sync_sitemap_xml(
+        generated_v1, pages_v1, project_date=day2, update_date=False
+    )
+    assert noop_check == generated_v1
+
+    # 第二天新增 1 个详情页：已有详情页保留旧 lastmod，新页面和首页写入 day2
+    pages_v2 = pages_v1 + [{"path": "/p/archify/", "title": "archify"}]
+    generated_v2 = sync_readme_to_site.sync_sitemap_xml(
+        generated_v1, pages_v2, project_date=day2, update_date=True
+    )
+    assert (
+        "<loc>https://claude-skills.bt199.com/</loc>\n    <lastmod>2026-07-16</lastmod>"
+        in generated_v2
+    )
+    assert (
+        "<loc>https://claude-skills.bt199.com/p/archify/</loc>\n    <lastmod>2026-07-16</lastmod>"
+        in generated_v2
+    )
+    assert (
+        "<loc>https://claude-skills.bt199.com/p/baoyu-skills/</loc>\n    <lastmod>2026-07-15</lastmod>"
+        in generated_v2
+    )
+
+    # CRLF 保留
+    crlf_v1 = generated_v1.replace("\n", "\r\n")
+    assert (
+        sync_readme_to_site.sync_sitemap_xml(
+            crlf_v1, pages_v1, project_date=day2, update_date=False
+        )
+        == crlf_v1
+    )
+
+
+def test_update_llms_detail_pages_syncs_index_and_fails_closed() -> None:
+    """docs/llms.txt 详情页索引区块应自动同步、幂等，且标记缺失/重复/倒序均 fail-closed。"""
+    base_llms = (
+        "> 面向中文开发者的精选仓库，收录 3+ 个精选技能，另含 2 个可直接安装的原创中文技能。\n\n"
+        "## 独立中文详解页\n\n"
+        "<!-- detail-pages-start -->\n"
+        "- old\n"
+        "<!-- detail-pages-end -->\n"
+    )
+    pages = [
+        {"path": "/skills/skill-translator/", "title": "skill-translator [原创] 指南"},
+        {"path": "/p/baoyu-skills/", "title": "baoyu-skills 中文详解"},
+    ]
+    updated = sync_readme_to_site.update_llms_detail_pages(base_llms, pages)
+    assert "- [baoyu-skills 中文详解](https://claude-skills.bt199.com/p/baoyu-skills/)" in updated
+    assert (
+        "- [skill-translator \\[原创\\] 指南](https://claude-skills.bt199.com/skills/skill-translator/)"
+        in updated
+    )
+    assert updated.index("/p/baoyu-skills/") < updated.index("/skills/skill-translator/")
+
+    empty_updated = sync_readme_to_site.update_llms_detail_pages(base_llms, [])
+    assert "暂无已发布的独立中文详解页" in empty_updated
+
+    # CRLF 保留
+    crlf_llms = updated.replace("\n", "\r\n")
+    assert sync_readme_to_site.update_llms_detail_pages(crlf_llms, pages) == crlf_llms
+
+    # 标记异常必须 fail-closed
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.update_llms_detail_pages("no markers", pages),
+        "标记校验失败",
+    )
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.update_llms_detail_pages(
+            "<!-- detail-pages-end -->\n<!-- detail-pages-start -->\n", pages
+        ),
+        "顺序错误",
+    )
+    _expect_runtime_error(
+        lambda: sync_readme_to_site.update_llms_detail_pages(
+            base_llms + "<!-- detail-pages-start -->\n", pages
+        ),
+        "标记校验失败",
+    )
+
+    # 端到端 build_sync_outputs 多页联动 + 幂等检查
+    readme, html, _sitemap, promo, _llms, skills_js = _public_sync_fixture()
+    sitemap_v0 = """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://claude-skills.bt199.com/</loc>
+    <lastmod>2026-01-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
+"""
+    r1, h1, s1, p1, l1, changed1 = sync_readme_to_site.build_sync_outputs(
+        readme,
+        html,
+        sitemap_v0,
+        promo,
+        base_llms,
+        skills_js=skills_js,
+        total_skills=3,
+        repo_stars=9,
+        total_original=2,
+        project_date=datetime.date(2026, 7, 15),
+        detail_pages=pages,
+    )
+    assert changed1 is True
+    assert "<loc>https://claude-skills.bt199.com/p/baoyu-skills/</loc>" in s1
+    assert "https://claude-skills.bt199.com/p/baoyu-skills/" in l1
+
+    # 次日无新增/改动时完全幂等，不改日期
+    r2, h2, s2, p2, l2, changed2 = sync_readme_to_site.build_sync_outputs(
+        r1,
+        h1,
+        s1,
+        p1,
+        l1,
+        skills_js=skills_js,
+        total_skills=3,
+        repo_stars=9,
+        total_original=2,
+        project_date=datetime.date(2026, 7, 16),
+        detail_pages=pages,
+    )
+    assert changed2 is False
+    assert (r2, h2, s2, p2, l2) == (r1, h1, s1, p1, l1)
+
+
+def test_checked_in_llms_has_valid_detail_pages_markers() -> None:
+    """仓库内 docs/llms.txt 必须包含唯一且顺序正确的详情页起止标记。"""
+    llms = (REPO_ROOT / "docs" / "llms.txt").read_text(encoding="utf-8")
+    assert llms.count(sync_readme_to_site.LLMS_DETAIL_PAGES_START) == 1
+    assert llms.count(sync_readme_to_site.LLMS_DETAIL_PAGES_END) == 1
+    assert llms.index(sync_readme_to_site.LLMS_DETAIL_PAGES_START) < llms.index(
+        sync_readme_to_site.LLMS_DETAIL_PAGES_END
+    )
+
+
 if __name__ == "__main__":
     test_dry_run_works_with_gbk_stdout()
     test_project_date_uses_asia_shanghai_boundary()
@@ -1108,4 +1467,9 @@ if __name__ == "__main__":
     test_html_optional_nav_stars_and_jsonld_faq_anchors()
     test_sync_script_hygiene_no_raw_control_chars_or_stale_original_default()
     test_original_skill_sets_and_promo_counts_are_consistent()
+    test_discover_detail_pages_extracts_metadata_and_sorts_deterministically()
+    test_generate_skills_js_injects_detail_url_and_validates_safe_paths()
+    test_sync_sitemap_xml_generates_multipage_and_is_idempotent()
+    test_update_llms_detail_pages_syncs_index_and_fails_closed()
+    test_checked_in_llms_has_valid_detail_pages_markers()
     print("PASS: sync_readme_to_site.py regression tests")

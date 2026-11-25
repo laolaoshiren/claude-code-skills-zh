@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JimLiu/baoyu-skills 中文深度指南：22 个自媒体与创作 Agent Skills 按需选型与安装 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="宝玉开源的 JimLiu/baoyu-skills（27.9K+ Stars，MIT 许可）深度中文指南：详解公众号发布、小红书配图、文章插图、SVG 图表与翻译等 22 个技能如何拆选单装、Windows/macOS 安装命令、凭据隔离与 baoyu-danger-* 风险边界。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="skill-repo" content="https://github.com/JimLiu/baoyu-skills">
+<link rel="canonical" href="https://claude-skills.bt199.com/p/baoyu-skills/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="JimLiu/baoyu-skills 中文深度指南：22 个自媒体与创作 Agent Skills 按需选型">
+<meta property="og:description" content="覆盖微信公众号发布、小红书配图、封面图、信息图、SVG 图表与翻译的 22 个中文生态标杆技能。含按需拆选方案、Windows PowerShell 配置避坑与风险边界。">
+<meta property="og:url" content="https://claude-skills.bt199.com/p/baoyu-skills/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="JimLiu/baoyu-skills 中文深度指南">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="JimLiu/baoyu-skills 中文深度指南：按需选型与零报错安装">
+<meta name="twitter:description" content="27.9K+ Stars 中文生态标杆：公众号排版发布、小红书配图、文章插图、封面图与 SVG 图表，教你拆选单项避免拖慢上下文。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "JimLiu/baoyu-skills",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/p/baoyu-skills/",
+  "codeRepository": "https://github.com/JimLiu/baoyu-skills",
+  "description": "宝玉（JimLiu）开源的 22 个日常提效 Agent Skills，覆盖微信公众号排版发布、小红书配图、文章插图、封面图、信息图、SVG 图表、幻灯片与翻译，支持按需单装，适用于 Claude Code、Codex 与 OpenClaw。",
+  "author": {
+    "@type": "Person",
+    "name": "JimLiu (宝玉)",
+    "url": "https://github.com/JimLiu"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "首页",
+      "item": "https://claude-skills.bt199.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "精选第三方技能",
+      "item": "https://claude-skills.bt199.com/#skills"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "JimLiu/baoyu-skills",
+      "item": "https://claude-skills.bt199.com/p/baoyu-skills/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "为什么官方建议不要一次性全装 baoyu-skills 的 22 个技能？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "每个已加载的 Skill 都会在 Agent 每次对话启动时占用额外上下文 token，并增加触发路由冲突概率。原仓 README.zh.md 也明确提示应按需只装自己真正高频使用的 2 到 4 个技能。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "做微信公众号发布时，还需要额外安装 baoyu-markdown-to-html 吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不需要。原仓说明 baoyu-post-to-wechat 已经内置了 Markdown 到公众号可用 HTML 的转换流程。公众号最小组合通常是 baoyu-cover-image、baoyu-article-illustrator 和 baoyu-post-to-wechat；只有需要先把原始草稿整理成规范 Markdown 结构时，再额外加装 baoyu-format-markdown。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "本机是家庭宽带或动态 IP，不在微信公众号 API 白名单里怎么发布？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "baoyu-post-to-wechat 提供三种发布方式：若没有固定白名单 IP，可选用浏览器方式（依赖本机 Google Chrome，首次扫码登录保存会话）；或者使用远程 API 方式，通过 SSH SOCKS5 隧道将对 api.weixin.qq.com 的请求转发到一台在白名单内的服务器，AppSecret 与草稿组装仍留在本地。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "图片生成一定要用 OpenAI 或 Google API 吗？支持国内生图模型吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不一定。baoyu-image-gen 除 Google、OpenAI、Azure、OpenRouter、Replicate 外，还支持阿里通义万相（DashScope）、智谱 Z.AI、MiniMax、即梦（Jimeng）和豆包（Seedream）。如果你只需要技术流程图或架构图，使用 baoyu-diagram 会由 Claude 直接手算坐标生成深浅色 SVG，完全不调用生图 API。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "仓库里带 baoyu-danger- 前缀的技能有什么风险？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "baoyu-danger-gemini-web 和 baoyu-danger-x-to-markdown 均使用逆向工程的非官方 Web API 与浏览器 Cookie。原仓免责声明已明确提示：上游变更可能导致无预警失效，X 平台检测到非官方调用时账号可能受限。建议优先使用官方 API 渠道，切勿在主力生产账号上无节制调用。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#skills">精选第三方技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">JimLiu/baoyu-skills</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-green">🇨🇳 完整中文文档</span>
+        <span class="pill pill-amber">🏆 热门与高潜 · 平台运营</span>
+        <span class="pill pill-cyan">MIT License</span>
+      </div>
+      <h1><span class="accent-text">JimLiu/baoyu-skills</span> 中文深度指南与按需选型</h1>
+      <p class="hero-lead">由开发者 <strong>JimLiu（宝玉）</strong> 开源的 22 个日常提效 Agent Skills 集合：覆盖微信公众号排版与多账号发布、小红书多风格配图、文章插图、封面图、信息图、自包含 SVG 图表、幻灯片与三档翻译，是目前中文自媒体与技术专栏创作者接入 Claude Code / Codex 的高星标杆仓库。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">GitHub Stars</div>
+          <div class="metric-value is-star">⭐ 27.9K+（核验 27,872）</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">原作者与许可</div>
+          <div class="metric-value">JimLiu · MIT（v2.5.2）</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">适用工具</div>
+          <div class="metric-value">Claude Code / Codex / OpenClaw</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">前置依赖</div>
+          <div class="metric-value is-cyan">Node.js + <code>npx bun</code></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="https://github.com/JimLiu/baoyu-skills" class="btn btn-primary" target="_blank" rel="noopener noreferrer">🚀 直达原仓 GitHub ↗</a>
+        <a href="https://github.com/JimLiu/baoyu-skills/blob/main/README.zh.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📖 阅读官方中文 README ↗</a>
+        <a href="#install" class="btn btn-cyan">⚡ 按需单装命令</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#combos">中文创作者选型组合</a>
+      <a href="#catalog">22 个技能全景拆解</a>
+      <a href="#install">Windows / macOS 安装</a>
+      <a href="#risks">前置条件与风险边界</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="combos">
+      <h2>🎯 中文创作者选型建议：按场景拆装，别整包一把梭</h2>
+      <p class="section-intro">原仓官方 <code>README.zh.md</code> 明确提醒：<strong>仓库包含 22 个技能，不要一次性全装</strong>——每个已加载的 Skill 都会在 Agent 每次对话时占用上下文窗口。建议按实际发布渠道，每次只装 2–4 个核心单项：</p>
+
+      <div class="grid-3">
+        <div class="info-box is-good">
+          <h3>📱 公众号技术专栏（最小组合）</h3>
+          <p><code>baoyu-cover-image</code> + <code>baoyu-article-illustrator</code> + <code>baoyu-post-to-wechat</code></p>
+          <p><strong>省心点：</strong>不必另装 <code>baoyu-markdown-to-html</code>，因为 <code>baoyu-post-to-wechat</code> 已内置 Markdown 转公众号富文本流程；只有整理杂乱草稿时再补装 <code>baoyu-format-markdown</code>。</p>
+        </div>
+        <div class="info-box is-good">
+          <h3>📕 小红书图文运营组合</h3>
+          <p><code>baoyu-xhs-images</code> + <code>baoyu-image-gen</code> + <code>baoyu-compress-image</code></p>
+          <p><strong>省心点：</strong>内置 12 种视觉风格（如 <code>notion</code>、<code>study-notes</code>、<code>chalkboard</code>、<code>cute</code>）与 3 套配色，支持 <code>--yes</code> 非交互批量出图并压缩体积。</p>
+        </div>
+        <div class="info-box is-good">
+          <h3>✍️ 纯技术博客（零生图 API 成本）</h3>
+          <p><code>baoyu-diagram</code> + <code>baoyu-translate</code> + <code>baoyu-format-markdown</code></p>
+          <p><strong>省心点：</strong><code>baoyu-diagram</code> 由 Claude 直接手算坐标写自包含 SVG（内置深浅色适配），无需配置任何生图模型 Key 就能产出清晰流程图、时序图与架构图。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="catalog">
+      <h2>📋 核心 22 个技能清单（按真实仓库目录核验）</h2>
+      <p class="section-intro">根据 <code>JimLiu/baoyu-skills</code> 的 <code>skills/</code> 目录与 <code>.claude-plugin/marketplace.json</code> 实测核验，共分为内容创作、AI 生图与效率工具三大类：</p>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>分类</th>
+              <th>技能名</th>
+              <th>核心能力与中文场景说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>内容与发布（10 个）</strong></td>
+              <td><code>baoyu-post-to-wechat</code></td>
+              <td>微信公众号文章/贴图发布：支持官方 API、Chrome 扫码浏览器、SSH 远程 API（绕开本机动态 IP 白名单限制）以及 <code>EXTEND.md</code> 多账号切换。</td>
+            </tr>
+            <tr>
+              <td><strong>内容与发布</strong></td>
+              <td><code>baoyu-xhs-images</code></td>
+              <td>把文章或主题转为小红书信息图卡片，提供 12 种视觉风格与多布局密度。</td>
+            </tr>
+            <tr>
+              <td><strong>内容与发布</strong></td>
+              <td><code>baoyu-article-illustrator</code> / <code>baoyu-cover-image</code></td>
+              <td>文章插图与 5 维定制封面图（支持 16:9 与公众号 <code>2.35:1</code> 头图比例、纯视觉无字模式）。</td>
+            </tr>
+            <tr>
+              <td><strong>内容与发布</strong></td>
+              <td><code>baoyu-diagram</code> / <code>baoyu-infographic</code> / <code>baoyu-slide-deck</code> / <code>baoyu-comic</code></td>
+              <td>手写深浅色 SVG 技术图表（不耗生图 API）、信息图、逐页演示幻灯片与漫画分镜。</td>
+            </tr>
+            <tr>
+              <td><strong>内容与发布</strong></td>
+              <td><code>baoyu-post-to-weibo</code> / <code>baoyu-post-to-x</code></td>
+              <td>微博与 X（Twitter）多图/长文发帖自动化辅助。</td>
+            </tr>
+            <tr>
+              <td><strong>AI 生图（2 个）</strong></td>
+              <td><code>baoyu-image-gen</code> / <code>baoyu-danger-gemini-web</code></td>
+              <td><code>baoyu-image-gen</code> 统一接入 Google、OpenAI、Azure、OpenRouter、Replicate 及<strong>阿里通义万相 DashScope、智谱 Z.AI、MiniMax、即梦、豆包</strong>；<code>baoyu-danger-gemini-web</code> 为非官方 Web 逆向接口（见下方风险提示）。</td>
+            </tr>
+            <tr>
+              <td><strong>工具处理（10 个）</strong></td>
+              <td><code>baoyu-translate</code> / <code>baoyu-format-markdown</code> / <code>baoyu-markdown-to-html</code> / <code>baoyu-compress-image</code></td>
+              <td>长文翻译润色、草稿 Markdown 结构化、独立 HTML 转换与图片无损/有损压缩。</td>
+            </tr>
+            <tr>
+              <td><strong>工具处理</strong></td>
+              <td><code>baoyu-url-to-markdown</code> / <code>baoyu-youtube-transcript</code> / <code>baoyu-wechat-summary</code> / <code>baoyu-podcast-summary</code> / <code>baoyu-electron-extract</code> / <code>baoyu-danger-x-to-markdown</code></td>
+              <td>网页/YouTube 字幕/公众号/播客/Electron 内容抓取与摘要；其中 <code>baoyu-danger-x-to-markdown</code> 使用非官方 X 接口。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>📦 Windows PowerShell 与 macOS/Linux 安装指南</h2>
+      <p class="section-intro">安装前请确认本机已安装 <strong>Node.js</strong>，且终端能够正常运行 <code>npx bun</code>。推荐按需单装，不要整包盲装。</p>
+
+      <div class="os-grid">
+        <div class="os-card is-featured">
+          <div class="os-card-head">
+            <h3>方式 1：通用 CLI 交互式 / 按需单装（推荐）</h3>
+            <span class="pill pill-cyan">跨平台通用</span>
+          </div>
+          <p class="os-note">运行首条命令可在终端勾选所需单项；或直接用 <code>--skill</code> 指定只装微信公众号相关技能。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">npx skills（Windows / macOS / Linux 通用）</span>
+              <button type="button" class="copy-btn" data-copy-target="baoyu-npx">📋 复制</button>
+            </div>
+            <pre id="baoyu-npx"><code># 交互式勾选需要的单项技能
+npx skills add jimliu/baoyu-skills
+
+# 示例：仅单装微信公众号发布与封面图
+npx skills add jimliu/baoyu-skills --skill baoyu-post-to-wechat --skill baoyu-cover-image</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>方式 2：Claude Code 插件市场（注意整包加载）</h3>
+            <span class="pill pill-amber">加载全部 22 项</span>
+          </div>
+          <p class="os-note">若确实需要频繁切换多类创作技能，可在 Claude Code 2.1+ 中注册插件市场安装完整插件包。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Claude Code Slash Command</span>
+              <button type="button" class="copy-btn" data-copy-target="baoyu-plugin">📋 复制</button>
+            </div>
+            <pre id="baoyu-plugin"><code>/plugin marketplace add JimLiu/baoyu-skills
+/plugin install baoyu-skills@baoyu-skills</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>方式 3：Windows PowerShell 5.1+ 手动单装</h3>
+            <span class="pill pill-purple">Codex / Claude Code</span>
+          </div>
+          <p class="os-note">只把需要的技能目录复制到全局 <code>$HOME\.claude\skills\</code>（若用于 Codex 项目级，目标改为 <code>.\.agents\skills\</code>）。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Windows PowerShell</span>
+              <button type="button" class="copy-btn" data-copy-target="baoyu-win">📋 复制</button>
+            </div>
+            <pre id="baoyu-win"><code>git clone https://github.com/JimLiu/baoyu-skills.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
+Copy-Item -Recurse -Force ".\baoyu-skills\skills\baoyu-post-to-wechat" "$HOME\.claude\skills\"
+Copy-Item -Recurse -Force ".\baoyu-skills\skills\baoyu-cover-image" "$HOME\.claude\skills\"</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>方式 4：macOS / Linux 手动单装与项目级配置</h3>
+            <span class="pill pill-green">Bash / Zsh</span>
+          </div>
+          <p class="os-note">同样支持按单个目录拷贝，避免全量加载。多账号与自定义配色通过 <code>.baoyu-skills/&lt;skill-name&gt;/EXTEND.md</code> 扩展。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">macOS / Linux Shell</span>
+              <button type="button" class="copy-btn" data-copy-target="baoyu-unix">📋 复制</button>
+            </div>
+            <pre id="baoyu-unix"><code>git clone https://github.com/JimLiu/baoyu-skills.git
+mkdir -p ~/.claude/skills
+cp -r baoyu-skills/skills/baoyu-post-to-wechat ~/.claude/skills/
+cp -r baoyu-skills/skills/baoyu-cover-image ~/.claude/skills/</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <h3>Windows PowerShell 代理与环境变量避坑（高频踩雷点）</h3>
+      <p class="section-intro">原仓明确提醒：Windows PowerShell 不支持 Linux 风格的 <code>HTTP_PROXY=http://... /skill</code> 内联写法。需要代理访问海外模型或平台时，必须先在当前会话赋值，再在同一会话内启动 Agent：</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title">Windows PowerShell 会话代理设置</span>
+          <button type="button" class="copy-btn" data-copy-target="baoyu-proxy">📋 复制</button>
+        </div>
+        <pre id="baoyu-proxy"><code>$env:HTTP_PROXY = 'http://127.0.0.1:7890'
+$env:HTTPS_PROXY = 'http://127.0.0.1:7890'
+# 在当前 PowerShell 会话启动 Claude Code / Codex（已在运行中的 Agent 需重启生效）</code></pre>
+      </div>
+    </section>
+
+    <section class="section-card" id="risks">
+      <h2>🛡️ 前置条件、凭据隔离与合规风险边界</h2>
+
+      <div class="callout callout-amber">
+        <div class="callout-title">🔑 API 密钥与公众号凭据隔离（严防提交到 Git）</div>
+        <ul class="prose-list">
+          <li><strong>配置位置</strong>：用户级放 <code>~/.baoyu-skills/.env</code>，项目级放 <code>&lt;project&gt;/.baoyu-skills/.env</code>（环境变量加载优先级：命令行 &gt; 系统环境 &gt; 项目级 &gt; 用户级）。</li>
+          <li><strong>防泄漏必做</strong>：使用项目级配置时，立刻把 <code>.baoyu-skills/.env</code> 写入 <code>.gitignore</code>，切勿把 <code>WECHAT_APP_SECRET</code> 或生图 API Key 推送到公开仓库。</li>
+          <li><strong>公众号 IP 白名单</strong>：官方 API 模式要求出口 IP 在微信公众号后台白名单内；家庭动态 IP 建议改用本机 Chrome 扫码模式，或配置基于 SSH 密钥的 <code>remote-api</code> 转发模式。</li>
+        </ul>
+      </div>
+
+      <div class="callout callout-red">
+        <div class="callout-title">🚨 审慎对待 <code>baoyu-danger-*</code> 前缀技能（逆向非官方接口）</div>
+        <ul class="prose-list">
+          <li><code>baoyu-danger-gemini-web</code> 与 <code>baoyu-danger-x-to-markdown</code> 通过浏览器 Cookie 或逆向工程访问非官方接口，原仓在「免责声明」中已明确标注<strong>使用风险自负</strong>。</li>
+          <li>上游页面或接口改动会随时导致失效；X 平台检测到非官方调用时可能触发账号风控或限制。</li>
+          <li><strong>合规建议</strong>：生图与内容采集优先走正规官方 API（如 <code>baoyu-image-gen</code> 配合国内通义万相/豆包或官方 OpenAI/Google Key），避免把主力账号 Cookie 暴露在自动化脚本中，并遵守各内容平台的原创与发布规范。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <article class="faq-item">
+          <h3>Q1：为什么大家强调不要一次全装这 22 个技能？</h3>
+          <p>Agent 启动时会把已安装 Skill 的元信息注入上下文。22 个技能同时挂载既浪费每轮 token，也容易在「写文章」「画图」等相近口令上互相抢触发。按场景挑 2–4 个高频项单装，响应更准、成本更低。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q2：发微信公众号文章，还需要单独装 baoyu-markdown-to-html 吗？</h3>
+          <p>不需要。原仓说明 <code>baoyu-post-to-wechat</code> 已内置 Markdown 到公众号 HTML 的转换流程；只有当你习惯把转换后的 HTML 手动粘贴到其他编辑器，或者需要单独预览 HTML 时才值得装 <code>baoyu-markdown-to-html</code>。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q3：没有固定公网 IP 进不了公众号白名单，还能用 baoyu-post-to-wechat 吗？</h3>
+          <p>可以，有两种官方支持方案：一是改用 Chrome 浏览器模式（首次扫码登录后自动保留独立会话）；二是若你有一台固定 IP 云服务器，可启用 <code>remote-api</code> 模式，通过 SSH SOCKS5 仅转发 API 请求，排版与 <code>AppSecret</code> 都留在本地。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q4：国内开发者没有海外信用卡，能用它的配图和画图功能吗？</h3>
+          <p>可以。<code>baoyu-image-gen</code> 原生支持阿里通义万相（<code>DASHSCOPE_API_KEY</code>）、智谱 Z.AI、MiniMax、即梦（Jimeng）与豆包（<code>ARK_API_KEY</code> / Seedream）。如果画的是技术流程图或架构图，直接用 <code>baoyu-diagram</code> 生成纯 SVG，零额外 API 费用。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q5：多个公众号怎么避免串号或配色混乱？</h3>
+          <p>在 <code>.baoyu-skills/baoyu-post-to-wechat/EXTEND.md</code> 中配置 <code>accounts</code> 列表即可为每个公众号设置独立别名、作者、主题和发布方式；浏览器模式下每个账号还会使用独立的 Chrome 配置目录，登录态互不干扰。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/p/archify/">
+          <div>
+            <span class="related-tag">💻 交互架构图 · 99.7K+ ⭐</span>
+            <h3>tt-a1i/archify</h3>
+            <p>需要给技术公众号或架构评审配更深度的可交互系统图？看看这款 99.7K+ Star 开源架构图 Skill。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/skill-translator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 技能本地化</span>
+            <h3>skill-translator</h3>
+            <p>把全库其他高星英文 Skill 无损汉化为中文触发版，并做安全与 Windows/GBK 兼容预检。</p>
+          </div>
+          <span class="related-go">查看原创技能 →</span>
+        </a>
+        <a class="related-card" href="/">
+          <div>
+            <span class="related-tag">🏠 全库导航 · 452+ 精选</span>
+            <h3>返回精选技能首页</h3>
+            <p>按「平台运营」「内容创作」「中文专属」分类继续浏览更多公众号、小红书、飞书与企微技能。</p>
+          </div>
+          <span class="related-go">回到首页检索 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>原作者与开源许可声明：</strong>本页为第三方开源项目中文导读与使用指南，项目版权归原作者 <strong>JimLiu（宝玉）</strong> 所有，采用 <strong>MIT License</strong>（发布至 ClawHub 的独立包遵循其 <code>MIT-0</code> 规则）。查看最新更新、完整参数或提交 Issue 请直接访问原仓库：<a href="https://github.com/JimLiu/baoyu-skills" target="_blank" rel="noopener noreferrer">https://github.com/JimLiu/baoyu-skills ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏中文 Claude Code Skills 精选集</h2>
+        <p>每周人工核验真实资产、剔除失效链接与纯营销壳项目。点个 Star 方便随时回查。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 给精选库点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#skills">精选目录</a>
+    <a href="/#original">原创技能</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve();
+        else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () {
+        return legacyCopy(text);
+      });
+    }
+    return legacyCopy(text);
+  }
+
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      var content = (el.textContent || '').trim();
+      copyText(content).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tt-a1i/archify 中文深度指南：99.7K+ Stars 交互式 HTML 架构图与 PR 可视化 Skill | Claude Code Skills 中文精选集</title>
+<meta name="description" content="tt-a1i/archify（99.7K+ Stars，Apache-2.0 许可）中文深度指南：把想法、代码库或 PR 转为离线可交互 HTML 架构图，详解 archify、archify-pr 与 Code Analysis 架构诊断、Windows/macOS 安装命令，以及「第三方在线付费站非官方」防踩坑提示。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="skill-repo" content="https://github.com/tt-a1i/archify">
+<link rel="canonical" href="https://claude-skills.bt199.com/p/archify/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="tt-a1i/archify 中文深度指南：99.7K+ Stars 交互式 HTML 架构图 Skill">
+<meta property="og:description" content="支持 10 种架构/时序/ERD/工作流交互图表、Code Analysis 循环依赖诊断与 archify-pr 变更导览。附官方防踩坑声明与跨平台零报错安装。">
+<meta property="og:url" content="https://claude-skills.bt199.com/p/archify/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="tt-a1i/archify 交互式 HTML 架构图中文指南">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="tt-a1i/archify 中文深度指南：交互式 HTML 架构图与 PR 可视化">
+<meta name="twitter:description" content="99.7K+ Stars Apache-2.0 开源 Skill，接手遗留代码、写架构评审与 PR 变更可视化的利器，附防踩坑与内网离线配置说明。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "tt-a1i/archify",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://www.apache.org/licenses/LICENSE-2.0",
+  "url": "https://claude-skills.bt199.com/p/archify/",
+  "codeRepository": "https://github.com/tt-a1i/archify",
+  "description": "将想法、代码库或 PR 差异转为可缩放、可切换深浅主题、可追溯源码的独立可交互 HTML 架构图，内置 10 种图表类型、Code Analysis 架构诊断与可选 archify-pr 同伴技能。",
+  "author": {
+    "@type": "Person",
+    "name": "tt-a1i",
+    "url": "https://github.com/tt-a1i"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "首页",
+      "item": "https://claude-skills.bt199.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "精选第三方技能",
+      "item": "https://claude-skills.bt199.com/#skills"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "tt-a1i/archify",
+      "item": "https://claude-skills.bt199.com/p/archify/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "网上搜到的 Archify 在线付费服务或会员站是官方的吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不是。tt-a1i/archify 官方中文 README 明确声明：Archify 开源免费，官方入口只有 archify.si 与 github.com/tt-a1i/archify；第三方提供的在线服务与收费套餐均由其运营方自行负责，名称或域名相似不代表官方合作。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "没有现成代码库，只有脑子里的方案或一段 Mermaid，能用 Archify 吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "可以。Archify 支持直接从一句文字描述、设计方案或 Mermaid 代码生成交互式 HTML 图表，也支持在对话中持续细调（例如「增加 Redis」「把鉴权移到左侧」），不需要先有代码仓库。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "在公司私有仓库里用 Archify 会上传源码吗？能否彻底关闭联网检查？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Archify 在本地生成独立 HTML 文件，不会把仓库代码或用户输入上传到外部服务。安装包内置一个约 24 小时一次的静默版本提醒检查（仅请求 archify.si 的 stable.json，不携带项目或设备数据）；如果处于内网或严格零外联要求，在 Agent 环境中设置 ARCHIFY_UPDATE_CHECK_DISABLED=1 即可彻底关闭。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Windows 用户安装 Archify 时为什么建议保留 --copy 参数？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Windows 默认普通终端权限下创建符号链接（symlink）经常失败。官方推荐命令中显式带上 --copy，会直接复制 Skill 文件到目标 Agent 目录而非建立软链接，可大幅减少 Windows 下的权限报错。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "archify 核心技能和 archify-pr 同伴技能有什么区别？都要装吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "默认安装只包含 archify 核心技能，覆盖 10 种交互图表、一页式 Explainer 和 Code Analysis 架构诊断。archify-pr 是可选同伴技能，专门基于 git merge-base 三点范围把分支变更、GitHub PR 或 GitLab MR 转为变更导览图，只对实质性结构改动提示，且可在全局规则里写 [archify pr: on-demand] 关闭主动提醒。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#skills">精选第三方技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">tt-a1i/archify</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-green">🇨🇳 官方中文 README</span>
+        <span class="pill pill-amber">🏆 99.7K+ Stars 现象级爆款</span>
+        <span class="pill pill-cyan">Apache-2.0 License</span>
+      </div>
+      <h1><span class="accent-text">tt-a1i/archify</span> 中文深度指南：交互式 HTML 架构图与 PR 可视化</h1>
+      <p class="hero-lead">由开发者 <strong>tt-a1i</strong> 开源的交互式可视化 Agent Skill：把一句系统构想、完整代码仓库或 PR 差异变成可缩放、可切换深浅主题、可点击追源码的独立 HTML 架构图，并自带 <strong>Code Analysis 循环依赖诊断</strong> 与可选 <strong>archify-pr</strong> 变更导览。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">GitHub Stars</div>
+          <div class="metric-value is-star">⭐ 99.7K+（核验 99,748）</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">原作者与许可</div>
+          <div class="metric-value">tt-a1i · Apache-2.0（v3.3.1）</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">适用工具</div>
+          <div class="metric-value">Claude Code / Cursor / Codex / OpenCode / Copilot</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">官方入口</div>
+          <div class="metric-value is-cyan"><a href="https://archify.si/zh/gallery" target="_blank" rel="noopener noreferrer">archify.si（官方演示）↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="https://github.com/tt-a1i/archify" class="btn btn-primary" target="_blank" rel="noopener noreferrer">🚀 直达原仓 GitHub ↗</a>
+        <a href="https://github.com/tt-a1i/archify/blob/main/README_ZH.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📖 阅读官方 README_ZH ↗</a>
+        <a href="#install" class="btn btn-cyan">⚡ 安装与触发命令</a>
+      </div>
+    </header>
+
+    <div class="callout callout-red" id="official-warning">
+      <div class="callout-title">🚨 官方重要防踩坑声明：第三方在线付费站不代表 Archify 官方</div>
+      <p>根据 <code>tt-a1i/archify</code> 仓库顶部与「官方入口与第三方服务」章节的明确公告：<strong>Archify 开源免费</strong>，当前官方入口仅有 <a href="https://archify.si" target="_blank" rel="noopener noreferrer">archify.si</a> 与 <a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener noreferrer">github.com/tt-a1i/archify</a>。搜索结果中名称或域名相似的第三方在线工具、收费套餐与数据处理政策均由其运营方自行负责，<strong>不代表官方合作</strong>，切勿误付会员费或随意向不明站点上传公司源码。</p>
+    </div>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#modules">三大核心模块拆解</a>
+      <a href="#scenarios">三大高频中文开发场景</a>
+      <a href="#install">安装与触发步骤</a>
+      <a href="#caveats">实测避坑与隐私开关</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="modules">
+      <h2>🧩 源码核验：archify / archify-pr / viewer 三大能力</h2>
+      <p class="section-intro">核验原仓根目录与 <code>SKILL.md</code>，Archify 并非简单的 Mermaid 封装，而是由核心技能、可选 PR 同伴技能和独立交互查看器三部分构成：</p>
+
+      <div class="grid-3">
+        <div class="info-box is-good">
+          <h3>1. <code>archify/</code> 核心技能</h3>
+          <p>支持 <strong>10 种校验型图表</strong>（Architecture、Workflow、Sequence、Data Flow、Lifecycle、ERD、Class、Tree、Timeline、Waterfall），输出独立离线 HTML；同时内置<strong>架构诊断（Code Analysis）</strong>，可把依赖关系画成环形星图和可旋转 3D 模型并定位循环依赖与复杂度热点（需用户同意后才运行）。</p>
+        </div>
+        <div class="info-box is-good">
+          <h3>2. <code>archify-pr/</code> 可选 PR 同伴</h3>
+          <p>需从仓库源码按需加装。基于 <code>git merge-base</code> 三点范围把分支 diff、GitHub PR 或 GitLab MR 转为结构化变更导览图。对文档、锁文件、格式化等小改动保持静默，<strong>只报告代码证据，不臆断合并风险结论</strong>。</p>
+        </div>
+        <div class="info-box is-good">
+          <h3>3. <code>viewer/</code> 独立交互查看器</h3>
+          <p>产出物为自包含本地 HTML（存放在 <code>.archify/&lt;type&gt;-&lt;slug&gt;-&lt;时间&gt;/</code>）：浏览器直接打开即可缩放平移、一键切深浅主题、点击节点追溯源码、高亮上游/下游路径，并导出 PNG、SVG、WebM 与 1200×630 路径分享卡片。</p>
+        </div>
+      </div>
+
+      <h3>10 种内置图表速查（按任务选型）</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>图表类型</th>
+              <th>最适合的工程场景</th>
+              <th>写 Prompt 时建议交代的信息</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Architecture / Data Flow</strong></td>
+              <td>微服务拓扑、系统边界、数据管线与血缘追踪</td>
+              <td>范围、8–12 个核心组件、主链路与外部信任边界</td>
+            </tr>
+            <tr>
+              <td><strong>Workflow / Lifecycle</strong></td>
+              <td>CI/CD、审批流、Agent 工具编排、订单状态机</td>
+              <td>参与者、正常分支、异常与重试/取消终态</td>
+            </tr>
+            <tr>
+              <td><strong>Sequence / Waterfall</strong></td>
+              <td>API 鉴权、缓存回源、异步回调与单次请求耗时分布</td>
+              <td>调用方、被调用方、时序顺序、Span 耗时（注明实测或示意）</td>
+            </tr>
+            <tr>
+              <td><strong>ERD / Class / Tree</strong></td>
+              <td>数据库表结构、核心类继承关系、仓库目录能力拆解</td>
+              <td>表/字段/主外键基数，或根节点与各模块职责</td>
+            </tr>
+            <tr>
+              <td><strong>Timeline</strong></td>
+              <td>线上故障复盘、版本演进与里程碑回溯</td>
+              <td>带时区的时间点、关键事件与来源泳道</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="scenarios">
+      <h2>🎯 中文开发者三大高频落地场景</h2>
+      <div class="grid-3">
+        <div class="info-box">
+          <h3>🏚️ 1. 接手大型遗留项目</h3>
+          <p>老系统文档早已过时时，先让 Archify 扫描仓库输出 8–12 个核心组件的高层运行时图，再开启 Code Analysis 找出循环依赖与高耦合热点，点选问题节点就能直达对应源码。</p>
+        </div>
+        <div class="info-box">
+          <h3>📐 2. 写架构评审方案与技术分享</h3>
+          <p>无需先写代码，用一句话描述方案就能出可交互评审页。评审会现场直接切深浅色、追踪请求路径；需要贴进飞书文档、语雀或 PPT 时，一键导出 PNG 或 Route Share Card。</p>
+        </div>
+        <div class="info-box">
+          <h3>🔍 3. PR / MR 重构变更可视化</h3>
+          <p>搭配 <code>archify-pr</code> 或 <code>archify.mjs compare</code> 生成 Before / Delta / After 架构对比，让 Reviewer 直观看到本次重构改动了哪些模块边界，不再只盯着几千行 diff 盲审。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>📦 安装与触发步骤（Windows / macOS / Linux 通用）</h2>
+      <p class="section-intro">支持 Claude Code、Cursor、Codex CLI、OpenCode 与 GitHub Copilot。命令中的 <code>--copy</code> 直接复制文件而非建符号链接，对 Windows 普通终端尤为友好。</p>
+
+      <div class="os-grid">
+        <div class="os-card is-featured">
+          <div class="os-card-head">
+            <h3>方式 1：一条 CLI 非交互安装（推荐）</h3>
+            <span class="pill pill-cyan">Windows / macOS / Linux</span>
+          </div>
+          <p class="os-note">把 <code>--agent</code> 设为你的主力工具（支持 <code>claude-code</code>、<code>cursor</code>、<code>codex</code>、<code>opencode</code>、<code>github-copilot</code>，可重复传多个）。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">安装 archify 核心技能到 Claude Code</span>
+              <button type="button" class="copy-btn" data-copy-target="arch-cli">📋 复制</button>
+            </div>
+            <pre id="arch-cli"><code>npx -y skills@latest add https://archify.si --skill archify --agent claude-code --global --copy --yes</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>方式 2：直接让 AI Agent 读取 llms.txt 安装</h3>
+            <span class="pill pill-purple">免手敲参数</span>
+          </div>
+          <p class="os-note">把官方 <code>README_ZH.md</code> 提供的这句指令原样发给当前 Agent，由其按你的客户端路径自动完成安装。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">发送给 Agent 的安装口令</span>
+              <button type="button" class="copy-btn" data-copy-target="arch-llms">📋 复制</button>
+            </div>
+            <pre id="arch-llms"><code>Install Archify for me by reading https://raw.githubusercontent.com/tt-a1i/archify/main/llms.txt</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>可选扩展：按需加装 archify-pr 同伴技能</h3>
+            <span class="pill pill-amber">PR / MR 变更可视化</span>
+          </div>
+          <p class="os-note">需先装好核心 <code>archify</code>，再从 GitHub 源码单独加装 <code>archify-pr</code>（不强制装，按团队 Code Review 需要选择）。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">加装 archify-pr（以 Claude Code 为例）</span>
+              <button type="button" class="copy-btn" data-copy-target="arch-pr">📋 复制</button>
+            </div>
+            <pre id="arch-pr"><code>npx -y skills@latest add tt-a1i/archify --skill archify-pr --agent claude-code --global --copy --yes</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>实测开箱中文触发 Prompt</h3>
+            <span class="pill pill-green">安装后直接复用</span>
+          </div>
+          <p class="os-note">安装完成后，可在无代码库时画概念图，或在已有项目里生成带源码关联的架构图与诊断报告。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">直接发给 Agent 的中文提示词</span>
+              <button type="button" class="copy-btn" data-copy-target="arch-prompt">📋 复制</button>
+            </div>
+            <pre id="arch-prompt"><code>分析这个仓库，然后使用 archify 生成一张高层运行时架构图。
+只保留 8–12 个核心组件，突出一条主要路径，并标出外部依赖与信任边界。
+辅助信息放进说明卡片，不要继续增加连线。</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="caveats">
+      <h2>⚙️ 中文用户实测注意事项与隐私控制开关</h2>
+
+      <div class="callout callout-amber">
+        <div class="callout-title">🔒 内网 / 零外联环境：关闭低频更新检查</div>
+        <p>官方说明安装后的 <code>archify</code> 含有一个约 24 小时一次、失败静默的稳定版提醒检查（仅访问 <code>https://archify.si/skill-updates/archify/stable.json</code>，绝不上传项目代码、本地版本、用户输入或设备标识，也不会自动下载更新）。如在公司内网或严格零外联环境使用，直接设置以下环境变量即可彻底关闭：</p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">关闭更新检查环境变量（Windows PowerShell / Shell）</span>
+            <button type="button" class="copy-btn" data-copy-target="arch-nocheck">📋 复制</button>
+          </div>
+          <pre id="arch-nocheck"><code># Windows PowerShell
+$env:ARCHIFY_UPDATE_CHECK_DISABLED = '1'
+
+# macOS / Linux
+export ARCHIFY_UPDATE_CHECK_DISABLED=1</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-cyan">
+        <div class="callout-title">🎛️ 避免过度主动触发：按需控制 Explainer 与 PR 提醒</div>
+        <ul class="prose-list">
+          <li><strong>控制一页式说明页</strong>：如果你只希望明确要求时才生成网页版说明页，可在 Agent 全局规则（如 <code>CLAUDE.md</code> / <code>AGENTS.md</code>）写入 <code>[archify explainer: on-demand]</code>。</li>
+          <li><strong>关闭 PR 轻提示</strong>：装了 <code>archify-pr</code> 但只想手动调用时，在全局规则写入 <code>[archify pr: on-demand]</code> 即可。</li>
+          <li><strong>对外分享脱敏</strong>：Archify 默认在本地 <code>.archify/</code> 目录生成自包含 HTML；向外部展示或贴入公开博客前，务必确认节点卡片与路径中未包含内网域名、真实表字段敏感信息或业务机密。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <article class="faq-item">
+          <h3>Q1：网上搜到的「Archify 在线生成网站」和付费套餐是官方提供的吗？</h3>
+          <p>不是。原作者已在仓库首页和 <code>#official-services</code> 明确澄清：Archify 本体开源免费（Apache-2.0），官方入口只有 <code>archify.si</code> 与 <code>github.com/tt-a1i/archify</code>；任何第三方在线服务与收费套餐都不代表官方立场。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q2：手里还没有代码仓库，只有脑子里的架构想法或一段 Mermaid，能用吗？</h3>
+          <p>完全可以。直接说「用 Archify 画出：Browser -&gt; API -&gt; Redis 缓存 -&gt; PostgreSQL 回源」，或贴入 Mermaid 草稿就能生成交互式 HTML；之后还可以继续在对话中说「增加限流网关」「突出回滚路径」，它会保留 Typed Source 做增量调整。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q3：在公司私有项目里运行 Archify，会把源码上传到外部服务器吗？</h3>
+          <p>不会。Archify 依托你当前使用的 AI Agent 在本地分析并产出独立的 HTML 文件，不经由任何第三方绘图 SaaS。若对默认的低频版本号检查也有顾虑，配置 <code>ARCHIFY_UPDATE_CHECK_DISABLED=1</code> 即可实现彻底零外联。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q4：Windows 安装为什么一定要注意带 --copy？</h3>
+          <p>Windows 默认非管理员权限下创建符号链接容易报错退出。官方推荐命令中加上 <code>--copy</code> 会直接复制完整 Skill 目录到 Agent 本地技能目录，Windows PowerShell 5.1 与 PowerShell 7+ 都能稳定安装。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q5：archify 和 archify-pr 要一起装吗？</h3>
+          <p>先装核心 <code>archify</code> 即可满足 90% 的画图、架构讲解与 Code Analysis 诊断需求。如果你的团队需要频繁在 GitHub PR / GitLab MR 中附带变更架构导览图，再按需加装 <code>archify-pr</code> 即可。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/skill-translator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 技能本地化</span>
+            <h3>skill-translator</h3>
+            <p>如果团队想把其他英文架构、代码审查或测试 Skill 转为中文触发版并做 Windows 体检，先装这个原创技能。</p>
+          </div>
+          <span class="related-go">查看原创技能 →</span>
+        </a>
+        <a class="related-card" href="/p/baoyu-skills/">
+          <div>
+            <span class="related-tag">📣 内容与平台运营 · 27.9K+ ⭐</span>
+            <h3>JimLiu/baoyu-skills</h3>
+            <p>需要把技术架构总结进一步做成公众号图文、封面或小红书卡片？看这份 22 技能按需拆选指南。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/">
+          <div>
+            <span class="related-tag">🏠 全库导航 · 452+ 精选</span>
+            <h3>返回精选技能首页</h3>
+            <p>继续浏览更多代码审查、知识图谱、测试与 CI/CD 类高星 Claude Code Skills。</p>
+          </div>
+          <span class="related-go">回到首页检索 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>原作者与开源许可声明：</strong>本页为第三方开源项目中文导读与实测参考，项目版权归原作者 <strong>tt-a1i</strong> 所有，采用 <strong>Apache License 2.0</strong>（历史版本 MIT 授权详见原仓 <code>NOTICE</code> 与 <code>LICENSE-MIT</code>）。查看最新 Release、交互示例或提交 Issue 请访问原仓库：<a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener noreferrer">https://github.com/tt-a1i/archify ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏中文 Claude Code Skills 精选集</h2>
+        <p>持续追踪高星开源 Agent Skills，核验真实资产、许可与中文避坑边界，点个 Star 下次直接查。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 给精选库点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#skills">精选目录</a>
+    <a href="/#original">原创技能</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve();
+        else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () {
+        return legacyCopy(text);
+      });
+    }
+    return legacyCopy(text);
+  }
+
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      var content = (el.textContent || '').trim();
+      copyText(content).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

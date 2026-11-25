@@ -25,6 +25,14 @@
 - refactor-advisor：识别代码坏味道并给出可执行重构建议 — https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/refactor-advisor
 - perf-profiler：用可复现基线与 profiler 证据定位性能瓶颈 — https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/perf-profiler
 
+## 独立中文详解页
+
+<!-- detail-pages-start -->
+- [tt-a1i/archify 中文深度指南：99.7K+ Stars 交互式 HTML 架构图与 PR 可视化 Skill | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/archify/)
+- [JimLiu/baoyu-skills 中文深度指南：22 个自媒体与创作 Agent Skills 按需选型与安装 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/baoyu-skills/)
+- [skill-translator：英文 Skill 无损汉化与安全预检技能 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/skills/skill-translator/)
+<!-- detail-pages-end -->
+
 ## 主要链接
 
 - [GitHub 仓库](https://github.com/laolaoshiren/claude-code-skills-zh)：全部精选列表与原创技能源码

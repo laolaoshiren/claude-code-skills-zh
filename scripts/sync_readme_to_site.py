@@ -21,8 +21,10 @@ import stat
 import subprocess
 import sys
 import tempfile
+from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlsplit
+from xml.sax.saxutils import escape as xml_escape
 
 
 def _configure_stdio() -> None:
@@ -45,6 +47,10 @@ PROMO_PATH = REPO_ROOT / "PROMO.md"
 LLMS_PATH = REPO_ROOT / "docs" / "llms.txt"
 GITHUB_REPO = "laolaoshiren/claude-code-skills-zh"
 SITE_HOME_URL = "https://claude-skills.bt199.com/"
+SITE_ORIGIN = SITE_HOME_URL.rstrip("/")
+DETAIL_PAGE_SECTIONS = ("skills", "p", "c")
+LLMS_DETAIL_PAGES_START = "<!-- detail-pages-start -->"
+LLMS_DETAIL_PAGES_END = "<!-- detail-pages-end -->"
 GITHUB_GRAPHQL_BATCH_SIZE = 50
 CATEGORY_ORDER = [
     "star",
@@ -260,6 +266,222 @@ def normalize_repo_slug(repo: str) -> str:
     ):
         raise ValueError(f"非法 GitHub 仓库名: {repo!r}")
     return f"{owner}/{name}".lower()
+
+
+def validate_detail_path(path: str) -> str:
+    """校验将写入公开页面的站内详情页路径：仅允许以单个 / 开头的安全站内路径。"""
+    if not isinstance(path, str):
+        raise ValueError(f"详情页路径必须是字符串: {path!r}")
+    candidate = path.strip()
+    if not candidate.startswith("/") or candidate.startswith("//"):
+        raise ValueError(f"详情页路径必须以单个 / 开头: {path!r}")
+    if any(
+        char.isspace() or ord(char) < 0x20 or ord(char) == 0x7F
+        for char in candidate
+    ):
+        raise ValueError(f"详情页路径不得包含空白或控制字符: {path!r}")
+    if "\\" in candidate or "?" in candidate or "#" in candidate:
+        raise ValueError(f"详情页路径不得包含反斜杠、查询参数或片段: {path!r}")
+    segments = [segment for segment in candidate.split("/") if segment]
+    if not segments:
+        raise ValueError(f"详情页路径不能为空根路径: {path!r}")
+    for segment in segments:
+        if segment in {".", ".."} or not re.fullmatch(
+            r"[A-Za-z0-9][A-Za-z0-9._-]*", segment
+        ):
+            raise ValueError(f"详情页路径包含非法片段 {segment!r}: {path!r}")
+    return candidate
+
+
+def normalize_github_repo_url(url: str) -> str | None:
+    """把 GitHub 仓库根 URL 规范化为小写 https://github.com/owner/repo；子路径或非 GitHub 返回 None。"""
+    try:
+        parsed = urlsplit(validate_http_url(extract_github_url(url)))
+    except ValueError:
+        return None
+    if (parsed.hostname or "").lower() not in {"github.com", "www.github.com"}:
+        return None
+    path_parts = [part for part in parsed.path.split("/") if part]
+    if len(path_parts) != 2:
+        return None
+    owner, name = path_parts[0], path_parts[1]
+    if name.endswith(".git"):
+        name = name[:-4]
+    if not owner or not name:
+        return None
+    try:
+        slug = normalize_repo_slug(f"{owner}/{name}")
+    except ValueError:
+        return None
+    return f"https://github.com/{slug}"
+
+
+class _DetailPageHeadParser(HTMLParser):
+    """提取独立详情页 <head> 中的 title、canonical、skill-repo 与 original-skill。"""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self._in_title = False
+        self._in_body = False
+        self._title_parts: list[str] = []
+        self.canonical_href: str | None = None
+        self.skill_repo: str | None = None
+        self.original_skill: str | None = None
+
+    @property
+    def title(self) -> str:
+        return " ".join("".join(self._title_parts).split())
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        lower_tag = tag.lower()
+        if lower_tag == "body":
+            self._in_body = True
+            return
+        if self._in_body:
+            return
+        if lower_tag == "title":
+            self._in_title = True
+            return
+
+        attr_map = {
+            key.lower(): (value or "")
+            for key, value in attrs
+            if key
+        }
+        if lower_tag == "link":
+            rel_tokens = {token.lower() for token in attr_map.get("rel", "").split()}
+            if "canonical" in rel_tokens and self.canonical_href is None:
+                href = attr_map.get("href", "").strip()
+                if href:
+                    self.canonical_href = href
+        elif lower_tag == "meta":
+            meta_name = attr_map.get("name", "").strip().lower()
+            content = attr_map.get("content", "").strip()
+            if meta_name == "skill-repo" and self.skill_repo is None and content:
+                self.skill_repo = content
+            elif (
+                meta_name == "original-skill"
+                and self.original_skill is None
+                and content
+            ):
+                self.original_skill = content
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag.lower() == "title":
+            self._in_title = False
+
+    def handle_data(self, data: str) -> None:
+        if self._in_title and not self._in_body:
+            self._title_parts.append(data)
+
+
+def _extract_canonical_detail_path(canonical_href: str, source_file: Path) -> str:
+    """校验 canonical URL 属于本站并提取安全站内路径。"""
+    validated = validate_http_url(canonical_href)
+    parsed = urlsplit(validated)
+    home = urlsplit(SITE_HOME_URL)
+    if (
+        parsed.scheme.lower() != home.scheme.lower()
+        or parsed.netloc.lower() != home.netloc.lower()
+    ):
+        raise ValueError(
+            f"{source_file} 的 canonical 域名与本站不一致: {canonical_href!r}"
+        )
+    if parsed.query or parsed.fragment:
+        raise ValueError(
+            f"{source_file} 的 canonical 不得包含查询参数或片段: {canonical_href!r}"
+        )
+    return validate_detail_path(parsed.path)
+
+
+def discover_detail_pages(docs_dir: Path | None = None) -> list[dict[str, str | None]]:
+    """扫描 docs/{skills,p,c}/*/index.html，提取元数据并按 canonical 路径确定性排序。"""
+    root = Path(docs_dir) if docs_dir is not None else (REPO_ROOT / "docs")
+    pages: list[dict[str, str | None]] = []
+    seen_paths: dict[str, Path] = {}
+    seen_repos: dict[str, str] = {}
+
+    for section in DETAIL_PAGE_SECTIONS:
+        section_dir = root / section
+        if not section_dir.is_dir():
+            continue
+        for child in sorted(section_dir.iterdir(), key=lambda item: item.name):
+            if not child.is_dir():
+                continue
+            index_file = child / "index.html"
+            if not index_file.is_file():
+                continue
+
+            parser = _DetailPageHeadParser()
+            parser.feed(read_file(index_file))
+            parser.close()
+
+            if parser.canonical_href is not None:
+                canonical_path = _extract_canonical_detail_path(
+                    parser.canonical_href, index_file
+                )
+            else:
+                canonical_path = validate_detail_path(f"/{section}/{child.name}/")
+
+            if canonical_path in seen_paths:
+                raise RuntimeError(
+                    f"详情页 canonical 路径重复 {canonical_path!r}: "
+                    f"{seen_paths[canonical_path]} 与 {index_file}"
+                )
+            seen_paths[canonical_path] = index_file
+
+            normalized_repo: str | None = None
+            if parser.skill_repo is not None:
+                normalized_repo = normalize_github_repo_url(parser.skill_repo)
+                if normalized_repo is None:
+                    raise ValueError(
+                        f"{index_file} 的 meta skill-repo 不是合法 GitHub 仓库 URL: "
+                        f"{parser.skill_repo!r}"
+                    )
+                if normalized_repo in seen_repos:
+                    raise RuntimeError(
+                        f"详情页 meta skill-repo 重复 {normalized_repo!r}: "
+                        f"{seen_repos[normalized_repo]} 与 {canonical_path}"
+                    )
+                seen_repos[normalized_repo] = canonical_path
+
+            title = parser.title or child.name
+            pages.append(
+                {
+                    "section": section,
+                    "slug": child.name,
+                    "path": canonical_path,
+                    "url": f"{SITE_ORIGIN}{canonical_path}",
+                    "title": title,
+                    "skill_repo": normalized_repo,
+                    "original_skill": parser.original_skill,
+                }
+            )
+
+    pages.sort(key=lambda page: str(page["path"]))
+    return pages
+
+
+def build_detail_url_map(
+    detail_pages: list[dict[str, str | None]],
+) -> dict[str, str]:
+    """从已发现的详情页构造小写 GitHub 仓库 URL -> 安全站内路径映射。"""
+    mapping: dict[str, str] = {}
+    for page in detail_pages:
+        raw_repo = page.get("skill_repo")
+        if not raw_repo:
+            continue
+        repo_url = normalize_github_repo_url(raw_repo)
+        if repo_url is None:
+            raise ValueError(f"详情页 skill_repo 非法: {raw_repo!r}")
+        detail_path = validate_detail_path(str(page.get("path", "")))
+        existing = mapping.get(repo_url)
+        if existing is not None and existing != detail_path:
+            raise RuntimeError(
+                f"重复的 skill_repo 映射 {repo_url!r}: {existing!r} vs {detail_path!r}"
+            )
+        mapping[repo_url] = detail_path
+    return mapping
 
 
 def format_stars(stars: str) -> str:
@@ -693,8 +915,25 @@ def refresh_readme_stars(readme: str, star_counts: dict[str, int]) -> str:
 
 # ── 生成 JavaScript ───────────────────────────────────────────────────────────
 
-def generate_skills_js(skills_data: dict[str, list[dict]]) -> str:
-    """生成 skillsData JavaScript 对象代码"""
+def generate_skills_js(
+    skills_data: dict[str, list[dict]],
+    detail_url_map: dict[str, str] | None = None,
+) -> str:
+    """生成 skillsData JavaScript 对象代码，可选注入经过安全校验的站内 detailUrl。"""
+    normalized_detail_map: dict[str, str] = {}
+    if detail_url_map:
+        for raw_repo_url, raw_detail_path in detail_url_map.items():
+            repo_url = normalize_github_repo_url(raw_repo_url)
+            if repo_url is None:
+                raise ValueError(f"detail_url_map 包含非法 GitHub 仓库 URL: {raw_repo_url!r}")
+            safe_path = validate_detail_path(raw_detail_path)
+            existing = normalized_detail_map.get(repo_url)
+            if existing is not None and existing != safe_path:
+                raise RuntimeError(
+                    f"detail_url_map 存在冲突映射 {repo_url!r}: {existing!r} vs {safe_path!r}"
+                )
+            normalized_detail_map[repo_url] = safe_path
+
     lines = ["const skillsData = {"]
 
     for key in CATEGORY_ORDER:
@@ -705,7 +944,8 @@ def generate_skills_js(skills_data: dict[str, list[dict]]) -> str:
             name = escape_js_string(item["name"])
             stars = escape_js_string(item.get("stars", ""))
             desc = escape_js_string(strip_inline_markdown(item["desc"]))
-            url = escape_js_string(validate_http_url(item["url"]))
+            validated_url = validate_http_url(item["url"])
+            url = escape_js_string(validated_url)
 
             parts = [f"name:'{name}'"]
             if stars:
@@ -714,6 +954,15 @@ def generate_skills_js(skills_data: dict[str, list[dict]]) -> str:
             parts.append(f"url:'{url}'")
             if item.get("zhDoc"):
                 parts.append("zhDoc:true")
+
+            detail_url = item.get("detailUrl")
+            if not detail_url and normalized_detail_map:
+                repo_key = normalize_github_repo_url(validated_url)
+                if repo_key is not None:
+                    detail_url = normalized_detail_map.get(repo_key)
+            if detail_url is not None:
+                safe_detail_url = escape_js_string(validate_detail_path(detail_url))
+                parts.append(f"detailUrl:'{safe_detail_url}'")
 
             # star 分类加 tag
             if key == "star":
@@ -869,6 +1118,84 @@ def update_sitemap_lastmod(
         "sitemap 首页 lastmod",
     )
     return sitemap[:block_match.start()] + updated_block + sitemap[block_match.end():]
+
+
+def _extract_sitemap_lastmods(sitemap: str) -> dict[str, str]:
+    """提取现有 sitemap.xml 中每个 <url> 块的 loc -> lastmod 映射。"""
+    lastmods: dict[str, str] = {}
+    for match in re.finditer(r"<url(?:\s[^>]*)?>.*?</url>", sitemap, re.DOTALL):
+        block = match.group(0)
+        loc_match = re.search(r"<loc>\s*([^<\s]+)\s*</loc>", block)
+        lastmod_match = re.search(r"<lastmod>\s*(\d{4}-\d{2}-\d{2})\s*</lastmod>", block)
+        if loc_match and lastmod_match:
+            lastmods[loc_match.group(1).strip()] = lastmod_match.group(1).strip()
+    return lastmods
+
+
+def sync_sitemap_xml(
+    sitemap: str,
+    detail_pages: list[dict[str, str | None]],
+    *,
+    project_date: datetime.date | None = None,
+    update_date: bool = True,
+) -> str:
+    """
+    生成多页 docs/sitemap.xml：
+    - 首页 priority=1.0, changefreq=weekly
+    - 每个独立详情页 priority=0.8, changefreq=monthly
+    - 幂等性：已有 URL 保留原有 lastmod（仅首页在 update_date=True 时推进）；
+      新增页面写入当日 lastmod，无实质变化时不改动任何 lastmod。
+    """
+    homepage_block = _find_sitemap_homepage_block(sitemap).group(0)
+    existing_home_lastmod = _extract_unique_date(
+        homepage_block,
+        r"<lastmod>(\d{4}-\d{2}-\d{2})</lastmod>",
+        "sitemap 首页 lastmod",
+    )
+    existing_lastmods = _extract_sitemap_lastmods(sitemap)
+    today = _resolve_public_date(project_date).isoformat()
+    home_lastmod = today if update_date else existing_home_lastmod
+
+    newline = _detect_newline_style(sitemap, "sitemap.xml") or "\n"
+    trailing_newline = newline if sitemap.endswith(newline) else ""
+
+    sorted_pages = sorted(
+        detail_pages,
+        key=lambda page: validate_detail_path(str(page["path"])),
+    )
+
+    lines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+        "  <url>",
+        f"    <loc>{xml_escape(SITE_HOME_URL)}</loc>",
+        f"    <lastmod>{home_lastmod}</lastmod>",
+        "    <changefreq>weekly</changefreq>",
+        "    <priority>1.0</priority>",
+        "  </url>",
+    ]
+
+    seen_urls: set[str] = {SITE_HOME_URL}
+    for page in sorted_pages:
+        detail_path = validate_detail_path(str(page["path"]))
+        page_url = f"{SITE_ORIGIN}{detail_path}"
+        if page_url in seen_urls:
+            raise RuntimeError(f"sitemap 中存在重复 URL: {page_url!r}")
+        seen_urls.add(page_url)
+        page_lastmod = existing_lastmods.get(page_url, today)
+        lines.extend(
+            [
+                "  <url>",
+                f"    <loc>{xml_escape(page_url)}</loc>",
+                f"    <lastmod>{page_lastmod}</lastmod>",
+                "    <changefreq>monthly</changefreq>",
+                "    <priority>0.8</priority>",
+                "  </url>",
+            ]
+        )
+
+    lines.append("</urlset>")
+    return newline.join(lines) + trailing_newline
 
 
 def _extract_unique_date(content: str, pattern: str, label: str) -> str:
@@ -1229,6 +1556,58 @@ def update_llms_counts(
     return llms
 
 
+def update_llms_detail_pages(
+    llms: str,
+    detail_pages: list[dict[str, str | None]],
+) -> str:
+    """同步 docs/llms.txt 中独立中文详解页索引区块，起止标记缺失或重复均 fail-closed。"""
+    start_count = llms.count(LLMS_DETAIL_PAGES_START)
+    end_count = llms.count(LLMS_DETAIL_PAGES_END)
+    if start_count != 1 or end_count != 1:
+        raise RuntimeError(
+            "llms.txt 独立详解页标记校验失败："
+            f"start 找到 {start_count} 处，end 找到 {end_count} 处（均期望 1 处）"
+        )
+    start_index = llms.index(LLMS_DETAIL_PAGES_START)
+    end_index = llms.index(LLMS_DETAIL_PAGES_END)
+    if end_index < start_index:
+        raise RuntimeError("llms.txt 独立详解页标记顺序错误：end 出现在 start 之前")
+
+    newline = _detect_newline_style(llms, "docs/llms.txt") or "\n"
+    sorted_pages = sorted(
+        detail_pages,
+        key=lambda page: validate_detail_path(str(page["path"])),
+    )
+
+    if not sorted_pages:
+        body_lines = [
+            "- 暂无已发布的独立中文详解页（新增详情页后运行 `python scripts/sync_readme_to_site.py` 自动更新）。"
+        ]
+    else:
+        body_lines = []
+        for page in sorted_pages:
+            detail_path = validate_detail_path(str(page["path"]))
+            page_url = f"{SITE_ORIGIN}{detail_path}"
+            raw_title = str(page.get("title") or page.get("slug") or detail_path)
+            safe_title = (
+                " ".join(raw_title.split())
+                .replace("[", "\\[")
+                .replace("]", "\\]")
+            )
+            body_lines.append(f"- [{safe_title}]({page_url})")
+
+    replacement_block = (
+        f"{LLMS_DETAIL_PAGES_START}{newline}"
+        f"{newline.join(body_lines)}{newline}"
+        f"{LLMS_DETAIL_PAGES_END}"
+    )
+    return (
+        llms[:start_index]
+        + replacement_block
+        + llms[end_index + len(LLMS_DETAIL_PAGES_END):]
+    )
+
+
 def build_sync_outputs(
     readme_content: str,
     html_content: str,
@@ -1242,6 +1621,7 @@ def build_sync_outputs(
     repo_stars: int,
     total_original: int,
     project_date: datetime.date,
+    detail_pages: list[dict[str, str | None]] | None = None,
 ) -> tuple[str, str, str, str, str, bool]:
     """先生成并校验非日期结果，仅在有实质变化时统一推进公开日期。"""
     readme_source = (
@@ -1278,13 +1658,25 @@ def build_sync_outputs(
     )
     new_promo = update_promo_counts(promo_content, total_skills, total_original)
     new_llms = update_llms_counts(llms_content, total_skills, total_original)
-    # 即使最终 no-op，也要先验证首页锚点和 lastmod 唯一性。
-    update_sitemap_lastmod(sitemap_content, update_date=False)
+    if detail_pages is not None:
+        new_llms = update_llms_detail_pages(new_llms, detail_pages)
+        sitemap_without_date = sync_sitemap_xml(
+            sitemap_content,
+            detail_pages,
+            project_date=project_date,
+            update_date=False,
+        )
+    else:
+        # 即使最终 no-op，也要先验证首页锚点和 lastmod 唯一性。
+        update_sitemap_lastmod(sitemap_content, update_date=False)
+        sitemap_without_date = sitemap_content
+
     validate_public_dates(readme_without_date, html_without_date, sitemap_content)
 
     material_changed = (
         html_without_date != html_content
         or readme_without_date != readme_content
+        or sitemap_without_date != sitemap_content
         or new_promo != promo_content
         or new_llms != llms_content
     )
@@ -1319,10 +1711,18 @@ def build_sync_outputs(
         project_date=project_date,
     )
     new_readme = update_readme_original_count(new_readme, total_original)
-    new_sitemap = update_sitemap_lastmod(
-        sitemap_content,
-        project_date=project_date,
-    )
+    if detail_pages is not None:
+        new_sitemap = sync_sitemap_xml(
+            sitemap_content,
+            detail_pages,
+            project_date=project_date,
+            update_date=True,
+        )
+    else:
+        new_sitemap = update_sitemap_lastmod(
+            sitemap_content,
+            project_date=project_date,
+        )
     validate_public_dates(new_readme, new_html, new_sitemap)
     return new_readme, new_html, new_sitemap, new_promo, new_llms, True
 
@@ -1386,12 +1786,15 @@ def main():
         items = skills_data.get(key, [])
         print(f"     {key}: {len(items)} 个")
 
-    # 4. 计算原创技能数量
+    # 4. 计算原创技能数量 & 扫描多页详情页
     original_count = count_original_skills()
+    detail_pages = discover_detail_pages(REPO_ROOT / "docs")
+    detail_url_map = build_detail_url_map(detail_pages)
+    print(f"📄 发现 {len(detail_pages)} 个独立详情页（第三方内链映射 {len(detail_url_map)} 项）")
 
     # 5. 生成 JavaScript
     print("📝 生成 skillsData JavaScript ...")
-    skills_js = generate_skills_js(skills_data)
+    skills_js = generate_skills_js(skills_data, detail_url_map=detail_url_map)
 
     # 6. 先在内存生成并严格校验五文件结果。
     print("🔧 在内存生成并校验 README、官网、sitemap、PROMO 与 llms.txt ...")
@@ -1408,6 +1811,7 @@ def main():
             repo_stars=repo_stars,
             total_original=original_count,
             project_date=project_date,
+            detail_pages=detail_pages,
         )
     )
 

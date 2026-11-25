@@ -146,7 +146,10 @@ section{padding:5rem 2rem}
 .oc-title-link:hover{color:var(--accent3)}
 .original-card h3{font-size:1rem;font-weight:700;margin-bottom:.35rem;line-height:1.35}
 .original-card p{color:var(--text2);font-size:.83rem;line-height:1.55}
-.oc-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:.7rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:auto}
+.oc-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:.7rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:auto;flex-wrap:wrap}
+.oc-action-links{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
+.original-detail-link{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:7px;font-size:.76rem;font-weight:700;background:rgba(108,92,231,0.2);color:var(--accent2);border:1px solid rgba(162,155,254,0.45);transition:.2s}
+.original-detail-link:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
 .oc-link{font-size:.78rem;font-weight:600;color:var(--accent2);display:inline-flex;align-items:center;gap:4px}
 .oc-link:hover{color:var(--accent3)}
 
@@ -180,11 +183,17 @@ section{padding:5rem 2rem}
 .skill-card:hover::before{opacity:1}
 .skill-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:.65rem}
 .skill-title-wrap{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}
-.skill-name{font-weight:700;font-size:.98rem;word-break:break-word}
+.skill-name,.skill-title-link{font-weight:700;font-size:.98rem;word-break:break-word;color:var(--accent2)}
+.skill-title-link:hover{color:var(--accent3)}
 .zh-doc-badge{display:inline-flex;align-items:center;justify-content:center;padding:1px 6px;border-radius:6px;font-size:.74rem;background:rgba(0,184,148,0.14);border:1px solid rgba(0,184,148,0.35);line-height:1.2;flex-shrink:0}
 .skill-stars{display:flex;align-items:center;gap:4px;color:var(--orange);font-size:.8rem;font-weight:600;white-space:nowrap;flex-shrink:0}
 .skill-desc{color:var(--text2);font-size:.85rem;line-height:1.58;flex:1}
 .skill-meta-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:.85rem}
+.skill-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:.85rem;padding-top:.7rem;border-top:1px solid rgba(255,255,255,0.06)}
+.skill-detail-btn{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:8px;font-size:.78rem;font-weight:700;background:rgba(108,92,231,0.2);color:var(--accent2);border:1px solid rgba(162,155,254,0.45);transition:.2s}
+.skill-detail-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);transform:translateY(-1px)}
+.skill-gh-link{font-size:.78rem;font-weight:600;color:var(--text2);display:inline-flex;align-items:center;gap:4px;margin-left:auto}
+.skill-gh-link:hover{color:var(--accent3)}
 .skill-tag{display:inline-block;padding:3px 9px;border-radius:6px;font-size:.71rem;font-weight:600;line-height:1.35}
 .tag-security{background:rgba(255,118,117,0.15);color:var(--red)}
 .tag-docs{background:rgba(116,185,255,0.15);color:var(--accent3)}
@@ -535,7 +544,10 @@ Copy-Item -Recurse -Force "claude-code-skills-zh\skills\*" "$HOME\.claude\skills
           <p>把任意英文 SKILL.md / AGENTS.md 转为自然中文触发版，保留代码与命令结构并预检安全及 Windows 兼容性</p>
         </div>
         <div class="oc-actions">
-          <a class="oc-link" href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/skill-translator/SKILL.md" target="_blank" rel="noopener noreferrer">查看 SKILL.md ↗</a>
+          <div class="oc-action-links">
+            <a class="original-detail-link" href="/skills/skill-translator/">📖 详解页</a>
+            <a class="oc-link" href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/skill-translator/SKILL.md" target="_blank" rel="noopener noreferrer">查看 SKILL.md ↗</a>
+          </div>
           <button type="button" class="copy-btn" data-skill="skill-translator" onclick="copySingleSkill(this)">📋 复制安装</button>
         </div>
       </div>
@@ -967,8 +979,8 @@ Copy-Item -Recurse -Force "claude-code-skills-zh\skills\*" "$HOME\.claude\skills
 // Skills data
 const skillsData = {
   star: [
-    {name:'JimLiu/baoyu-skills',stars:'27.9K+',desc:'🇨🇳 宝玉开源的 22 个日常提效 Agent Skills：覆盖公众号排版发布、小红书配图、微博/X 发帖、文章插图、封面与信息图，提供完整中文文档并支持 npx skills 按需单装；做技术专栏、公众号或小红书运营的中文创作者可直接拆选单项接入 Claude Code / Codex，避免整包加载拖慢上下文',url:'https://github.com/JimLiu/baoyu-skills',zhDoc:true,tag:'star'},
-    {name:'tt-a1i/archify',stars:'99.7K+',desc:'🇨🇳 把想法、PR 或代码库转为可交互 HTML 架构图的开源 Agent Skill，提供官方中文 README（仓库明确说明第三方在线付费站非官方）；写架构评审方案、接手大型遗留系统或做学习地图时，中文开发者无需手绘静态图即可产出可缩放交互的文档页面',url:'https://github.com/tt-a1i/archify',zhDoc:true,tag:'star'},
+    {name:'JimLiu/baoyu-skills',stars:'27.9K+',desc:'🇨🇳 宝玉开源的 22 个日常提效 Agent Skills：覆盖公众号排版发布、小红书配图、微博/X 发帖、文章插图、封面与信息图，提供完整中文文档并支持 npx skills 按需单装；做技术专栏、公众号或小红书运营的中文创作者可直接拆选单项接入 Claude Code / Codex，避免整包加载拖慢上下文',url:'https://github.com/JimLiu/baoyu-skills',zhDoc:true,detailUrl:'/p/baoyu-skills/',tag:'star'},
+    {name:'tt-a1i/archify',stars:'99.7K+',desc:'🇨🇳 把想法、PR 或代码库转为可交互 HTML 架构图的开源 Agent Skill，提供官方中文 README（仓库明确说明第三方在线付费站非官方）；写架构评审方案、接手大型遗留系统或做学习地图时，中文开发者无需手绘静态图即可产出可缩放交互的文档页面',url:'https://github.com/tt-a1i/archify',zhDoc:true,detailUrl:'/p/archify/',tag:'star'},
     {name:'alibaba/open-code-review',stars:'56.1K+',desc:'🛡️ 阿里巴巴开源的混合架构代码审查工具与 Agent Skill：以确定性静态管线加 LLM Agent 输出行级评审，内置 NPE、线程安全、XSS、SQL 注入等多语言规则并支持 Claude Code、Kimi 插件及 Windows install.ps1；国内研发团队接入提交前自检或 CI 审查时，可大幅减少纯大模型评审的误报与幻觉',url:'https://github.com/alibaba/open-code-review',tag:'star'},
     {name:'everything-claude-code',stars:'310.3K+',desc:'🧠 把 Claude Code 变成完整开发环境的全栈技能系统：Skills、记忆、安全与研究驱动开发；英文文档，想一次补齐整套工作流、又愿意读原文或配合 skill-translator 汉化的中文开发者可以把它当地图',url:'https://github.com/affaan-m/ECC',tag:'star'},
     {name:'agentic-awesome-skills',stars:'50.3K+',desc:'📚 1,900+ 可安装技能库，兼容 Claude Code / Cursor / Codex / Gemini CLI；英文目录，适合在多个 Agent 之间找可迁移技能的中文读者先检索再按需单装',url:'https://github.com/sickn33/agentic-awesome-skills',tag:'star'},
@@ -1594,6 +1606,16 @@ function updateSkillsStatus(tab, shownCount, totalCount) {
   }
 }
 
+function isSafeDetailUrl(url) {
+  return (
+    typeof url === 'string' &&
+    url.startsWith('/') &&
+    !url.startsWith('//') &&
+    !/\.\./.test(url) &&
+    /^\/(?:[A-Za-z0-9][A-Za-z0-9._-]*\/)*[A-Za-z0-9._-]*\/?$/.test(url)
+  );
+}
+
 function renderSkills(tab) {
   const container = document.getElementById('skillsContainer');
   const resolvedTab = CATEGORY_META[tab] ? tab : 'star';
@@ -1630,7 +1652,7 @@ function renderSkills(tab) {
   }
 
   data.forEach(s => {
-    const card = document.createElement('div');
+    const card = document.createElement('article');
     card.className = 'skill-card';
 
     const header = document.createElement('div');
@@ -1640,7 +1662,7 @@ function renderSkills(tab) {
     titleWrap.className = 'skill-title-wrap';
 
     const link = document.createElement('a');
-    link.className = 'skill-name';
+    link.className = 'skill-title-link';
     link.href = s.url;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
@@ -1690,6 +1712,27 @@ function renderSkills(tab) {
     if (metaRow.childNodes.length > 0) {
       card.appendChild(metaRow);
     }
+
+    const actions = document.createElement('div');
+    actions.className = 'skill-actions';
+
+    if (isSafeDetailUrl(s.detailUrl)) {
+      const detailLink = document.createElement('a');
+      detailLink.className = 'skill-detail-btn';
+      detailLink.href = s.detailUrl;
+      detailLink.textContent = '📖 中文详解';
+      actions.appendChild(detailLink);
+    }
+
+    const ghLink = document.createElement('a');
+    ghLink.className = 'skill-gh-link';
+    ghLink.href = s.url;
+    ghLink.target = '_blank';
+    ghLink.rel = 'noopener noreferrer';
+    ghLink.textContent = 'GitHub ↗';
+    actions.appendChild(ghLink);
+
+    card.appendChild(actions);
 
     fragment.appendChild(card);
   });

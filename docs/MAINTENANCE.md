@@ -20,7 +20,7 @@
 
 - 检查开放 PR 和 Issue，优先处理新增资源推荐、断链、描述错误。
 - 搜索近期活跃的 Claude Code / Codex / Agent Skills 项目，补充 5-15 个高相关条目。
-- 运行 `python scripts/sync_readme_to_site.py --fetch-stars` 同步 README 徽章与统计口径、官网数据（含独立展示的「🔬 学术科研」分类）、`docs/sitemap.xml` 日期、`PROMO.md` 与 `docs/llms.txt` 中的精选与原创数量。
+- 运行 `python scripts/sync_readme_to_site.py --fetch-stars` 同步 README 徽章与统计口径、官网数据（含独立展示的「🔬 学术科研」分类与详情页内链 `detailUrl`）、多页 `docs/sitemap.xml`、`PROMO.md` 与 `docs/llms.txt`（含数量与独立中文详解页索引）。
 - 跑本地校验，确保 GitHub Actions 不报错。
 - 仓库已配置 `Auto Maintenance` GitHub Actions，每周自动同步 README / 官网统计并向 `PROMO.md` 与 `docs/llms.txt` 对齐数量，同时执行 lint、空白和脚本回归检查。
 
@@ -188,6 +188,42 @@ README 是面向用户的项目首页，只保留项目价值、安装入口、�
 - “强大、优雅、领先、革命性”等空泛词。
 - 只堆关键词，不说明实际使用场景。
 - 明显未经验证的星标数、功能数、官方身份。
+
+## 多页 SEO / GEO 详情页规范
+
+官网支持多页独立中文详解页架构，新增落地页后运行一次 `python scripts/sync_readme_to_site.py`（或带 `--fetch-stars`）即可自动纳入 `docs/sitemap.xml`、首页精选卡片内链与 `docs/llms.txt`。
+
+### 目录约定
+
+| 路径 | 用途 |
+|------|------|
+| `docs/skills/<skill-name>/index.html` | 本仓库原创技能的深度中文详解页 |
+| `docs/p/<slug>/index.html` | 第三方精选项目的深度中文详解页 |
+| `docs/c/<slug>/index.html` | 按中文场景聚合的专题导览页 |
+
+### `<head>` 元数据契约
+
+- 所有独立页均应提供与本站域名一致的 `<link rel="canonical" href="https://claude-skills.bt199.com/<section>/<slug>/">` 及 `<title>`。
+- 第三方精选项目独立页在 `<head>` 中声明：
+
+```html
+<meta name="skill-repo" content="https://github.com/owner/repo">
+<link rel="canonical" href="https://claude-skills.bt199.com/p/<slug>/">
+```
+
+- 原创技能独立页在 `<head>` 中声明：
+
+```html
+<meta name="original-skill" content="<skill-name>">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/<skill-name>/">
+```
+
+### 自动同步行为
+
+1. `discover_detail_pages(docs_dir)` 按路径确定性扫描 `docs/skills/*/index.html`、`docs/p/*/index.html` 与 `docs/c/*/index.html`，提取 `canonical` 路径、`<title>`、`skill-repo`（规范化为小写 `https://github.com/owner/repo`）和 `original-skill`；遇到外站 canonical、非法路径或重复映射时 fail-closed 报错。
+2. `generate_skills_js()` 会把命中 `skill-repo` 的第三方详情页路径以 `detailUrl:'/p/<slug>/'` 注入 `skillsData`（仅接受以单个 `/` 开头的安全站内路径，并转义脚本边界字符）；首页卡片使用 `<article class="skill-card">` 与安全 DOM API 渲染 `📖 中文详解` 与 `GitHub ↗`，严禁 `innerHTML` 或嵌套 `<a>`。
+3. `sync_sitemap_xml()` 自动生成多页 `docs/sitemap.xml`：首页固定 `priority: 1.0`、`changefreq: weekly`，每个独立详情页固定 `priority: 0.8`、`changefreq: monthly`；无实质变化时保持字节幂等、不无故推进 `lastmod`，新增页面写入当日 `lastmod` 且保留已有详情页的原 `lastmod`。
+4. `update_llms_detail_pages()` 自动维护 `docs/llms.txt` 中 `<!-- detail-pages-start -->` 与 `<!-- detail-pages-end -->` 之间的全部独立详解页 URL 与标题，便于搜索引擎与 AI 检索抓取。
 
 ## 原创 Skills 迭代方向
 
