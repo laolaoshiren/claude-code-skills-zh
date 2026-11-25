@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>alibaba/open-code-review 中文深度指南：阿里混合架构 AI 代码审查工具与委托模式配置 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="阿里巴巴开源的 alibaba/open-code-review（56.2K+ Stars，Apache-2.0，v1.14.3）中文实操指南：拆解确定性工程管线×LLM Agent 架构、AACR-Bench 1/9 Token 对比、无需独立 API Key 的 Delegation 委托模式、Windows/macOS 安装与 CI 集成避坑。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="skill-repo" content="https://github.com/alibaba/open-code-review">
+<link rel="canonical" href="https://claude-skills.bt199.com/p/open-code-review/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="alibaba/open-code-review 中文深度指南：混合架构 AI 代码审查与委托模式配置">
+<meta property="og:description" content="56.2K+ Stars 阿里开源 AI 代码审查工具与 Agent Skill：兼容 Claude Code / Codex / Cursor / Kimi Code，支持原生模式与零额外 API Key 的 Delegation 委托模式。">
+<meta property="og:url" content="https://claude-skills.bt199.com/p/open-code-review/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="alibaba/open-code-review 中文深度指南">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="alibaba/open-code-review 中文深度指南：确定性管线 × Agent 审查">
+<meta name="twitter:description" content="Git >= 2.41 前置条件、原生模式 vs 委托模式选型、ocr review / ocr scan 常用命令与中文团队接入避坑。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "alibaba/open-code-review",
+  "softwareVersion": "v1.14.3",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://www.apache.org/licenses/LICENSE-2.0",
+  "url": "https://claude-skills.bt199.com/p/open-code-review/",
+  "codeRepository": "https://github.com/alibaba/open-code-review",
+  "description": "阿里巴巴开源的混合架构 AI 代码审查 CLI 与 Agent Skills：用确定性工程管线做文件筛选、分包与规则匹配，用 LLM Agent 做深度上下文审查，兼容 Claude Code、Codex、Cursor 与 Kimi Code。",
+  "author": {
+    "@type": "Organization",
+    "name": "Alibaba",
+    "url": "https://github.com/alibaba"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "首页",
+      "item": "https://claude-skills.bt199.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "精选第三方技能",
+      "item": "https://claude-skills.bt199.com/#skills"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "alibaba/open-code-review",
+      "item": "https://claude-skills.bt199.com/p/open-code-review/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "没有单独的 API Key，只有 Claude Code 或 Cursor 订阅账号能用 open-code-review 吗？",
+      "acceptedAnswer": {
+        "text": "可以。官方专门提供了 Delegation 委托模式（open-code-review-delegate 技能 / delegate-review 命令）：由 ocr CLI 负责确定性文件筛选、规则解析与覆盖率护栏，实际推理直接复用你当前宿主 Agent（Claude Code / Cursor / Codex / Kimi Code）已配置的模型与认证，无需在 OCR 中额外配 API Key。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "为什么很多人刚装完运行 ocr review 会报 Git 错误？",
+      "acceptedAnswer": {
+        "text": "Open Code Review 明确要求 Git 版本 >= 2.41（依赖较新的 diff 与检索特性）。Windows 和部分 Linux 发行版自带的旧版 Git 低于 2.41 时会报错，安装前请先运行 git --version 检查并升级 Git。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "原生模式（Native）和委托模式（Delegation）该怎么选？",
+      "acceptedAnswer": {
+        "text": "如果你有独立模型 API Key 且要接入 CI/CD（GitHub Actions / GitLab CI / Gerrit）跑自动化流水线，选原生模式（open-code-review + ocr config provider），能跑满官方独立定位与反思模块；如果只是本地开发提交前自检、不想额外配置 Key，优先用委托模式（open-code-review-delegate）。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "接手一个没有 Git Diff 的老代码目录，能用它做全量体检吗？",
+      "acceptedAnswer": {
+        "text": "可以。除了针对变更的 ocr review，官方内置了 ocr scan 全文件扫描模式，可直接运行 ocr scan --path <目录> 审计不熟悉的遗留模块，并支持 --resume <session-id> 断点续扫。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "它和本仓轻量原创技能 zh-code-reviewer 有什么区别？",
+      "acceptedAnswer": {
+        "text": "zh-code-reviewer 是零外部依赖的纯 SKILL.md 轻量中文审查工作流，适合个人快速看一次小 diff；alibaba/open-code-review 则是 Go + Node 驱动的重型混合工程工具，强项在于超大变更集防漏审、精细化规则引擎、行号精准定位与企业级 CI 集成，两者互补。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#skills">精选第三方技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">alibaba/open-code-review</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-cyan">🇨🇳 官方简体中文文档</span>
+        <span class="pill pill-green">🛡️ 混合架构代码审查</span>
+        <span class="pill pill-purple">⭐ 56.2K+ Stars · Apache-2.0</span>
+      </div>
+      <h1><span class="accent-text">alibaba/open-code-review</span> 中文深度指南</h1>
+      <p class="hero-lead">由阿里集团内部官方 AI 代码审查助手孵化开源（最新 <code>v1.14.3</code>）。用<strong>确定性工程管线</strong>解决大变更漏审、行号漂移与提示词波动，用 <strong>LLM Agent</strong> 做深层上下文推理，提供 Windows / macOS / Linux 全平台 CLI、CI 集成以及兼容 Claude Code / Codex / Cursor / Kimi Code 的双模式 Agent Skills。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">GitHub 星标 / 版本</div>
+          <div class="metric-value is-cyan">56.2K+ ⭐ · v1.14.3</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">Apache-2.0</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">硬性前置条件</div>
+          <div class="metric-value">Git ≥ 2.41 + ocr CLI</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">原仓库入口</div>
+          <div class="metric-value"><a href="https://github.com/alibaba/open-code-review" target="_blank" rel="noopener noreferrer">alibaba/open-code-review ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装与运行命令</a>
+        <a href="https://github.com/alibaba/open-code-review" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📦 访问 GitHub 原仓库 ↗</a>
+        <a href="https://github.com/alibaba/open-code-review/blob/main/docs/i18n/README.zh-CN.md" class="btn btn-cyan" target="_blank" rel="noopener noreferrer">🇨🇳 阅读官方中文 README ↗</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#why">混合架构核心优势</a>
+      <a href="#modes">原生模式 vs 委托模式</a>
+      <a href="#install">安装与常用 CLI 命令</a>
+      <a href="#pitfalls">中文团队接入避坑</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="why">
+      <h2>🏗️ 为什么纯大模型 Prompt 审查容易翻车？阿里是怎么解的？</h2>
+      <p class="section-intro">原仓在 AACR-Bench（50 个真实开源仓库、200 个 PR、10 种语言、1,505 条人工交叉标注缺陷）中指出，纯语言驱动的通用 Agent 在大变更集下容易出现<strong>漏审文件、行号漂移与质量波动</strong>。Open Code Review 把流程拆成两层：</p>
+      <div class="grid-2">
+        <div class="info-box is-good">
+          <h3>确定性工程层（绝不能出错的硬约束）</h3>
+          <ul class="clean-list">
+            <li><strong>精准文件筛选</strong>：由确定性逻辑圈定所有待审文件，防止大 PR 被模型“偷懒跳过”。</li>
+            <li><strong>智能关联分包</strong>：把强关联文件（如多语言配置或上下游模块）归为一包，以独立子 Agent 并发审查并隔离上下文。</li>
+            <li><strong>模板化规则匹配</strong>：按文件语言与特征精准注入 NPE、线程安全、XSS、SQL 注入等规则，减少无关噪声。</li>
+            <li><strong>独立定位与反思模块</strong>：专门修正评论行号与过滤低价值误报。</li>
+          </ul>
+        </div>
+        <div class="info-box is-good">
+          <h3>Agent 动态推理层（专注需要判断的部分）</h3>
+          <ul class="clean-list">
+            <li><strong>跨文件深层取证</strong>：不只看 diff 片段，而是按需读取完整文件、搜索调用链与其他变更文件。</li>
+            <li><strong>场景特化工具集</strong>：基于大规模生产调用轨迹精简工具链，减少重复无效工具调用。</li>
+            <li><strong>成本与精准度取舍</strong>：官方基准显示在相同底层模型下准确率（Precision）与 F1 更高、Token 消耗约降为通用 Agent 的 1/9（以低噪声换取略低召回率）。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="modes">
+      <h2>⚖️ 最关键选型：原生模式（Native） vs 委托模式（Delegation）</h2>
+      <p class="section-intro">很多中文开发者装完才发现「Claude Code 订阅账号不能直接当原生模式的 API Key」——提前看懂这两种模式能省掉大量配置折腾：</p>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>对比维度</th>
+              <th>原生模式（Native）</th>
+              <th>委托模式（Delegation）</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>对应 Skill / 命令</strong></td>
+              <td><code>open-code-review</code> / <code>ocr review</code></td>
+              <td><code>open-code-review-delegate</code> / <code>delegate-review</code></td>
+            </tr>
+            <tr>
+              <td><strong>模型与认证来源</strong></td>
+              <td>OCR 独立配置的 LLM Provider（需独立 API Key）</td>
+              <td>直接复用宿主 Agent（Claude Code / Cursor / Codex / Kimi Code）现有登录与额度</td>
+            </tr>
+            <tr>
+              <td><strong>管线能力范围</strong></td>
+              <td>跑满 OCR 完整原生审查管线、独立定位与反思模块</td>
+              <td>由 OCR CLI 提供文件筛选、规则解析与护栏，宿主 Agent 执行分析与输出</td>
+            </tr>
+            <tr>
+              <td><strong>最适合谁</strong></td>
+              <td>有独立 API Key、需要接入 GitHub Actions / GitLab CI / Gerrit 的研发团队</td>
+              <td>个人开发者提交前自检、没有独立 API Key 或不想再配一套凭据的用户</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 安装与高频命令速查（Windows / macOS / Linux）</h2>
+      <p class="section-intro">两种模式都要求本地满足 <strong>Git ≥ 2.41</strong> 且已安装 <code>ocr</code> CLI；原生模式才需要执行 <code>ocr config provider</code>：</p>
+
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">步骤 1：全局安装 ocr CLI（npm 跨平台通用）</span>
+            <button type="button" class="copy-btn" data-copy-target="ocr-cli">📋 复制</button>
+          </div>
+          <pre id="ocr-cli"><code>git --version
+npm install -g @alibaba-group/open-code-review</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">步骤 2：为 Claude Code / Codex / Cursor / Kimi 安装 Skills</span>
+            <button type="button" class="copy-btn" data-copy-target="ocr-skills">📋 复制</button>
+          </div>
+          <pre id="ocr-skills"><code>npx skills add alibaba/open-code-review</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">原生模式：交互式配置模型端点与 Key</span>
+            <button type="button" class="copy-btn" data-copy-target="ocr-cfg">📋 复制</button>
+          </div>
+          <pre id="ocr-cfg"><code>ocr config provider
+ocr config model</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">日常高频审查与全目录体检命令</span>
+            <button type="button" class="copy-btn" data-copy-target="ocr-run">📋 复制</button>
+          </div>
+          <pre id="ocr-run"><code># 审查当前工作区全部未提交改动
+ocr review
+# 审查当前分支相对 main 的改动
+ocr review --from main
+# 审计没有 git diff 的遗留目录（支持断点续扫）
+ocr scan --path internal/agent
+# 委托模式预览待审文件与规则
+ocr delegate preview</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="pitfalls">
+      <h2>⚠️ 中文开发者实测避坑与注意事项</h2>
+      <div class="callout callout-warn">
+        <strong>上手前先检查这 4 点，避免卡在环境与成本问题：</strong>
+        <ul class="clean-list">
+          <li><strong>Git 版本门槛（硬性 ≥ 2.41）</strong>：Windows 或老旧 Linux 服务器若 Git 版本偏低，<code>ocr review</code> 会直接失败；先用 <code>git --version</code> 核验。</li>
+          <li><strong>区分订阅额度与独立 API Key</strong>：Claude Code Pro/Team 登录态不会自动变成 <code>ocr review</code> 原生模式的 API 凭据；没单独配 Key 时请直接使用 <code>open-code-review-delegate</code> 委托模式。</li>
+          <li><strong>代码隐私与模型端点合规</strong>：无论哪种模式，待审源码与上下文都会发往你配置的 LLM 端点；企业内部涉密代码库请务必配置内网自托管或经公司合规审批的兼容 OpenAI/Anthropic 端点。</li>
+          <li><strong>中断可续跑</strong>：大仓库审查若因网络波动中断，可先跑 <code>ocr session list</code> 查回话 ID，再用 <code>--resume &lt;session-id&gt;</code> 续扫，避免重复消耗 Token。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>支持哪些国产编码 Agent 和 CI 平台？</h3>
+          <p>除 Claude Code、Codex、Cursor、OpenCode 外，官方仓库内置了 <code>.kimi-plugin/</code> 专门支持 Kimi Code，CI 侧支持 GitHub Actions（根目录自带 <code>action.yml</code>）、GitLab CI、GitFlic CI 与 Gerrit。</p>
+        </div>
+        <div class="faq-item">
+          <h3>没有独立模型 API Key 能先体验吗？</h3>
+          <p>可以，装完 <code>ocr</code> CLI 与 <code>open-code-review-delegate</code> 技能后，即可在委托模式下借用宿主编码 Agent 现有模型运行规则筛选与审查流程。</p>
+        </div>
+        <div class="faq-item">
+          <h3>适合跟本仓原创技能 zh-code-reviewer 怎么分工？</h3>
+          <p>日常个人快速看小改动，用零依赖的 <code>zh-code-reviewer</code> 最轻快；团队级大 PR、需要多语言内置安全规则（NPE/并发/XSS/SQL 注入）或接入 CI 自动卡点时，优先上 <code>alibaba/open-code-review</code>。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/p/archify/">
+          <div>
+            <span class="related-tag">💻 交互架构图 · 99.7K+ ⭐</span>
+            <h3>tt-a1i/archify</h3>
+            <p>审查大 PR 或接手遗留仓库前，先一键生成离线可交互 HTML 架构图与耦合诊断，看清全貌再审查。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/skill-translator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 技能本地化</span>
+            <h3>skill-translator</h3>
+            <p>把海外英文审查、测试、安全 Skill 无损转为中文触发版，附带高危命令与 Windows/GBK 预检。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/p/baoyu-skills/">
+          <div>
+            <span class="related-tag">📣 自媒体创作 · 27.9K+ ⭐</span>
+            <h3>JimLiu/baoyu-skills</h3>
+            <p>22 个中文日常创作与平台发布技能，适合研发团队写完技术复盘后一键配图与排版发布。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>原作者与许可声明：</strong>本页为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">claude-code-skills-zh</a> 基于原仓库公开文档（v1.14.3）整理的中文选型与避坑指南。项目归属于 <strong>Alibaba</strong>，采用 <strong>Apache-2.0</strong> 开源协议，完整源码与官方文档请访问 <a href="https://github.com/alibaba/open-code-review" target="_blank" rel="noopener noreferrer">github.com/alibaba/open-code-review ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>452+ 人工核验技能与 22 个原创中文技能持续更新，官网支持跨分类实时检索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve();
+        else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      var content = (el.textContent || '').trim();
+      copyText(content).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

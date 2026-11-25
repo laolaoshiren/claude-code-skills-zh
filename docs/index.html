@@ -565,7 +565,10 @@ Copy-Item -Recurse -Force "claude-code-skills-zh\skills\*" "$HOME\.claude\skills
           <p>八阶段 AI 视频流水线：调研 → 提案 → 脚本 → 分镜 → 素材 → 剪辑 → 合成 → 导出，含中文口播/字幕规则与成本门禁</p>
         </div>
         <div class="oc-actions">
-          <a class="oc-link" href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/ai-video-producer/SKILL.md" target="_blank" rel="noopener noreferrer">查看 SKILL.md ↗</a>
+          <div class="oc-action-links">
+            <a class="original-detail-link" href="/skills/ai-video-producer/">📖 详解页</a>
+            <a class="oc-link" href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/ai-video-producer/SKILL.md" target="_blank" rel="noopener noreferrer">查看 SKILL.md ↗</a>
+          </div>
           <button type="button" class="copy-btn" data-skill="ai-video-producer" onclick="copySingleSkill(this)">📋 复制安装</button>
         </div>
       </div>
@@ -981,7 +984,7 @@ const skillsData = {
   star: [
     {name:'JimLiu/baoyu-skills',stars:'27.9K+',desc:'🇨🇳 宝玉开源的 22 个日常提效 Agent Skills：覆盖公众号排版发布、小红书配图、微博/X 发帖、文章插图、封面与信息图，提供完整中文文档并支持 npx skills 按需单装；做技术专栏、公众号或小红书运营的中文创作者可直接拆选单项接入 Claude Code / Codex，避免整包加载拖慢上下文',url:'https://github.com/JimLiu/baoyu-skills',zhDoc:true,detailUrl:'/p/baoyu-skills/',tag:'star'},
     {name:'tt-a1i/archify',stars:'99.7K+',desc:'🇨🇳 把想法、PR 或代码库转为可交互 HTML 架构图的开源 Agent Skill，提供官方中文 README（仓库明确说明第三方在线付费站非官方）；写架构评审方案、接手大型遗留系统或做学习地图时，中文开发者无需手绘静态图即可产出可缩放交互的文档页面',url:'https://github.com/tt-a1i/archify',zhDoc:true,detailUrl:'/p/archify/',tag:'star'},
-    {name:'alibaba/open-code-review',stars:'56.1K+',desc:'🛡️ 阿里巴巴开源的混合架构代码审查工具与 Agent Skill：以确定性静态管线加 LLM Agent 输出行级评审，内置 NPE、线程安全、XSS、SQL 注入等多语言规则并支持 Claude Code、Kimi 插件及 Windows install.ps1；国内研发团队接入提交前自检或 CI 审查时，可大幅减少纯大模型评审的误报与幻觉',url:'https://github.com/alibaba/open-code-review',tag:'star'},
+    {name:'alibaba/open-code-review',stars:'56.1K+',desc:'🛡️ 阿里巴巴开源的混合架构代码审查工具与 Agent Skill：以确定性静态管线加 LLM Agent 输出行级评审，内置 NPE、线程安全、XSS、SQL 注入等多语言规则并支持 Claude Code、Kimi 插件及 Windows install.ps1；国内研发团队接入提交前自检或 CI 审查时，可大幅减少纯大模型评审的误报与幻觉',url:'https://github.com/alibaba/open-code-review',detailUrl:'/p/open-code-review/',tag:'star'},
     {name:'everything-claude-code',stars:'310.3K+',desc:'🧠 把 Claude Code 变成完整开发环境的全栈技能系统：Skills、记忆、安全与研究驱动开发；英文文档，想一次补齐整套工作流、又愿意读原文或配合 skill-translator 汉化的中文开发者可以把它当地图',url:'https://github.com/affaan-m/ECC',tag:'star'},
     {name:'agentic-awesome-skills',stars:'50.3K+',desc:'📚 1,900+ 可安装技能库，兼容 Claude Code / Cursor / Codex / Gemini CLI；英文目录，适合在多个 Agent 之间找可迁移技能的中文读者先检索再按需单装',url:'https://github.com/sickn33/agentic-awesome-skills',tag:'star'},
     {name:'ClawX',stars:'7.6K+',desc:'🖥️ OpenClaw 桌面图形界面：把 CLI Agent 编排变成可视化桌面体验，中文官网与快速开始完整，不习惯终端的中文用户可优先用它入门',url:'https://github.com/ValueCell-ai/ClawX',zhDoc:true,tag:'star'},

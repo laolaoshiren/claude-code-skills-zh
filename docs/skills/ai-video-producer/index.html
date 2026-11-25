@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ai-video-producer：中文八阶段 AI 视频流水线技能（防抽卡成本门禁） | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：把一句话选题或文案做成可发布的中文 AI 视频。内置调研、提案、脚本、分镜、素材、剪辑、合成、导出八阶段质量门禁，覆盖中文口播语速、字幕断句、抖音/B站/小红书画幅与反盲盒抽卡成本控制。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="ai-video-producer">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/ai-video-producer/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="ai-video-producer：中文八阶段 AI 视频流水线技能">
+<meta property="og:description" content="从选题调研、分镜首尾帧到中文口播字幕与多平台导出：零基础、有素材、专业三档适配，每阶段带质量与预算门禁，告别盲盒抽卡烧额度。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/ai-video-producer/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="ai-video-producer 中文八阶段 AI 视频流水线技能">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ai-video-producer：中文八阶段 AI 视频流水线技能">
+<meta name="twitter:description" content="内置中文口播语速、14字语义字幕断句、抖音/B站/小红书画幅与反盲盒抽卡成本门禁，MIT 开源一键安装。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "ai-video-producer",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/ai-video-producer/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/ai-video-producer",
+  "description": "面向中文创作者与开发者的八阶段 AI 视频制作流水线 Skill：覆盖调研、提案、脚本、分镜、素材、剪辑、合成与多平台导出，内置中文口播语速、字幕断句、反盲盒抽卡与成本预算门禁。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "首页",
+      "item": "https://claude-skills.bt199.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "原创中文技能",
+      "item": "https://claude-skills.bt199.com/#original"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "ai-video-producer",
+      "item": "https://claude-skills.bt199.com/skills/ai-video-producer/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "零基础用户用 ai-video-producer 需要懂分镜、帧率或剪辑术语吗？",
+      "acceptedAnswer": {
+        "text": "不需要。技能第一步会自动判断用户档位：零基础（A 档）只需回答 3 个问题——讲什么主题、发哪个平台与多长、有没有付费模型预算；其余构图、节奏、字幕字数与画幅比例均由技能给出默认值并说明理由。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "ai-video-producer 为什么强调「反盲盒抽卡」？具体怎么省预算？",
+      "acceptedAnswer": {
+        "text": "AI 视频最烧钱的环节是反复生成整段高清视频。该技能把调研与脚本阶段锁定在几乎零成本的文本审查期，提案必须先经用户选定方向并设好预算上限；分镜阶段强制单镜头不超过 8 秒并先定首尾帧，素材阶段先出低清低步数预览再出成品，按镜号分段渲染以做到改哪段只重跑哪段。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "中文口播和中文字幕有哪些专门规则？",
+      "acceptedAnswer": {
+        "text": "脚本硬性按每秒 4–5 个汉字控制语速（60 秒控制在 240–300 字），单句不超过 25 字、开头 3 秒直给钩子；字幕每行不超过 14 个汉字、最多 2 行、按语义断句并置于底部 15% 安全区避开人脸；同一角色全片锁定同一 TTS voice id 避免跨段变声。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "它支持抖音、B 站、小红书和视频号的不同尺寸吗？",
+      "acceptedAnswer": {
+        "text": "支持。第 8 阶段导出明确按平台区分：抖音/视频号 9:16（1080x1920）、B 站/YouTube 16:9（1920x1080）、小红书 3:4（1080x1440）或 9:16（1080x1920），并要求按平台单独产出封面图、标题简介、.srt/.ass 字幕与素材授权清单。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "ai-video-producer 和仓库里收录的 heygen-com/hyperframes 是什么关系？",
+      "acceptedAnswer": {
+        "text": "ai-video-producer 是本仓库独立的中文原创 Skill（MIT 许可），流水线设计思路参考了 OpenMontage 与 HyperFrames 的公开工程理念，但不依赖它们的代码；如果你需要基于 HTML 代码直接编排渲染 MP4，可以将两者搭配使用。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">ai-video-producer</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-purple">🎁 本仓原创</span>
+        <span class="pill pill-cyan">🎬 八阶段 AI 视频流水线</span>
+        <span class="pill pill-green">💰 反盲盒抽卡成本门禁</span>
+      </div>
+      <h1><span class="accent-text">ai-video-producer</span>：面向中文创作者的八阶段 AI 视频流水线</h1>
+      <p class="hero-lead">把一句话选题、一篇技术博客或一堆零散素材做成可发布的中文视频。内置「调研 → 提案 → 脚本 → 分镜 → 素材 → 剪辑 → 合成 → 导出」八个带门禁的阶段，针对中文口播语速、14 字语义字幕与国内多平台尺寸专门优化。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">本仓原创内容创作技能</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">适用档位</div>
+          <div class="metric-value">A 零基础 / B 有素材 / C 专业</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/ai-video-producer/SKILL.md" target="_blank" rel="noopener noreferrer">skills/ai-video-producer/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/ai-video-producer/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#pipeline" class="btn btn-cyan">🎬 查看八阶段流水线</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#tiers">三档自适应启动</a>
+      <a href="#pipeline">八阶段流水线与门禁</a>
+      <a href="#pitfalls">7 个高频翻车排查表</a>
+      <a href="#install">安装与触发示例</a>
+      <a href="#boundaries">版权与合规红线</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="tiers">
+      <h2>🎯 先判断档位：零基础不问一堆参数，专业用户直接接表格</h2>
+      <p class="section-intro">多数英文视频 Skill 一上来就抛十几个参数劝退新手；<code>ai-video-producer</code> 会先根据你手里已有的材料自动分档：</p>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>档位</th>
+              <th>典型用户状态</th>
+              <th>Agent 执行策略</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>A. 零基础</strong></td>
+              <td>「我就想做一条 60 秒产品介绍视频」</td>
+              <td>只问 3 件事（主题、时长与平台、预算上限），其余全部给默认值并说明理由</td>
+            </tr>
+            <tr>
+              <td><strong>B. 有素材</strong></td>
+              <td>手里已经有一批录屏、截图、实拍片段或录音</td>
+              <td>先做素材盘点与分类，再倒推能讲通的故事结构与补拍/生成缺口</td>
+            </tr>
+            <tr>
+              <td><strong>C. 专业档</strong></td>
+              <td>已有分镜表、视觉参考或时间线工程</td>
+              <td>严格按对方表格推进，补全缺失字段并做镜头时长、安全区与音频技术校验</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="pipeline">
+      <h2>🎬 八阶段流水线：每一关验收通过才烧下一步预算</h2>
+      <p class="section-intro">核心思路是把高昂的视频生成成本压在最后，先在几乎零成本的文本与低清预览阶段把变量全部锁死：</p>
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>调研（Research）→ 产出 <code>research_brief</code></h3>
+            <p>至少执行 5 次检索覆盖主题事实、同类结构、版权与平台规则；每条关键结论必须附来源 URL，查无实据的说法显式标注，杜绝在成片里瞎下断言。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>提案（Proposal）→ 产出 <code>proposal_packet</code></h3>
+            <p>提供 2–3 个差异化方向，标清 3 秒钩子、视觉风格、<strong>调用次数与 API 成本估算</strong>及潜在风险。<strong>门禁：用户明确选定方向后才继续，绝不擅自拍板。</strong></p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>脚本（Script）→ 贴合中文口播节奏</h3>
+            <p>按中文口播 <strong>每秒 4–5 字</strong> 控稿（60 秒 = 240–300 字），单句不超过 25 字；开头 3 秒直给冲突/反常识/具体数字；阿拉伯数字与英文专名单独标读法防 TTS 读错。门禁：朗读时长误差 ≤ 10%。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>分镜（Storyboard）→ 反盲盒抽卡核心关口</h3>
+            <p>输出完整 7 列分镜表，强制<strong>每个镜头 ≤ 8 秒</strong>、生成类镜头先锁首尾帧、同一角色统一固定定妆描述，并提前标注生成失败时的替代素材。门禁：无「待定」镜头。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <h3>素材（Assets）→ 预览先行 + 授权台账</h3>
+            <p>生成素材先出低分辨率/低步数预览确认构图，确认后再出成品；采集素材逐条记录来源与授权；片头片尾与字幕条尽量模板化复用以压低后续成本。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">6</div>
+          <div class="step-body">
+            <h3>剪辑（Edit）→ 3–5 秒视觉节奏与留气口</h3>
+            <p>先粗剪再精剪；高信息密度段落每 3–5 秒给一次视觉变化，转场克制默认硬切，口播句间留 0.2–0.3 秒气口确保听感清晰。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">7</div>
+          <div class="step-body">
+            <h3>合成（Compose）→ 音色锁定 + 14 字语义字幕</h3>
+            <p>同一角色全片锁定同一 TTS <code>voice id</code>；中文字幕每行 <strong>≤ 14 汉字</strong>、最多 2 行、按语义断句并位于底部 15% 安全区；人声约 -6dB、背景乐再压低 12–18dB，并用手机外放复听。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">8</div>
+          <div class="step-body">
+            <h3>导出（Publish）→ 多平台尺寸与交付清单</h3>
+            <p>按抖音/视频号 <code>9:16 (1080×1920)</code>、B 站/YouTube <code>16:9 (1920×1080)</code>、小红书 <code>3:4 (1080×1440)</code> 分别导出，同时交付独立封面图、标题简介、<code>.srt/.ass</code> 字幕、授权清单与实际成本账。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="pitfalls">
+      <h2>🧯 AI 视频 7 个高频翻车点与内置解法</h2>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>常见翻车现象</th>
+              <th>根因定位</th>
+              <th>技能内置处理策略</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>跨段人物变声</strong></td>
+              <td>不同段落未绑定同一 TTS 音色</td>
+              <td>全片锁定单一 <code>voice id</code>，仅重跑异常段</td>
+            </tr>
+            <tr>
+              <td><strong>后段画面发雾发灰</strong></td>
+              <td>多段连续生成导致潜空间漂移</td>
+              <td>上一段尾帧接下一段首帧，并控制单镜头 ≤ 8 秒</td>
+            </tr>
+            <tr>
+              <td><strong>口型与声音对不上</strong></td>
+              <td>先出画面后配音导致时长错配</td>
+              <td>强制先定配音音频时长，再按时长生成画面</td>
+            </tr>
+            <tr>
+              <td><strong>生成 20 版挑不出能用的</strong></td>
+              <td>无分镜约束的盲盒式抽卡</td>
+              <td>退回第 4 阶段锁定分镜、首尾帧与定妆描述</td>
+            </tr>
+            <tr>
+              <td><strong>改一句台词重跑整条片</strong></td>
+              <td>缺少按镜号分段渲染机制</td>
+              <td>按镜号独立输出切片，局部修改只重跑对应镜号</td>
+            </tr>
+            <tr>
+              <td><strong>中文字幕遮挡人脸或溢出</strong></td>
+              <td>按字数机械切分且无安全区校验</td>
+              <td>语义断句 ≤ 14 字/行，统一压在底部 15% 安全区</td>
+            </tr>
+            <tr>
+              <td><strong>封面在信息流看不清字</strong></td>
+              <td>直接从视频截帧充当封面</td>
+              <td>要求按平台比例单独设计大字主标题封面</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种安装方式（Windows / macOS / Linux 零报错）</h2>
+      <p class="section-intro">支持通过 Claude Code 插件市场全量安装，也支持按需只装 <code>ai-video-producer</code> 单个技能：</p>
+
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装（推荐）</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 ai-video-producer</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill ai-video-producer</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\ai-video-producer" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\ai-video-producer\*" "$HOME\.claude\skills\ai-video-producer\"</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/ai-video-producer
+cp -r claude-code-skills-zh/skills/ai-video-producer/* ~/.claude/skills/ai-video-producer/</code></pre>
+        </div>
+      </div>
+
+      <h3>安装后怎么触发？</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title">直接用自然中文提需求即可自动命中</span>
+          <button type="button" class="copy-btn" data-copy-target="cmd-prompt">📋 复制</button>
+        </div>
+        <pre id="cmd-prompt"><code>把这篇技术文章做成一条 60 秒的 B 站/抖音双版本演示视频，我属于零基础，先不花付费 API 预算，帮我按阶段先出调研简报和 2 个提案方向。</code></pre>
+      </div>
+    </section>
+
+    <section class="section-card" id="boundaries">
+      <h2>🛡️ 版权、肖像与平台合规边界</h2>
+      <div class="callout callout-warn">
+        <strong>发布前必须核对的 4 条红线：</strong>
+        <ul class="clean-list">
+          <li><strong>版权与风格参考</strong>：AI 生成素材同样受平台与版权规则约束；参考他人视频风格时，绝不复制原画面、旁白、Logo 与主播形象。</li>
+          <li><strong>肖像与声音授权</strong>：克隆他人声音或人物形象必须取得明确授权；不确定时一律改用中性合规配音与原创视觉素材。</li>
+          <li><strong>敏感行业审慎核查</strong>：医疗、金融、教育等领域内容发布前需自行核对目标平台审核与监管要求。</li>
+          <li><strong>不做虚假承诺</strong>：技能专注工程化生产质量与成本可控，不承诺「必上热门」或「保证涨粉」。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>零基础用户用 ai-video-producer 需要懂分镜、帧率或剪辑术语吗？</h3>
+          <p>不需要。进入 A 档（零基础）后只需回答主题、时长/平台、预算上限 3 个问题，其余参数均由技能自动补齐默认值并解释原因。</p>
+        </div>
+        <div class="faq-item">
+          <h3>怎么避免调用付费视频模型反复抽卡烧钱？</h3>
+          <p>流程把预算门槛前置到了第 2 阶段提案与第 4 阶段分镜，先在零成本文本期定稿，再用低清预览确认构图，最后按镜号分段渲染并附成本账。</p>
+        </div>
+        <div class="faq-item">
+          <h3>支持哪些国内短视频与图文平台？</h3>
+          <p>原生内置抖音、微信视频号（9:16 1080×1920）、B 站（16:9 1920×1080）、小红书（3:4 1080×1440 或 9:16）的画幅与封面规范。</p>
+        </div>
+        <div class="faq-item">
+          <h3>和 heygen-com/hyperframes 等代码视频工具能搭配使用吗？</h3>
+          <p>可以。用 <code>ai-video-producer</code> 跑通调研、提案、中文口播脚本与分镜表后，再用代码编排渲染器（如 HyperFrames 或 Remotion）生成产品演示动画画面，效率很高。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/skill-translator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 技能本地化</span>
+            <h3>skill-translator</h3>
+            <p>把海外高星英文 Skill 无损汉化为中文触发版，先做高危命令与 Windows/GBK 兼容性预检。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/p/baoyu-skills/">
+          <div>
+            <span class="related-tag">📣 自媒体创作 · 27.9K+ ⭐</span>
+            <h3>JimLiu/baoyu-skills</h3>
+            <p>宝玉开源的 22 个日常创作技能，覆盖公众号发布、小红书配图、文章插图与信息图，可与视频封面互补。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/p/open-code-review/">
+          <div>
+            <span class="related-tag">🛡️ 代码审查 · 56.2K+ ⭐</span>
+            <h3>alibaba/open-code-review</h3>
+            <p>阿里巴巴开源的确定性管线 × LLM Agent 混合代码审查工具，支持零额外 Key 的委托审查模式。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>ai-video-producer</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 独立中文原创实现（<strong>MIT License</strong>），流水线理念参考 OpenMontage（AGPL-3.0）与 HyperFrames（Apache-2.0）公开设计，不依赖其代码。源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/ai-video-producer/SKILL.md" target="_blank" rel="noopener noreferrer">skills/ai-video-producer/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>452+ 核验技能与 22 个原创中文技能持续更新，点个 Star 下次直接检索调用。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve();
+        else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      var content = (el.textContent || '').trim();
+      copyText(content).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>
