@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>heygen-com/hyperframes 中文深度指南：HTML 写视频、9 个官方 Skills 与 Remotion 对比 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="90.5K+ Stars HeyGen 开源 AI 视频编辑框架 heygen-com/hyperframes（Apache-2.0）中文深度指南：无需 React 直接用 HTML/CSS/GSAP 渲染确定性 MP4、9 个官方 Agent Skills 拆解、vs Remotion 选型对比、Git LFS 与 Node 22+ / FFmpeg 避坑。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="skill-repo" content="https://github.com/heygen-com/hyperframes">
+<link rel="canonical" href="https://claude-skills.bt199.com/p/hyperframes/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="heygen-com/hyperframes 中文深度指南：用 HTML 编排视频的 Agent 引擎">
+<meta property="og:description" content="90.5K+ Stars Apache-2.0 开源框架：HTML + Seekable 动画 + FFmpeg 确定性渲染 MP4，附 9 个官方 Skills 与本仓 ai-video-producer 协作方案。">
+<meta property="og:url" content="https://claude-skills.bt199.com/p/hyperframes/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="heygen-com/hyperframes 中文深度指南">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="heygen-com/hyperframes 中文深度指南：HTML 渲染 MP4 与 9 个官方 Skills">
+<meta name="twitter:description" content="无需 React 打包，直接用 HTML 轨道属性与 GSAP 渲染视频，支持 Claude Code / Codex / Cursor / Gemini CLI。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：影视时间轴品红 + 摄影青蓝主题 */
+  :root {
+    --accent: #ec4899;
+    --accent2: #f472b6;
+    --cyan: #22d3ee;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #db2777, #ec4899);
+    box-shadow: 0 4px 18px rgba(236, 72, 153, 0.34);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 8px 26px rgba(236, 72, 153, 0.48);
+  }
+  .nav-star,
+  .step-num {
+    background: linear-gradient(135deg, #db2777, #ec4899);
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(236, 72, 153, 0.16) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(34, 211, 238, 0.1) 0%, transparent 50%);
+  }
+  .hf-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .hf-btn {
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 15, 0.72);
+    color: var(--text2);
+    border-radius: 10px;
+    padding: 8px 13px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.18s ease;
+  }
+  .hf-btn:hover {
+    border-color: var(--accent2);
+    color: var(--text);
+  }
+  .hf-btn.is-active {
+    background: rgba(236, 72, 153, 0.18);
+    border-color: var(--accent);
+    color: #fbcfe8;
+  }
+  .track-timeline {
+    background: #070910;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+  }
+  .track-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--text2);
+    margin-bottom: 12px;
+  }
+  .track-row {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .track-label {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text3);
+  }
+  .track-lane {
+    position: relative;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .track-clip {
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .clip-video { left: 0%; width: 100%; background: rgba(236, 72, 153, 0.25); border: 1px solid rgba(236, 72, 153, 0.55); color: #fbcfe8; }
+  .clip-title { left: 16%; width: 66%; background: rgba(34, 211, 238, 0.2); border: 1px solid rgba(34, 211, 238, 0.52); color: #cffafe; }
+  .clip-audio { left: 0%; width: 100%; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.5); color: #a7f3d0; }
+  .skill-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .skill-pill {
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 15, 0.68);
+    color: var(--text2);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-family: var(--mono);
+    cursor: pointer;
+    transition: all 0.16s ease;
+  }
+  .skill-pill:hover { border-color: var(--cyan); color: var(--text); }
+  .skill-pill.is-active { background: rgba(34, 211, 238, 0.16); border-color: var(--cyan); color: #cffafe; }
+  .skill-detail {
+    background: rgba(10, 10, 15, 0.72);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 15px 18px;
+  }
+  .skill-detail-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .skill-detail-name { font-family: var(--mono); font-weight: 800; color: #fbcfe8; }
+  .skill-detail-tier { font-size: 0.76rem; color: var(--cyan); background: rgba(34, 211, 238, 0.12); padding: 2px 9px; border-radius: 999px; }
+  .skill-detail-desc { font-size: 0.91rem; color: var(--text2); }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "heygen-com/hyperframes",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://www.apache.org/licenses/LICENSE-2.0",
+  "url": "https://claude-skills.bt199.com/p/hyperframes/",
+  "codeRepository": "https://github.com/heygen-com/hyperframes",
+  "description": "HeyGen 开源的编程式 AI 视频编辑与渲染框架：直接用 HTML、CSS 与可寻址动画（GSAP/Lottie/Three.js）编排多轨道时间轴并渲染确定性 MP4，内置 9 个官方编码 Agent Skills。",
+  "author": {
+    "@type": "Organization",
+    "name": "HeyGen",
+    "url": "https://github.com/heygen-com"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "首页",
+      "item": "https://claude-skills.bt199.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "精选第三方技能",
+      "item": "https://claude-skills.bt199.com/#skills"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "heygen-com/hyperframes",
+      "item": "https://claude-skills.bt199.com/p/hyperframes/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "HyperFrames 本地渲染视频需要付费或接 HeyGen 账号吗？",
+      "acceptedAnswer": {
+        "text": "不需要。HyperFrames 渲染引擎（CLI、@hyperframes/core、engine、producer）采用 Apache-2.0 开源协议，本机只需要 Node.js 22+ 与 FFmpeg 即可免费无限次本地渲染 MP4，没有按渲染次数的收费门槛；只有 HyperFrames Studio Pro（$25/月）的云端商业视频/配音/音乐生成模型或云端分享才涉及账号与额度。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "HyperFrames 和 Remotion 的核心区别是什么？",
+      "acceptedAnswer": {
+        "text": "两者都用无头 Chrome 和 FFmpeg 渲染视频，但编写模型不同：Remotion 基于 React 组件且需要构建打包步骤，采用 Source-available Remotion License；HyperFrames 直接用纯 HTML + CSS + data-* 时间轴属性编写，无需打包即可在浏览器直接预览，Agent 读写更轻，且主框架采用 Apache-2.0 许可。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "为什么官方提示用 npx hyperframes skills update 比 npx skills add 更稳？",
+      "acceptedAnswer": {
+        "text": "原仓明确指出，npx skills add 解析的是 skills.sh 注册表缓存，有时会滞后 main 分支数小时，且不传 --skill 时在非交互环境会装入全部 9 个技能；而 npx hyperframes skills update 会直接拉取与你当前 CLI 版本匹配的 6 个 Core Skills（核心套装），避免技能和渲染器版本错配。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "直接 git clone heygen-com/hyperframes 为什么体积特别大？",
+      "acceptedAnswer": {
+        "text": "仓库使用 Git LFS 存放了约 240 MB 的回归测试基准 .mp4 文件。如果只是看源码或做开发而不需要跑媒体回归测试，克隆前应使用 GIT_LFS_SKIP_SMUDGE=1 git clone https://github.com/heygen-com/hyperframes.git；普通使用者直接跑 npx skills add 或 npx hyperframes init 即可，无需完整克隆仓库。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "它可以如何与本仓原创技能 ai-video-producer 搭配使用？",
+      "acceptedAnswer": {
+        "text": "两者分工互补：先用本仓的 ai-video-producer 完成中文选题调研、口播语速与字幕断句校对、分镜脚本与商业素材成本确认；拿到确定脚本和素材后，再交给 HyperFrames 的 /hyperframes 与 /hyperframes-registry 编写 HTML 轨道工程并本地渲染出确定性 MP4。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#skills">精选第三方技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">heygen-com/hyperframes</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-amber">🎬 90.5K+ Stars · Apache-2.0</span>
+        <span class="pill pill-cyan">HTML 写视频 · 无需 React</span>
+        <span class="pill pill-purple">9 个官方 Agent Skills</span>
+      </div>
+      <h1><span class="accent-text">heygen-com/hyperframes</span> 中文深度指南：用 HTML 编排视频的 Agent 引擎</h1>
+      <p class="hero-lead">由 <strong>HeyGen</strong> 开源的编程式 AI 视频编辑器与确定性渲染引擎。把视频写成带 <code>data-start</code> / <code>data-duration</code> 属性的纯 HTML 文件，配合 GSAP、Lottie 或 Three.js 可寻址动画，由无头 Chrome + FFmpeg 逐帧渲染出确定性 MP4，内置 <strong>6 个核心技能 + 3 个按需技能</strong>。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">GitHub Stars</div>
+          <div class="metric-value is-star">⭐ 90.5K+（核验 90,492）</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">Apache-2.0（本地免费渲染）</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">硬性环境要求</div>
+          <div class="metric-value is-cyan">Node.js ≥ 22 + FFmpeg</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">兼容 Agent</div>
+          <div class="metric-value">Claude Code / Codex / Cursor / Gemini CLI</div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#timeline-lab" class="btn btn-primary">🎛️ 预览 HTML 轨道与 9 大技能</a>
+        <a href="https://github.com/heygen-com/hyperframes" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📦 访问原仓库 GitHub ↗</a>
+        <a href="https://hyperframes.heygen.com/quickstart" class="btn btn-cyan" target="_blank" rel="noopener noreferrer">📖 官方 Quickstart ↗</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#timeline-lab">轨道预览与 9 个官方 Skills</a>
+      <a href="#compare">HyperFrames vs Remotion</a>
+      <a href="#install">安装与 CLI 渲染命令</a>
+      <a href="#collab">与 ai-video-producer 协同</a>
+      <a href="#pitfalls">版本同步与 LFS 避坑</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="timeline-lab">
+      <h2>🎛️ HTML 多轨时间轴结构 &amp; 9 个官方 Skills 交互拆解</h2>
+      <p class="section-intro">HyperFrames 的核心洞察是：<strong>大模型本来就极擅长写 HTML/CSS</strong>。切换横屏/竖屏规格查看对应的 <code>data-composition-id</code> 模板，并点击下方 9 个官方技能查看分工：</p>
+
+      <div class="hf-controls" role="group" aria-label="切换视频画幅预设">
+        <button type="button" class="hf-btn is-active" data-preset="landscape">🖥️ 16:9 横屏产品片（1920×1080 · 6s）</button>
+        <button type="button" class="hf-btn" data-preset="portrait">📱 9:16 竖屏短视频（1080×1920 · 6s）</button>
+      </div>
+
+      <div class="track-timeline">
+        <div class="track-meta">
+          <span id="hf-spec-label">画幅：1920×1080（横屏 B 站 / YouTube / 官网首发）</span>
+          <span>帧级寻址：window.__timelines.launch（GSAP paused）</span>
+        </div>
+        <div class="track-row">
+          <span class="track-label">Track 0 · 视频</span>
+          <div class="track-lane"><div class="track-clip clip-video">&lt;video data-start="0" data-duration="6"&gt; intro.mp4</div></div>
+        </div>
+        <div class="track-row">
+          <span class="track-label">Track 1 · 标题</span>
+          <div class="track-lane"><div class="track-clip clip-title">&lt;h1 data-start="1" data-duration="4"&gt; 发布标题 + GSAP 入场</div></div>
+        </div>
+        <div class="track-row">
+          <span class="track-label">Track 2 · 音频</span>
+          <div class="track-lane"><div class="track-clip clip-audio">&lt;audio data-start="0" data-duration="6" data-volume="0.5"&gt; music.wav</div></div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title" id="hf-code-title">index.html 最小视频工程片段（1920×1080）</span>
+          <button type="button" class="copy-btn" data-copy-target="hf-code-out">📋 复制</button>
+        </div>
+        <pre id="hf-code-out"><code>&lt;div id="stage" data-composition-id="launch" data-start="0" data-width="1920" data-height="1080"&gt;
+  &lt;video class="clip" data-start="0" data-duration="6" data-track-index="0" src="intro.mp4" muted playsinline&gt;&lt;/video&gt;
+  &lt;h1 id="title" class="clip" data-start="1" data-duration="4" data-track-index="1"&gt;Launch day&lt;/h1&gt;
+  &lt;audio data-start="0" data-duration="6" data-track-index="2" data-volume="0.5" src="music.wav"&gt;&lt;/audio&gt;
+&lt;/div&gt;</code></pre>
+      </div>
+
+      <h3>点击查看官方 9 个 Skills（6 个 Core Set + 3 个 On Demand）</h3>
+      <div class="skill-pills" id="hf-skill-pills"></div>
+      <div class="skill-detail" aria-live="polite">
+        <div class="skill-detail-head">
+          <span class="skill-detail-name" id="hf-sk-name">/hyperframes</span>
+          <span class="skill-detail-tier" id="hf-sk-tier">Core Set · 必装主契约</span>
+        </div>
+        <p class="skill-detail-desc" id="hf-sk-desc">任何新建、修改、动效编排或渲染 HyperFrames 视频的请求都应先读它，内置渲染契约与完整工作循环。</p>
+      </div>
+    </section>
+
+    <section class="section-card" id="compare">
+      <h2>⚖️ 架构对比：HyperFrames vs Remotion</h2>
+      <p class="section-intro">原仓官方也坦诚受到 Remotion 启发，二者底层均使用 headless Chrome + FFmpeg 渲染，但在 Agent 协作成本与开源协议上有明显差异：</p>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>对比维度</th>
+              <th>HyperFrames</th>
+              <th>Remotion</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>编排方式</strong></td>
+              <td>纯 HTML + CSS + 可寻址动画适配器（GSAP / Lottie / Three.js / WAAPI）</td>
+              <td>React / JSX 组件树</td>
+            </tr>
+            <tr>
+              <td><strong>构建步骤</strong></td>
+              <td><strong>无构建步骤</strong>，单个 <code>index.html</code> 可直接打开预览</td>
+              <td>需要前端打包器（Webpack / Vite 等）</td>
+            </tr>
+            <tr>
+              <td><strong>Agent 编写友好度</strong></td>
+              <td>高（Agent 改局部 DOM 和时间轴属性不易破坏编译）</td>
+              <td>需维护 React 状态、依赖与类型编译</td>
+            </tr>
+            <tr>
+              <td><strong>开源与商业许可</strong></td>
+              <td><strong>Apache-2.0</strong>（无渲染量限制或企业收费门槛）</td>
+              <td>Source-available Remotion License（企业人数达阈值需商业授权）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 安装 Skills 与本地渲染命令（Node.js ≥ 22 + FFmpeg）</h2>
+      <p class="section-intro">开发前请先确认终端能正常运行 <code>node -v</code>（≥ 22）与 <code>ffmpeg -version</code>；另外支持安装约 450 个可编辑预设组件块（<code>npx hyperframes add data-chart</code>）。</p>
+
+      <div class="os-grid">
+        <div class="os-card is-featured">
+          <div class="os-card-head">
+            <h3>方式 1：安装官方 Core Skills（推荐）</h3>
+            <span class="pill pill-cyan">版本严格对齐</span>
+          </div>
+          <p class="os-note">用 <code>npx hyperframes skills update</code> 可精准安装与 CLI 匹配的 6 个 Core Set，避免 <code>skills add</code> 注册表延迟或全装 9 个。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">跨平台 CLI（Windows / macOS / Linux）</span>
+              <button type="button" class="copy-btn" data-copy-target="hf-skills-cmd">📋 复制</button>
+            </div>
+            <pre id="hf-skills-cmd"><code># 方式 A：交互式勾选 "Core Skills"
+npx skills add heygen-com/hyperframes
+
+# 方式 B：非交互脚本推荐（拉取与当前 CLI 匹配的核心 6 技能）
+npx hyperframes skills update</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>方式 2：Claude Code 插件通道</h3>
+            <span class="pill pill-purple">自动更新支持</span>
+          </div>
+          <p class="os-note">支持在 Claude Code 终端启用 Marketplace 自动更新，调用形式为 <code>/hyperframes:hyperframes</code>。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Claude Code CLI</span>
+              <button type="button" class="copy-btn" data-copy-target="hf-claude-cmd">📋 复制</button>
+            </div>
+            <pre id="hf-claude-cmd"><code>claude plugin marketplace add heygen-com/hyperframes
+claude plugin install hyperframes@hyperframes</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>步骤 3：初始化、预览与渲染 MP4</h3>
+            <span class="pill pill-green">零付费本地出片</span>
+          </div>
+          <p class="os-note">自带浏览器编辑器可实时看时间轴与关键帧；最终输出帧级一致的 MP4。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">HyperFrames CLI</span>
+              <button type="button" class="copy-btn" data-copy-target="hf-cli-cmd">📋 复制</button>
+            </div>
+            <pre id="hf-cli-cmd"><code>npx hyperframes init my-video
+cd my-video
+npx hyperframes preview
+npx hyperframes render</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>步骤 4：安装现成动效与图表积木</h3>
+            <span class="pill pill-amber">450+ Catalog</span>
+          </div>
+          <p class="os-note">支持 Shader 转场、数据动态图表、地图动画与社交媒体浮层，直接源码级装入项目。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Catalog 组件安装</span>
+              <button type="button" class="copy-btn" data-copy-target="hf-cat-cmd">📋 复制</button>
+            </div>
+            <pre id="hf-cat-cmd"><code>npx hyperframes add flash-through-white
+npx hyperframes add data-chart
+npx hyperframes add instagram-follow</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="collab">
+      <h2>🤝 中文最佳组合：与本仓原创技能 <code>ai-video-producer</code> 分工协作</h2>
+      <div class="grid-2">
+        <div class="info-box is-good">
+          <h3>阶段 1：中文策划与成本门禁（<code>ai-video-producer</code>）</h3>
+          <p>先在中文语境下跑通「调研 → 提案 → 口播脚本 → 分镜」，严格按中文语速控字数、规范字幕断句，并在调用任何付费生图/配音 API 前给出预算确认。</p>
+        </div>
+        <div class="info-box is-good">
+          <h3>阶段 2：HTML 精确工程出片（<code>hyperframes</code>）</h3>
+          <p>将脚本、分镜节奏与配音素材喂给 <code>/hyperframes</code> 与 <code>/hyperframes-registry</code>，直接生成可版本控制、像素级可重现的 HTML 工程并用 FFmpeg 渲染成 MP4。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="pitfalls">
+      <h2>⚠️ 上手避坑与免费 vs 付费边界</h2>
+      <div class="callout callout-amber">
+        <div class="callout-title">📌 工程与成本注意点</div>
+        <ul class="prose-list">
+          <li><strong>克隆源码注意 Git LFS 体积</strong>：仓库含约 <strong>240 MB</strong> 的黄金回归测试 <code>.mp4</code> 样本。若只读源码请加 <code>GIT_LFS_SKIP_SMUDGE=1 git clone ...</code>，日常使用直接 <code>npx</code> 即可。</li>
+          <li><strong>别在 HyperFrames 源码目录里执行本地 Skill 安装</strong>：原仓提醒项目级安装目标可能覆盖仓内受追踪的 <code>skills/</code> 源码，应在你自己的视频项目目录下安装或用全局更新。</li>
+          <li><strong>本地引擎免费 vs Studio Pro 付费</strong>：CLI、本地 Chrome/FFmpeg 渲染与 AWS Lambda 部署完全遵循 Apache-2.0 免费；只有 HyperFrames Studio App 的 Pro 套餐（$25/月，含 HeyGen Video 1、Seedance 2.5、Lyria 3 Pro 等云端生成模型及 25,000 积分）和云端分享超过 5 个免费项目时才涉及收费。</li>
+          <li><strong>社区技能需自审</strong>：<code>heygen-com/hyperframes-community-skills</code> 由社区维护，原仓提示使用前务必自行审查源码。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <article class="faq-item">
+          <h3>Q1：不装任何桌面客户端，只用 Claude Code 就能做完视频吗？</h3>
+          <p>可以。只要本机装好 Node.js 22+ 与 FFmpeg，安装 <code>hyperframes</code> 的 Core Skills 后即可纯命令行完成脚手架创建、HTML/GSAP 编写、<code>preview</code> 预览和本地 <code>render</code> 出片。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q2：为什么普通 CSS/JS 定时动画不能直接拿去录视频，非要用 HyperFrames 适配器？</h3>
+          <p>普通 <code>requestAnimationFrame</code> 或 <code>setTimeout</code> 依赖真实挂钟时间（wall-clock），截帧时机器一卡就会丢帧错位。HyperFrames 要求把 GSAP Timeline 等设为 <code>paused: true</code> 并注册到 <code>window.__timelines</code>，渲染器就能按任意毫秒精确寻址每一帧。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q3：手里已有 Remotion 或 Lottie 项目想迁过来可行吗？</h3>
+          <p>官方专门提供了按需技能 <code>/remotion-to-hyperframes</code>，支持把 Remotion、Motion Canvas、Lottie、Three.js 或 Canvas 工程迁移到 HyperFrames，并逐帧比对校验还原度。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q4：可以把 Figma 设计稿直接变成产品介绍视频吗？</h3>
+          <p>可以。按需安装 <code>/figma</code> 技能后，贴入 Figma 链接即可提取品牌 Token、组件与故事板画框并重构为可寻址动效。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/ai-video-producer/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 八阶段中文视频流</span>
+            <h3>ai-video-producer</h3>
+            <p>负责中文口播节奏、字幕断句、分镜策划与成本审批，与 HyperFrames 组成黄金前后段流水线。</p>
+          </div>
+          <span class="related-go">查看原创技能 →</span>
+        </a>
+        <a class="related-card" href="/p/impeccable/">
+          <div>
+            <span class="related-tag">🎨 反 AI 味设计 · 117.2K+ ⭐</span>
+            <h3>pbakaus/impeccable</h3>
+            <p>写 HyperFrames HTML 动画画面之前，用它的设计词库与规则摆脱廉价渐变和模板感。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/p/xiaohongshu-mcp/">
+          <div>
+            <span class="related-tag">📣 小红书 MCP · 17.3K+ ⭐</span>
+            <h3>xpzouying/xiaohongshu-mcp</h3>
+            <p>渲染完 9:16 竖屏技术短视频 MP4 后，可搭配本地 MCP 进行检索调研与合规发布测试。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>原作者与开源许可声明：</strong>本页为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">claude-code-skills-zh</a> 基于原仓库公开文档整理的中文技术导读与对比指南。项目归属于 <strong>HeyGen</strong>，主开源引擎采用 <strong>Apache-2.0</strong> 许可，完整源码与文档请访问 <a href="https://github.com/heygen-com/hyperframes" target="_blank" rel="noopener noreferrer">github.com/heygen-com/hyperframes ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏中文 Claude Code Skills 精选集</h2>
+        <p>452+ 人工核验第三方技能与 22 个原创中文技能持续维护，官网支持跨分类实时检索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#skills">精选目录</a>
+    <a href="/#original">原创技能</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var presets = {
+    landscape: {
+      spec: '画幅：1920×1080（横屏 B 站 / YouTube / 官网首发）',
+      title: 'index.html 最小视频工程片段（1920×1080）',
+      code: '<div id="stage" data-composition-id="launch" data-start="0" data-width="1920" data-height="1080">\n  <video class="clip" data-start="0" data-duration="6" data-track-index="0" src="intro.mp4" muted playsinline></video>\n  <h1 id="title" class="clip" data-start="1" data-duration="4" data-track-index="1">Launch day</h1>\n  <audio data-start="0" data-duration="6" data-track-index="2" data-volume="0.5" src="music.wav"></audio>\n</div>'
+    },
+    portrait: {
+      spec: '画幅：1080×1920（竖屏抖音 / 小红书 / 视频号）',
+      title: 'index.html 最小竖屏工程片段（1080×1920）',
+      code: '<div id="stage" data-composition-id="launch-vertical" data-start="0" data-width="1080" data-height="1920">\n  <video class="clip" data-start="0" data-duration="6" data-track-index="0" src="clip-9x16.mp4" muted playsinline></video>\n  <h1 id="title" class="clip" data-start="1" data-duration="4" data-track-index="1">30 秒看懂核心亮点</h1>\n  <audio data-start="0" data-duration="6" data-track-index="2" data-volume="0.5" src="bgm.wav"></audio>\n</div>'
+    }
+  };
+
+  document.querySelectorAll('.hf-btn[data-preset]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-preset');
+      var p = presets[key];
+      if (!p) return;
+      document.querySelectorAll('.hf-btn').forEach(function (b) {
+        b.classList.toggle('is-active', b === btn);
+      });
+      document.getElementById('hf-spec-label').textContent = p.spec;
+      document.getElementById('hf-code-title').textContent = p.title;
+      document.getElementById('hf-code-out').querySelector('code').textContent = p.code;
+    });
+  });
+
+  var skills = [
+    { name: '/hyperframes', tier: 'Core Set · 必装主契约', desc: '任何制作、编辑、动效或渲染视频的请求都应先加载它，包含渲染契约、格式/动效/字幕参考与完整工作环。' },
+    { name: '/hyperframes-cli', tier: 'Core Set · CLI 操作', desc: '按任务驱动 CLI：初始化、静态 lint、逐帧检查、调整时间轴、本地预览、云端渲染、分享与报错恢复。' },
+    { name: '/hyperframes-registry', tier: 'Core Set · 450+ 组件库', desc: '手写动效前先查它：安装约 450 个可编辑转场、动态标题、字幕、图表、地图与 3D 运镜块（hyperframes add）。' },
+    { name: '/media-use', tier: 'Core Set · 媒体加工', desc: '获取或生成音乐、音效、配音、数字人及画面调色，混合多轨音量并修复偏暗或平淡的原素材。' },
+    { name: '/reverse-any-video', tier: 'Core Set · 逆向复刻', desc: '把任意参考视频（动效、口播、实拍、AI 生成）逆向重构为可编辑 HyperFrames 工程，并与原片逐帧核对。' },
+    { name: '/style-sampling', tier: 'Core Set · 五大成片流派', desc: '用 5 种经验证的系列风格快速制作主题短片：拼贴科普、财经解说、动画科学、3D 品牌、3D 纪实。' },
+    { name: '/figma', tier: 'On Demand · 设计稿转视频', desc: '粘贴 Figma 链接，自动抽取品牌 Token、组件与分镜画框，将其重构为可寻址产品宣传动效。' },
+    { name: '/slideshow', tier: 'On Demand · 交互演示文稿', desc: '制作带分步揭示、分支跳转与演讲者备注的可浏览交互 Deck（输出交互网页而非 MP4）。' },
+    { name: '/remotion-to-hyperframes', tier: 'On Demand · 迁移转换', desc: '将现有 Remotion、Motion Canvas、Lottie、Three.js 或 Canvas 视频代码迁移至 HyperFrames 并逐帧比对。' }
+  ];
+
+  var pillsWrap = document.getElementById('hf-skill-pills');
+  skills.forEach(function (sk, idx) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'skill-pill' + (idx === 0 ? ' is-active' : '');
+    btn.textContent = sk.name;
+    btn.addEventListener('click', function () {
+      pillsWrap.querySelectorAll('.skill-pill').forEach(function (el) {
+        el.classList.toggle('is-active', el === btn);
+      });
+      document.getElementById('hf-sk-name').textContent = sk.name;
+      document.getElementById('hf-sk-tier').textContent = sk.tier;
+      document.getElementById('hf-sk-desc').textContent = sk.desc;
+    });
+    pillsWrap.appendChild(btn);
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve();
+        else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

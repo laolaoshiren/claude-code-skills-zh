@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>xpzouying/xiaohongshu-mcp 中文深度指南：小红书 MCP 部署、13 个工具与防踢号避坑 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="17.3K+ Stars 开源小红书 MCP 服务 xpzouying/xiaohongshu-mcp（Apache-2.0）中文实战指南：覆盖预编译二进制/Docker/源码三种部署、Claude Code/Cursor/VS Code/Gemini CLI 配置生成、13 个 MCP 工具参数、AUTH_TOKEN 鉴权与单网页防踢号边界。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="skill-repo" content="https://github.com/xpzouying/xiaohongshu-mcp">
+<link rel="canonical" href="https://claude-skills.bt199.com/p/xiaohongshu-mcp/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="xpzouying/xiaohongshu-mcp 中文深度指南：小红书 MCP 部署与 13 工具全解">
+<meta property="og:description" content="17.3K+ Stars Go 驱动小红书 MCP Server：支持扫码登录、图文/视频发布、关键词检索与评论数据读取，含多客户端配置生成器与合规防风控边界。">
+<meta property="og:url" content="https://claude-skills.bt199.com/p/xiaohongshu-mcp/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="xpzouying/xiaohongshu-mcp 中文深度指南">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="xpzouying/xiaohongshu-mcp 中文深度指南：小红书 MCP 接入与避坑">
+<meta name="twitter:description" content="二进制 / Docker / Go 源码部署，13 个 MCP 工具速查，单网页登录防踢号规则与 AUTH_TOKEN 安全配置。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：小红书珊瑚红 + 暖橙视觉识别 */
+  :root {
+    --accent: #ff2442;
+    --accent2: #ff758f;
+    --cyan: #38bdf8;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #ff2442, #e11d48);
+    box-shadow: 0 4px 18px rgba(255, 36, 66, 0.34);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 8px 26px rgba(255, 36, 66, 0.48);
+  }
+  .nav-star,
+  .step-num {
+    background: linear-gradient(135deg, #ff2442, #fb7185);
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255, 36, 66, 0.16) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(56, 189, 248, 0.1) 0%, transparent 50%);
+  }
+  .cfg-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .cfg-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .cfg-tab,
+  .cfg-toggle {
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 15, 0.72);
+    color: var(--text2);
+    border-radius: 10px;
+    padding: 8px 13px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.18s ease;
+  }
+  .cfg-tab:hover,
+  .cfg-toggle:hover {
+    border-color: var(--accent2);
+    color: var(--text);
+  }
+  .cfg-tab.is-active,
+  .cfg-toggle.is-active {
+    background: rgba(255, 36, 66, 0.16);
+    border-color: var(--accent);
+    color: #ffd6de;
+  }
+  .tool-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 14px 0;
+  }
+  .tool-pill {
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 15, 0.68);
+    color: var(--text2);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-family: var(--mono);
+    cursor: pointer;
+    transition: all 0.16s ease;
+  }
+  .tool-pill:hover {
+    border-color: var(--cyan);
+    color: var(--text);
+  }
+  .tool-pill.is-active {
+    background: rgba(56, 189, 248, 0.16);
+    border-color: var(--cyan);
+    color: #bae6fd;
+  }
+  .tool-inspector {
+    background: rgba(10, 10, 15, 0.72);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+  }
+  .tool-inspector-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .tool-name-badge {
+    font-family: var(--mono);
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #ffd6de;
+    background: rgba(255, 36, 66, 0.18);
+    border: 1px solid rgba(255, 36, 66, 0.42);
+    padding: 3px 10px;
+    border-radius: 8px;
+  }
+  .tool-group-badge {
+    font-size: 0.78rem;
+    color: var(--cyan);
+    background: rgba(56, 189, 248, 0.12);
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .tool-desc {
+    color: var(--text2);
+    font-size: 0.92rem;
+    margin-bottom: 8px;
+  }
+  .tool-params {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: #cbd5e1;
+    background: #070910;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 10px 12px;
+    white-space: pre-wrap;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "xpzouying/xiaohongshu-mcp",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux, Docker",
+  "inLanguage": "zh-CN",
+  "license": "https://www.apache.org/licenses/LICENSE-2.0",
+  "url": "https://claude-skills.bt199.com/p/xiaohongshu-mcp/",
+  "codeRepository": "https://github.com/xpzouying/xiaohongshu-mcp",
+  "description": "开源小红书 Model Context Protocol (MCP) 服务端：用 Go 与无头浏览器驱动，让 Claude Code、Cursor、VS Code、Gemini CLI 与 Cline 通过标准 HTTP MCP 检索小红书内容、读取帖子与评论、发布图文/视频并管理登录会话。",
+  "author": {
+    "@type": "Person",
+    "name": "xpzouying",
+    "url": "https://github.com/xpzouying"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "首页",
+      "item": "https://claude-skills.bt199.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "精选第三方技能",
+      "item": "https://claude-skills.bt199.com/#skills"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "xpzouying/xiaohongshu-mcp",
+      "item": "https://claude-skills.bt199.com/p/xiaohongshu-mcp/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "为什么登录 xiaohongshu-mcp 后，在浏览器打开小红书网页版会掉线？",
+      "acceptedAnswer": {
+        "text": "小红书同一账号不允许在多个网页端同时登录。登录 xiaohongshu-mcp 保存 Cookie 后，不要再在其他桌面浏览器网页端登录同一个小红书账号，否则会把 MCP 会话踢出登录；需要查看账号动态请改用手机 App 端。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Docker 部署后客户端连不上 http://localhost:18060/mcp 怎么办？",
+      "acceptedAnswer": {
+        "text": "原仓明确提示：若 MCP 客户端运行在另一个 Docker 容器内（如部分工作流容器），不要填 localhost，请改为 http://host.docker.internal:18060/mcp；在非 Docker 本机环境遇到回环地址异常时，可改用本机局域网 IPv4 地址访问。若启用了 AUTH_TOKEN，客户端必须附带 Authorization: Bearer 请求头。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "调用 get_feed_detail 或发表评论为什么提示缺少 xsec_token？",
+      "acceptedAnswer": {
+        "text": "小红书帖子详情、评论、点赞、收藏与用户主页接口均强制要求同时传入 feed_id（或 user_id）和对应的 xsec_token，缺一不可。这两个参数必须先通过 list_feeds 或 search_feeds 返回结果动态获取，不能手动凭空猜测。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "提示发布成功但在小红书页面上看不到笔记怎么排查？",
+      "acceptedAnswer": {
+        "text": "按原仓 README 建议依次检查：1）改用 -headless=false 非无头模式观察真实页面提示；2）确认标题不超过 20 字、正文不超过 1000 字且无平台违禁词；3）确认本地图片路径不包含中文字符且单图体积不过大；4）登录网页版检查账号是否被风控或要求先完成实名认证。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "不想配 Go 环境和无头浏览器，有更轻量的替代方案吗？",
+      "acceptedAnswer": {
+        "text": "原仓 README 首页推荐了两类替代：非技术用户或不想折腾服务器 IP/Docker 的场景，可以使用同作者开源的浏览器插件版 xpzouying/x-mcp（直接在日常 Chrome/Edge 中运行）；只做图文选题与小红书卡片配图而不自动发帖时，也可搭配本库收录的 JimLiu/baoyu-skills。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#skills">精选第三方技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">xpzouying/xiaohongshu-mcp</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-green">🇨🇳 完整中文 README</span>
+        <span class="pill pill-amber">📣 中文自媒体高搜 MCP</span>
+        <span class="pill pill-cyan">Apache-2.0 · Go + 无头浏览器</span>
+      </div>
+      <h1><span class="accent-text">xpzouying/xiaohongshu-mcp</span> 中文深度指南与客户端配置</h1>
+      <p class="hero-lead">由 <strong>xpzouying</strong> 开源的标准化小红书 MCP Server（Streamable HTTP 协议，默认端点 <code>http://localhost:18060/mcp</code>）。暴露登录扫码、关键词检索、帖子与全量评论抓取、图文/视频定时发布及互动等 <strong>13 个标准 MCP 工具</strong>，可直接接入 Claude Code、Cursor、VS Code、Gemini CLI、Cline 与 n8n。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">GitHub Stars</div>
+          <div class="metric-value is-star">⭐ 17.3K+（核验 17,335）</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可与语言</div>
+          <div class="metric-value">Apache-2.0 · Go</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">暴露能力</div>
+          <div class="metric-value is-cyan">13 个 MCP Tools · HTTP/18060</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">前置依赖</div>
+          <div class="metric-value">小红书实名账号 + 无头浏览器</div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#config-builder" class="btn btn-primary">🎛️ 生成客户端 MCP 配置</a>
+        <a href="https://github.com/xpzouying/xiaohongshu-mcp" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📦 访问原仓库 GitHub ↗</a>
+        <a href="https://github.com/xpzouying/xiaohongshu-mcp/releases" class="btn btn-cyan" target="_blank" rel="noopener noreferrer">⬇️ 下载预编译二进制 ↗</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#config-builder">客户端配置生成器</a>
+      <a href="#tools">13 个 MCP 工具速查</a>
+      <a href="#deploy">3 种部署方式（含 Windows）</a>
+      <a href="#boundaries">防踢号与安全合规边界</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="config-builder">
+      <h2>🎛️ 多客户端 MCP 配置生成器 + 13 个工具交互速查</h2>
+      <p class="section-intro">先选择你使用的 AI 客户端，并按实际运行环境勾选「Docker 容器内调用」或「生产级 <code>AUTH_TOKEN</code> 鉴权」，即可一键复制精确配置：</p>
+
+      <div class="cfg-tabs" role="tablist" aria-label="选择 MCP 客户端">
+        <button type="button" class="cfg-tab is-active" data-client="claude">Claude Code CLI</button>
+        <button type="button" class="cfg-tab" data-client="cursor">Cursor (.cursor/mcp.json)</button>
+        <button type="button" class="cfg-tab" data-client="vscode">VS Code (.vscode/mcp.json)</button>
+        <button type="button" class="cfg-tab" data-client="gemini">Gemini CLI</button>
+        <button type="button" class="cfg-tab" data-client="cline">Cline</button>
+        <button type="button" class="cfg-tab" data-client="openclaw">OpenClaw (MCPorter)</button>
+      </div>
+
+      <div class="cfg-toolbar">
+        <button type="button" class="cfg-toggle" id="toggle-docker" aria-pressed="false">🐳 客户端在 Docker 内（改用 host.docker.internal）</button>
+        <button type="button" class="cfg-toggle" id="toggle-auth" aria-pressed="false">🔐 启用 AUTH_TOKEN 请求头鉴权</button>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title" id="cfg-title">Claude Code CLI 接入命令</span>
+          <button type="button" class="copy-btn" data-copy-target="cfg-output">📋 复制</button>
+        </div>
+        <pre id="cfg-output"><code>claude mcp add --transport http xiaohongshu-mcp http://localhost:18060/mcp
+claude mcp list</code></pre>
+      </div>
+
+      <h3 id="tools">点击下方任一 MCP 工具，查看必需参数与避坑细节（共 13 个）</h3>
+      <div class="tool-pills" id="tool-pills" aria-label="13 个 MCP 工具列表"></div>
+      <div class="tool-inspector" aria-live="polite">
+        <div class="tool-inspector-head">
+          <span class="tool-name-badge" id="ti-name">check_login_status</span>
+          <span class="tool-group-badge" id="ti-group">登录会话管理</span>
+        </div>
+        <p class="tool-desc" id="ti-desc">检查当前无头浏览器会话是否已登录小红书，首次对话调用前建议先执行。</p>
+        <div class="tool-params" id="ti-params">必需参数：无 | 提示：若未登录可紧接着调用 get_login_qrcode 获取二维码 Base64 图片。</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="deploy">
+      <h2>📦 3 种部署方式（Windows / macOS / Linux / Docker）</h2>
+      <p class="section-intro">核心逻辑分为两步：<strong>先运行登录工具保存 Cookie</strong>，再启动 <code>xiaohongshu-mcp</code> 服务监听 <code>18060</code> 端口。首次启动会自动下载约 <strong>150MB</strong> 无头浏览器。</p>
+
+      <div class="os-grid">
+        <div class="os-card is-featured">
+          <div class="os-card-head">
+            <h3>方式 1：Windows x64 预编译二进制</h3>
+            <span class="pill pill-cyan">零 Go 环境</span>
+          </div>
+          <p class="os-note">从 GitHub Releases 下载 <code>xiaohongshu-login-windows-amd64.exe</code> 与 <code>xiaohongshu-mcp-windows-amd64.exe</code>（不支持 macOS Intel 与 Linux ARM64）。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Windows PowerShell</span>
+              <button type="button" class="copy-btn" data-copy-target="xhs-win">📋 复制</button>
+            </div>
+            <pre id="xhs-win"><code># 1. 首次扫码保存登录态
+.\xiaohongshu-login-windows-amd64.exe
+
+# 2. 启动 MCP（建议配环境变量 AUTH_TOKEN 启用鉴权）
+$env:AUTH_TOKEN = "replace-with-random-token"
+.\xiaohongshu-mcp-windows-amd64.exe</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>方式 2：Docker Compose（无界面 / noVNC GUI）</h3>
+            <span class="pill pill-purple">服务器 / 隔离环境</span>
+          </div>
+          <p class="os-note">日常自动化用无界面版；排查验证码或登录现场时可选 <code>novnc</code> 版（<code>http://127.0.0.1:6080/vnc.html</code>）。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Docker Compose</span>
+              <button type="button" class="copy-btn" data-copy-target="xhs-docker">📋 复制</button>
+            </div>
+            <pre id="xhs-docker"><code>git clone https://github.com/xpzouying/xiaohongshu-mcp.git
+cd xiaohongshu-mcp
+# 无界面版（默认）
+docker compose -f docker/docker-compose.yml up -d
+# 或：带可视化浏览器 GUI 版（仅限本机访问）
+docker compose -f docker/novnc/compose.yml up -d</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>方式 3：Go 源码编译（配国内 GOPROXY）</h3>
+            <span class="pill pill-green">支持自定义调试</span>
+          </div>
+          <p class="os-note">遇到闪退或需要改超时、代理配置时推荐源码启动，支持 <code>XHS_PROXY</code>（HTTP/HTTPS/SOCKS5）。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Go 源码运行</span>
+              <button type="button" class="copy-btn" data-copy-target="xhs-go">📋 复制</button>
+            </div>
+            <pre id="xhs-go"><code>go env -w GOPROXY=https://goproxy.cn,direct
+go run cmd/login/main.go
+# 排查问题可加 -headless=false 弹出真实浏览器窗口
+go run . -headless=false</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>步骤 4：用 MCP Inspector / curl 验证连通</h3>
+            <span class="pill pill-amber">上线前必测</span>
+          </div>
+          <p class="os-note">确认 <code>List Tools</code> 能返回全部 13 个工具后再让 Agent 接入。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">验证服务状态</span>
+              <button type="button" class="copy-btn" data-copy-target="xhs-verify">📋 复制</button>
+            </div>
+            <pre id="xhs-verify"><code># 方式 A：可视化调试面板
+npx @modelcontextprotocol/inspector
+
+# 方式 B：命令行探活
+curl -X POST http://localhost:18060/mcp -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","method":"initialize","params":{},"id":1}'</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="boundaries">
+      <h2>🛡️ 防踢号规则、安全部署与合法使用边界</h2>
+
+      <div class="callout callout-amber">
+        <div class="callout-title">⚠️ 小红书平台规则与防踢号硬约束（来自原仓实操总结）</div>
+        <ul class="prose-list">
+          <li><strong>严禁多网页端同时登录</strong>：小红书同一账号不允许在多个网页端在线。登录 <code>xiaohongshu-mcp</code> 后，<strong>不要再在日常浏览器里打开小红书网页版</strong>，否则会立刻把 MCP 会话踢掉；日常看号请用手机 App。</li>
+          <li><strong>字数与实名门槛</strong>：标题严格不超过 <strong>20 个字</strong>，正文不超过 <strong>1000 个字</strong>；未实名账号（尤其新号）容易弹出实名认证提示，建议先实名后再接入检索或发文。</li>
+          <li><strong>图片与视频约束</strong>：图文发布强烈推荐使用<strong>不含中文字符的本地绝对路径</strong>（比 HTTP 图床更稳）；视频发布仅支持单个本地视频文件绝对路径（建议 ≤ 1GB）。</li>
+        </ul>
+      </div>
+
+      <div class="callout callout-red">
+        <div class="callout-title">🚨 安全暴露红线与自动化合规边界</div>
+        <ul class="prose-list">
+          <li><strong>绝不把 <code>18060</code> 或 noVNC <code>6080</code> 暴露公网</strong>：原仓特别警告 noVNC GUI <strong>无独立密码</strong>，必须仅限本机 <code>127.0.0.1</code> 或 SSH 隧道访问；远程部署 MCP 时务必通过环境变量 <code>AUTH_TOKEN</code> 启用 Bearer 鉴权（避免用 <code>-token</code> 启动参数暴露给 <code>ps</code> 进程列表）。</li>
+          <li><strong>保留人工确认，拒绝滥用</strong>：原仓声明项目仅供学习与个人效率辅助，禁止违法违规、恶意引流、纯搬运抄袭或高频刷评刷赞；Agent 调用 <code>publish_content</code> / <code>post_comment_to_feed</code> 前建议先设 <code>visibility="仅自己可见"</code> 验证或人工确认内容。</li>
+          <li><strong>OpenClaw 用户注意</strong>：原仓作者明确不建议直接把仓库丢给 OpenClaw 自动部署，且 MCPorter 中间层可能带来额外兼容性问题；无强需求建议优先选用原生支持 HTTP MCP 的 Claude Code / Cursor / Cline。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <article class="faq-item">
+          <h3>Q1：检查登录状态时用户名显示 <code>xiaghgngshu-mcp</code> 是中毒了吗？</h3>
+          <p>不是。原仓 FAQ 已说明当前版本该显示名在源码中是写死的占位字符串，只要能正常调用 <code>list_feeds</code> 与 <code>search_feeds</code> 即代表会话有效。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q2：<code>search_feeds</code> 能直接按「最新」或「最多收藏」过滤吗？</h3>
+          <p>可以。<code>search_feeds</code> 支持传入 <code>filters</code> 对象：<code>sort_by</code>（综合 / 最新 / 最多点赞 / 最多评论 / 最多收藏）、<code>note_type</code>（不限 / 视频 / 图文）、<code>publish_time</code>（一天内 / 一周内 / 半年内）、<code>search_scope</code> 与 <code>location</code>（同城 / 附近），非常适合做中文垂直选题调研。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q3：想先看长评论区再决定写什么，怎么防止无限滚动卡死？</h3>
+          <p>调用 <code>get_feed_detail</code> 时默认只取前 10 条一级评论；需要深挖痛点时再设 <code>load_all_comments: true</code>，并用 <code>limit</code>（默认 20）、<code>reply_limit</code>（默认 10）和 <code>scroll_speed</code> 控制抓取上限。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q4：跟本库里的 <code>baoyu-skills</code> 或 <code>autoclaw-cc/xiaohongshu-mcp-skills</code> 怎么配合？</h3>
+          <p><code>xpzouying/xiaohongshu-mcp</code> 是底层 MCP 执行服务；你可以用 <code>JimLiu/baoyu-skills</code> 里的 <code>baoyu-xhs-images</code> 生成 12 种风格的小红书卡片图，再交由本地 <code>xiaohongshu-mcp</code> 或 <code>autoclaw-cc/xiaohongshu-mcp-skills</code> 工作流管理素材与发布预览。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/p/baoyu-skills/">
+          <div>
+            <span class="related-tag">📣 自媒体创作 · 27.9K+ ⭐</span>
+            <h3>JimLiu/baoyu-skills</h3>
+            <p>内含 <code>baoyu-xhs-images</code>（12 种小红书视觉风格卡片生成）与公众号排版发布技能，可与本项目互补。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/ai-video-producer/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 视频流水线</span>
+            <h3>ai-video-producer</h3>
+            <p>需要同步做小红书竖屏口播或 B 站视频？用八阶段成本可控中文视频流水线出片再发布。</p>
+          </div>
+          <span class="related-go">查看原创技能 →</span>
+        </a>
+        <a class="related-card" href="/p/hyperframes/">
+          <div>
+            <span class="related-tag">🎬 HTML 视频编辑 · 90.5K+ ⭐</span>
+            <h3>heygen-com/hyperframes</h3>
+            <p>HeyGen 开源的编程式视频编辑器，用 HTML + CSS 精确渲染 MP4 短视频，适合产品动效笔记。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>原作者与开源许可声明：</strong>本页为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">claude-code-skills-zh</a> 基于原仓库公开文档整理的中文部署与合规使用指南。项目版权归原作者 <strong>xpzouying</strong> 及社区贡献者所有，采用 <strong>Apache-2.0</strong> 开源协议，完整源码与更新说明请访问 <a href="https://github.com/xpzouying/xiaohongshu-mcp" target="_blank" rel="noopener noreferrer">github.com/xpzouying/xiaohongshu-mcp ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏中文 Claude Code Skills 精选集</h2>
+        <p>452+ 人工核验第三方技能与 22 个原创中文技能持续维护，官网支持跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#skills">精选目录</a>
+    <a href="/#original">原创技能</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var state = { client: 'claude', docker: false, auth: false };
+
+  function getEndpoint() {
+    return state.docker ? 'http://host.docker.internal:18060/mcp' : 'http://localhost:18060/mcp';
+  }
+
+  function renderConfig() {
+    var url = getEndpoint();
+    var titleEl = document.getElementById('cfg-title');
+    var outEl = document.getElementById('cfg-output');
+    var codeEl = outEl.querySelector('code');
+    var title = '';
+    var text = '';
+
+    if (state.client === 'claude') {
+      title = 'Claude Code CLI 接入命令';
+      text = state.auth
+        ? 'claude mcp add --transport http --header "Authorization: Bearer YOUR_AUTH_TOKEN" xiaohongshu-mcp ' + url + '\nclaude mcp list'
+        : 'claude mcp add --transport http xiaohongshu-mcp ' + url + '\nclaude mcp list';
+    } else if (state.client === 'cursor') {
+      title = 'Cursor 配置（.cursor/mcp.json 或 ~/.cursor/mcp.json）';
+      var cursorObj = {
+        mcpServers: {
+          'xiaohongshu-mcp': {
+            url: url,
+            description: '小红书内容服务 - MCP Streamable HTTP'
+          }
+        }
+      };
+      if (state.auth) {
+        cursorObj.mcpServers['xiaohongshu-mcp'].headers = { Authorization: 'Bearer YOUR_AUTH_TOKEN' };
+      }
+      text = JSON.stringify(cursorObj, null, 2);
+    } else if (state.client === 'vscode') {
+      title = 'VS Code 工作区配置（.vscode/mcp.json）';
+      var vsObj = {
+        servers: {
+          'xiaohongshu-mcp': {
+            url: url,
+            type: 'http'
+          }
+        },
+        inputs: []
+      };
+      if (state.auth) {
+        vsObj.servers['xiaohongshu-mcp'].headers = { Authorization: 'Bearer YOUR_AUTH_TOKEN' };
+      }
+      text = JSON.stringify(vsObj, null, 2);
+    } else if (state.client === 'gemini') {
+      title = 'Google Gemini CLI 配置（~/.gemini/settings.json）';
+      var gemObj = {
+        mcpServers: {
+          xiaohongshu: {
+            httpUrl: url,
+            timeout: 30000
+          }
+        }
+      };
+      if (state.auth) {
+        gemObj.mcpServers.xiaohongshu.headers = { Authorization: 'Bearer YOUR_AUTH_TOKEN' };
+      }
+      text = JSON.stringify(gemObj, null, 2);
+    } else if (state.client === 'cline') {
+      title = 'Cline MCP 配置';
+      var clineObj = {
+        'xiaohongshu-mcp': {
+          url: url,
+          type: 'streamableHttp',
+          autoApprove: [],
+          disabled: false
+        }
+      };
+      if (state.auth) {
+        clineObj['xiaohongshu-mcp'].headers = { Authorization: 'Bearer YOUR_AUTH_TOKEN' };
+      }
+      text = JSON.stringify(clineObj, null, 2);
+    } else {
+      title = 'OpenClaw（通过 MCPorter 桥接，注意稳定性边界）';
+      text = 'npm i -g mcporter\nnpx mcporter config add xiaohongshu-mcp ' + url + '\nnpx mcporter list xiaohongshu-mcp';
+      if (state.auth) {
+        text += '\n# 提示：如启用 AUTH_TOKEN，请在 MCPorter 配置中补充 Authorization 请求头';
+      }
+    }
+
+    titleEl.textContent = title;
+    codeEl.textContent = text;
+  }
+
+  document.querySelectorAll('.cfg-tab[data-client]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      state.client = btn.getAttribute('data-client');
+      document.querySelectorAll('.cfg-tab').forEach(function (b) {
+        b.classList.toggle('is-active', b === btn);
+      });
+      renderConfig();
+    });
+  });
+
+  var dockerBtn = document.getElementById('toggle-docker');
+  var authBtn = document.getElementById('toggle-auth');
+  dockerBtn.addEventListener('click', function () {
+    state.docker = !state.docker;
+    dockerBtn.classList.toggle('is-active', state.docker);
+    dockerBtn.setAttribute('aria-pressed', String(state.docker));
+    renderConfig();
+  });
+  authBtn.addEventListener('click', function () {
+    state.auth = !state.auth;
+    authBtn.classList.toggle('is-active', state.auth);
+    authBtn.setAttribute('aria-pressed', String(state.auth));
+    renderConfig();
+  });
+
+  var tools = [
+    { name: 'check_login_status', group: '登录会话', desc: '检查当前无头浏览器会话是否处于已登录状态。', params: '必需参数：无 | 建议作为每次会话的第一个只读探活工具。' },
+    { name: 'get_login_qrcode', group: '登录会话', desc: '获取小红书登录二维码，返回 Base64 图片与超时时间。', params: '必需参数：无 | 注意：扫码成功后切勿再到其他浏览器登录网页版。' },
+    { name: 'delete_cookies', group: '登录会话', desc: '删除本地 cookies 文件以重置会话，切换账号时使用。', params: '必需参数：无 | 删除后需重新运行登录工具或扫码。' },
+    { name: 'list_feeds', group: '内容检索', desc: '读取当前账号的小红书首页推荐 Feed 列表。', params: '必需参数：无 | 返回值内含后续详情/评论所需的 feed_id 与 xsec_token。' },
+    { name: 'search_feeds', group: '内容检索', desc: '按关键词搜索笔记，并支持排序、体裁、时间与同城过滤。', params: '必需参数：keyword | 可选 filters: sort_by / note_type / publish_time / search_scope / location' },
+    { name: 'get_feed_detail', group: '内容检索', desc: '读取单条笔记的正文、互动数据与一/二级评论列表。', params: '必需参数：feed_id, xsec_token | 可选：load_all_comments, limit(默认20), click_more_replies, reply_limit, scroll_speed' },
+    { name: 'user_profile', group: '内容检索', desc: '读取指定作者主页的基础信息、粉丝获赞统计与公开笔记列表。', params: '必需参数：user_id, xsec_token | 两者均可从 list_feeds / search_feeds 结果获取。' },
+    { name: 'publish_content', group: '内容发布', desc: '发布图文笔记到小红书，支持本地图/外链图、定时与可见范围。', params: '必需参数：title(≤20字), content(≤1000字), images(≥1张，推荐不含中文的本地路径) | 可选：tags, at_users, schedule_at, is_original, is_ai_generated, visibility, products' },
+    { name: 'publish_with_video', group: '内容发布', desc: '发布本地视频笔记并等待转码完成后提交。', params: '必需参数：title, content, video(仅支持单个本地视频绝对路径，建议≤1GB) | 可选：tags, schedule_at, is_ai_generated, visibility, products' },
+    { name: 'post_comment_to_feed', group: '评论互动', desc: '向指定小红书笔记发表一级评论（请确保人工审核内容合规）。', params: '必需参数：feed_id, xsec_token, content' },
+    { name: 'reply_comment_in_feed', group: '评论互动', desc: '回复笔记下的指定用户或指定 comment_id 评论。', params: '必需参数：feed_id, xsec_token, content，以及 comment_id 或 user_id 至少一个' },
+    { name: 'like_feed', group: '互动操作', desc: '为笔记点赞或取消点赞，内部自动检测当前状态防止重复动作。', params: '必需参数：feed_id, xsec_token | 可选：unlike=true 取消点赞' },
+    { name: 'favorite_feed', group: '互动操作', desc: '收藏笔记或取消收藏，内部自动检测当前状态。', params: '必需参数：feed_id, xsec_token | 可选：unfavorite=true 取消收藏' }
+  ];
+
+  var pillsWrap = document.getElementById('tool-pills');
+  tools.forEach(function (tool, idx) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tool-pill' + (idx === 0 ? ' is-active' : '');
+    btn.textContent = tool.name;
+    btn.addEventListener('click', function () {
+      pillsWrap.querySelectorAll('.tool-pill').forEach(function (el) {
+        el.classList.toggle('is-active', el === btn);
+      });
+      document.getElementById('ti-name').textContent = tool.name;
+      document.getElementById('ti-group').textContent = tool.group;
+      document.getElementById('ti-desc').textContent = tool.desc;
+      document.getElementById('ti-params').textContent = tool.params;
+    });
+    pillsWrap.appendChild(btn);
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve();
+        else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+
+  renderConfig();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>pbakaus/impeccable 中文深度指南：62 条反 AI 味检测规则与 24 个 UI 设计指令 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="117.2K+ Stars 开源前端设计套件 pbakaus/impeccable（v4.11.1，Apache-2.0）中文深度指南：24 条设计引导指令（polish / bolder / critique / audit / live）、62 条无 LLM 确定性反 AI 味检测器、CI SARIF 集成与国内 Trae / DeepSeek Harness / Qoder 安装路径。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="skill-repo" content="https://github.com/pbakaus/impeccable">
+<link rel="canonical" href="https://claude-skills.bt199.com/p/impeccable/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="pbakaus/impeccable 中文深度指南：反 AI 味 UI 设计词汇与确定性检测器">
+<meta property="og:description" content="117.2K+ Stars 前端设计技能套件：用 24 条精确设计词汇替代「再高级一点」，内置 62 条确定性规则抓出紫蓝渐变、卡片套卡片与低对比度文本。">
+<meta property="og:url" content="https://claude-skills.bt199.com/p/impeccable/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="pbakaus/impeccable 中文深度指南">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="pbakaus/impeccable 中文深度指南：62 条反 AI 味规则与 24 个 UI 指令">
+<meta name="twitter:description" content="支持 Claude Code / Cursor / Codex / Trae 中国版 / DeepSeek Harness / Qoder，一行 npx impeccable install 即装。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：艺术编辑琥珀金 + 青蓝对比主题 */
+  :root {
+    --accent: #f59e0b;
+    --accent2: #fbbf24;
+    --cyan: #38bdf8;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: #0b0b12;
+    box-shadow: 0 4px 18px rgba(245, 158, 11, 0.32);
+  }
+  .btn-primary:hover {
+    color: #0b0b12;
+    box-shadow: 0 8px 26px rgba(245, 158, 11, 0.48);
+  }
+  .nav-star,
+  .step-num {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    color: #0b0b12;
+  }
+  .nav-star:hover {
+    color: #0b0b12;
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.16) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(56, 189, 248, 0.1) 0%, transparent 50%);
+  }
+  .stage-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .stage-btn {
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 15, 0.72);
+    color: var(--text2);
+    border-radius: 10px;
+    padding: 8px 13px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.18s ease;
+  }
+  .stage-btn:hover {
+    border-color: var(--accent2);
+    color: var(--text);
+  }
+  .stage-btn.is-active {
+    background: rgba(245, 158, 11, 0.16);
+    border-color: var(--accent);
+    color: #fde68a;
+  }
+  .cmd-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .cmd-chip {
+    border: 1px solid var(--border);
+    background: rgba(20, 20, 32, 0.9);
+    color: var(--text2);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-family: var(--mono);
+    font-size: 0.81rem;
+    cursor: pointer;
+    transition: all 0.16s ease;
+  }
+  .cmd-chip:hover {
+    border-color: var(--cyan);
+    color: var(--text);
+  }
+  .cmd-chip.is-active {
+    background: rgba(56, 189, 248, 0.16);
+    border-color: var(--cyan);
+    color: #bae6fd;
+  }
+  .cmd-card {
+    background: rgba(10, 10, 15, 0.72);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+  }
+  .cmd-card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .cmd-card-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #fde68a;
+  }
+  .cmd-card-stage {
+    font-size: 0.78rem;
+    color: var(--cyan);
+    background: rgba(56, 189, 248, 0.12);
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .cmd-card-desc {
+    color: var(--text2);
+    font-size: 0.93rem;
+    margin-bottom: 10px;
+  }
+  .cmd-card-usage {
+    font-family: var(--mono);
+    font-size: 0.83rem;
+    background: #070910;
+    border: 1px solid rgba(245, 158, 11, 0.28);
+    border-radius: 10px;
+    padding: 11px 13px;
+    color: #fef3c7;
+    white-space: pre-wrap;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "pbakaus/impeccable",
+  "softwareVersion": "v4.11.1",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://www.apache.org/licenses/LICENSE-2.0",
+  "url": "https://claude-skills.bt199.com/p/impeccable/",
+  "codeRepository": "https://github.com/pbakaus/impeccable",
+  "description": "面向 AI 编码 Agent 的 UI 设计词汇与反 AI 味（AI slop）评审套件，包含 24 个可组合设计指令、62 条不依赖大模型的确定性检测规则、CI SARIF 输出与实时浏览器热改模式。",
+  "author": {
+    "@type": "Person",
+    "name": "Paul Bakaus",
+    "url": "https://github.com/pbakaus"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "首页",
+      "item": "https://claude-skills.bt199.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "精选第三方技能",
+      "item": "https://claude-skills.bt199.com/#skills"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "pbakaus/impeccable",
+      "item": "https://claude-skills.bt199.com/p/impeccable/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "impeccable 的 62 条反 AI 味检测器会消耗大模型 API 额度吗？",
+      "acceptedAnswer": {
+        "text": "不会。npx impeccable detect 运行的是 62 条本地确定性规则引擎，不调用任何 LLM，也不需要配置 API Key；直接扫描源码（JSX/TSX/HTML/CSS）或通过本机 Chrome/Edge 扫描已渲染网页 URL。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "支持国内常用的 Trae 中国版、DeepSeek Harness 和 Qoder 吗？",
+      "acceptedAnswer": {
+        "text": "支持。原仓根目录内置了 .trae-cn/、.dsh/（DeepSeek Harness）和 .qoder/ 等 20+ 种编码工具的专属构建目录；运行 npx impeccable install 即可自动识别或通过手动复制目录接入。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "为什么建议先跑 /impeccable init 和 /impeccable document 再改页面？",
+      "acceptedAnswer": {
+        "text": "init 会在项目内生成 PRODUCT.md（记录目标用户、核心业务与约束），document 会把已有视觉规范沉淀为 DESIGN.md。后续每次执行 critique、polish 或 bolder 时都会自动读取这两个上下文文件，避免每次改动风格漂移。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "在团队里怎么只保留共享规范，不把临时截图提交到 Git？",
+      "acceptedAnswer": {
+        "text": "原仓建议将 PRODUCT.md、DESIGN.md 以及 .impeccable/config.json、design.json、surfaces/*.md、critique/ignore.md 纳入 Git 版本控制；把 .impeccable/*.png、review/、hook.cache.json 与 live/sessions/ 等运行态目录写入 .gitignore。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "有匿名遥测或自动 Hook 风险吗？如何关闭？",
+      "acceptedAnswer": {
+        "text": "在 Claude Code 等支持生命周期 Hook 的工具中，安装的设计 Hook 会在编辑文件时自动运行。如不希望自动触发，可拒绝安装 Hook 或在运行时禁用；匿名视觉方向选择遥测可通过 npx impeccable telemetry off、设置 DO_NOT_TRACK=1 或在 .impeccable/config.json 中设置 telemetry 为 false 关闭，且原仓声明不会上传项目代码或 PRODUCT.md。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#skills">精选第三方技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">pbakaus/impeccable</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-amber">🏆 117.2K+ Stars · Apache-2.0</span>
+        <span class="pill pill-cyan">🎨 反 AI 味 UI 设计词库</span>
+        <span class="pill pill-green">国内适配：Trae CN / DSH / Qoder</span>
+      </div>
+      <h1><span class="accent-text">pbakaus/impeccable</span> 中文深度指南：24 条设计指令与反 AI 味检测</h1>
+      <p class="hero-lead">由 <strong>Paul Bakaus</strong> 开源（最新 <code>v4.11.1</code>，衍生自 Anthropic <code>frontend-design</code>）。专为没有专职设计师的全栈与独立开发者打造：用 <strong>24 条精准设计词汇</strong>替代模糊的“再好看一点”，用 <strong>62 条无大模型确定性规则</strong>自动拦截紫蓝渐变、卡片嵌套卡片与低对比度文案。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">GitHub Stars / 版本</div>
+          <div class="metric-value is-star">⭐ 117.2K+ · v4.11.1</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">Apache-2.0</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">核心能力</div>
+          <div class="metric-value is-cyan">24 指令 + 62 条本地检测规则</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">兼容工具（20+）</div>
+          <div class="metric-value">Claude / Cursor / Codex / Trae CN / DSH</div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#vocab" class="btn btn-primary">🎛️ 探索 24 条设计指令</a>
+        <a href="https://github.com/pbakaus/impeccable" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📦 访问原仓库 GitHub ↗</a>
+        <a href="https://impeccable.style/docs" class="btn btn-cyan" target="_blank" rel="noopener noreferrer">📖 官方文档（英文）↗</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#why">治好哪些 AI 模板病</a>
+      <a href="#vocab">24 条指令交互工作台</a>
+      <a href="#detector">62 条检测器与 CI 门禁</a>
+      <a href="#install">安装与国产工具目录</a>
+      <a href="#pitfalls">Live 模式 / Hook / 遥测边界</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="why">
+      <h2>🎯 为什么 Agent 写的前端一眼就能看出“AI 味”？</h2>
+      <p class="section-intro">不加约束时，不同模型都会反复跌进同一套保守模板。Impeccable 用三层机制把控制权还给开发者：</p>
+      <div class="grid-2">
+        <div class="info-box is-bad">
+          <h3>常见 AI 模板病（Impeccable 重点拦截）</h3>
+          <ul class="prose-list">
+            <li>全站一律 <code>Inter</code> 字体、白底/暗底配千篇一律的紫蓝渐变按钮。</li>
+            <li>卡片套卡片、每个标题上方都硬塞一个圆角方块图标。</li>
+            <li>彩色背景上放浅灰字导致对比度不足、内边距局促或标题层级跳跃。</li>
+            <li>对 Agent 喊“高级一点 / Make it pop”，结果整页被盲目重做。</li>
+          </ul>
+        </div>
+        <div class="info-box is-good">
+          <h3>Impeccable 的三层解法</h3>
+          <ul class="prose-list">
+            <li><strong>先立规矩</strong>：<code>/impeccable init</code> 生成 <code>PRODUCT.md</code>，<code>document</code> 沉淀 <code>DESIGN.md</code>。</li>
+            <li><strong>精确局部操刀</strong>：一次只点名一个区域配一个动词（如 <code>/impeccable polish settings</code>），比整页重画稳得多。</li>
+            <li><strong>本地硬拦截</strong>：Agent 编辑 Hook + CLI <code>detect</code> 跑 62 条确定性规则，无需大模型 Token 就能把“AI 味”挡在提交前。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="vocab">
+      <h2>🎛️ 24 条设计词汇交互工作台（按研发阶段切换）</h2>
+      <p class="section-intro">原仓官方提示：<strong>先选一个小组件再调用具体指令</strong>。点击下方阶段和指令名，查看真实命令写法（Codex 中将 <code>/impeccable</code> 替换为 <code>$impeccable</code>）：</p>
+
+      <div class="stage-tabs" role="tablist" aria-label="设计指令阶段">
+        <button type="button" class="stage-btn is-active" data-stage="steer">🎨 Steer 风格转向（9）</button>
+        <button type="button" class="stage-btn" data-stage="review">🔍 Review 诊断评审（2）</button>
+        <button type="button" class="stage-btn" data-stage="finish">✨ Finish 上线打磨（6）</button>
+        <button type="button" class="stage-btn" data-stage="live">⚡ Iterate 实时迭代（2）</button>
+        <button type="button" class="stage-btn" data-stage="setup">📐 Plan 建档规划（4）</button>
+      </div>
+
+      <div class="cmd-grid" id="cmd-grid"></div>
+
+      <div class="cmd-card" aria-live="polite">
+        <div class="cmd-card-head">
+          <span class="cmd-card-title" id="cmd-title">/impeccable bolder</span>
+          <span class="cmd-card-stage" id="cmd-stage">Steer 风格转向</span>
+        </div>
+        <p class="cmd-card-desc" id="cmd-desc">放大过于保守、平淡的界面层次，增强视觉主焦点与对比度，摆脱平庸默认样式。</p>
+        <div class="cmd-card-usage" id="cmd-usage">Claude Code / Cursor：/impeccable bolder the pricing cards
+Codex CLI：$impeccable bolder the pricing cards</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="detector">
+      <h2>🛡️ 62 条反 AI 味检测器：Hook、终端 CLI 与 GitHub Actions SARIF</h2>
+      <p class="section-intro">检测器本身封装为独立原生引擎，<strong>零 API Key、零 Token 消耗</strong>。遇到需要看真实像素对比度或微小文字的规则，可直接指向本地开发服务器 URL：</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title">终端扫描源码 / 本地预览 URL / 生成 SARIF 报告</span>
+          <button type="button" class="copy-btn" data-copy-target="imp-detect">📋 复制</button>
+        </div>
+        <pre id="imp-detect"><code># 扫描源码目录（JSX/TSX/HTML/CSS 模式规则）
+npx impeccable detect src/
+
+# 扫描本地开发服务器（调用本机 Chrome/Edge 检测真实对比度与字号）
+npx impeccable detect http://localhost:5173
+
+# 列出全部 62 条规则 ID 与说明
+npx impeccable detect --list-rules
+
+# CI 中输出 SARIF 2.1.0（注意：退出码 2 表示发现问题，1 表示扫描失败）
+npx impeccable detect --sarif src/ > impeccable.sarif || test $? -eq 2</code></pre>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>📦 安装方式与国产编码工具专属路径</h2>
+      <p class="section-intro">Node.js 仅用于运行 <code>npx</code> 安装器；技能本体使用自带或自动下载至 <code>~/.impeccable/bin/</code> 的独立二进制引擎。支持原生移动端的 <code>ios</code> / <code>android</code> / <code>adaptive</code>（SwiftUI / Compose / React Native / Flutter）规范切换。</p>
+
+      <div class="os-grid">
+        <div class="os-card is-featured">
+          <div class="os-card-head">
+            <h3>方式 1：推荐通用安装（含 Design Hook）</h3>
+            <span class="pill pill-cyan">20+ 工具自动识别</span>
+          </div>
+          <p class="os-note">在项目根目录运行，交互选择项目级或全局安装，并建议启用 Design Hook 自动拦截编辑后的 AI 模板病。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Windows / macOS / Linux 通用</span>
+              <button type="button" class="copy-btn" data-copy-target="imp-npx">📋 复制</button>
+            </div>
+            <pre id="imp-npx"><code>npx impeccable install
+# 刷新已有版本
+npx impeccable update
+# 脚本指定工具与范围
+npx impeccable install --providers=claude,codex,cursor --scope=project</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>方式 2：Claude Code 插件市场 / VS Code</h3>
+            <span class="pill pill-purple">官方插件通道</span>
+          </div>
+          <p class="os-note">注意：VS Code 扩展（<code>renaissance-geek.impeccable</code>）目前仅安装技能本身，不包含自动设计 Hook。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Claude Code / VS Code</span>
+              <button type="button" class="copy-btn" data-copy-target="imp-plugin">📋 复制</button>
+            </div>
+            <pre id="imp-plugin"><code># Claude Code 终端内
+/plugin marketplace add pbakaus/impeccable
+
+# VS Code (需 1.109.3+ 与 Copilot Chat)
+code --install-extension renaissance-geek.impeccable</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <h3>国产与主流工具手工目录对照（无 Node 环境也可手动拷贝）</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>编码工具</th>
+              <th>仓库内构建目录</th>
+              <th>全局 Skills 目录</th>
+              <th>接入补充说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Claude Code</strong></td>
+              <td><code>.claude/</code></td>
+              <td><code>~/.claude/skills/</code></td>
+              <td>支持 Design Hook 与子 Agent</td>
+            </tr>
+            <tr>
+              <td><strong>Trae 中国版 (Trae China)</strong></td>
+              <td><code>.trae-cn/</code></td>
+              <td><code>~/.trae-cn/skills/</code></td>
+              <td>拷贝后需重启 Trae 生效</td>
+            </tr>
+            <tr>
+              <td><strong>DeepSeek Harness (DSH)</strong></td>
+              <td><code>.dsh/</code></td>
+              <td><code>$DSH_HOME/skills/</code></td>
+              <td><code>DSH_HOME</code> 位于用户目录时可自动管理</td>
+            </tr>
+            <tr>
+              <td><strong>Qoder</strong></td>
+              <td><code>.qoder/</code></td>
+              <td><code>~/.qoder/skills/</code></td>
+              <td>随仓库同步维护专属目录</td>
+            </tr>
+            <tr>
+              <td><strong>Codex CLI / Cursor / Gemini</strong></td>
+              <td><code>.agents/</code> · <code>.cursor/</code> · <code>.gemini/</code></td>
+              <td><code>~/.agents/skills/</code></td>
+              <td>Codex 需在 <code>/hooks</code> 确认一次项目 Hook</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="pitfalls">
+      <h2>⚠️ 安全、Live 模式与 Git 协同注意事项</h2>
+      <div class="callout callout-amber">
+        <div class="callout-title">🔒 使用前必须了解的 4 条安全与工程边界</div>
+        <ul class="prose-list">
+          <li><strong>Live 模式限本地开发环境</strong>：<code>/impeccable live</code> 会在本地 dev server 打开浮层并写回源码，严禁注入线上部署站点或削弱生产 CSP；其后台 Apply 回退调用会以绕过沙箱参数运行 <code>codex</code>/<code>claude</code>，建议设为 <code>IMPECCABLE_LIVE_COPY_AGENT=chat</code> 仅在当前对话内应用修改。</li>
+          <li><strong>Hook 在模型审批之外执行</strong>：Claude Code 安装命令 Hook 后，即使拒绝模型命令，首次编辑文件仍可能触发 Hook 下载引擎二进制；审查不信任仓库前可用 <code>--settings '{"disableAllHooks": true}'</code> 临时关闭。</li>
+          <li><strong>关闭匿名遥测</strong>：新建设计时若不需要上传“展示了哪些方向/选了哪个方向”的匿名统计，可运行 <code>npx impeccable telemetry off</code> 或设置 <code>DO_NOT_TRACK=1</code>。</li>
+          <li><strong>精简 Git 追踪范围</strong>：提交 <code>PRODUCT.md</code>、<code>DESIGN.md</code> 与 <code>.impeccable/config.json</code> 等共享规范；把 <code>**/.impeccable/*.png</code>、<code>review/</code>、<code>live/sessions/</code> 与 <code>hook.cache.json</code> 加入 <code>.gitignore</code>。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <article class="faq-item">
+          <h3>Q1：适合中文团队的 B 端后台和中文产品文案吗？</h3>
+          <p>适合结构、间距、对比度、无障碍与状态完整度治理（如 <code>audit</code>、<code>harden</code>、<code>adapt</code>）。但原仓提示语与设计规则为英文编写，中文产品微文案（<code>clarify</code>）和本地字体排印习惯（如思源黑体/苹方混排）建议结合 <code>PRODUCT.md</code> 显式写明中文语境要求。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q2：为什么 <code>PRODUCT.md</code> 比直接写长 Prompt 好用？</h3>
+          <p>长 Prompt 每次换新会话就丢；<code>/impeccable init</code> 提问后生成的 <code>PRODUCT.md</code> 持久化在仓库里，所有后续 24 条指令都会先读它，确保同一项目的按钮层级、配色与目标人群始终一致。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q3：已经有团队品牌字体（比如就用 Inter）总是被检测器报警怎么办？</h3>
+          <p>运行 <code>npx impeccable ignores add-value overused-font Inter --reason "Brand font"</code> 即可全局豁免；单文件豁免则加注释 <code>&lt;!-- impeccable-disable overused-font: reason --&gt;</code>，并可用 <code>--report-unused-ignores</code> 清理过期豁免。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q4：遇到配置损坏或 Hook 报错怎么一键诊断？</h3>
+          <p>直接在 Agent 中运行 <code>/impeccable doctor</code>，会自动检查过期的上下文文件、无效配置以及损坏的生命周期 Hook 路径。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/skill-translator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 技能汉化</span>
+            <h3>skill-translator</h3>
+            <p>想把 Impeccable 或其他英文 UI Skill 的规则手册无损转为中文触发语境？用它做汉化与安全预检。</p>
+          </div>
+          <span class="related-go">查看原创技能 →</span>
+        </a>
+        <a class="related-card" href="/p/hyperframes/">
+          <div>
+            <span class="related-tag">🎬 HTML 视频渲染 · 90.5K+ ⭐</span>
+            <h3>heygen-com/hyperframes</h3>
+            <p>同样用纯 HTML/CSS 驱动高完成度视觉作品，通过 <code>frame.md</code> 将网页设计系统转为视频动效。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/eslint-fix/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 前端代码修复</span>
+            <h3>eslint-fix</h3>
+            <p>修完 UI 视觉质感后，顺手把 TypeScript / ESLint 报错与构建隐患一并清零。</p>
+          </div>
+          <span class="related-go">查看原创技能 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>原作者与开源许可声明：</strong>本页为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">claude-code-skills-zh</a> 基于原仓库公开文档（<code>v4.11.1</code>）整理的中文选型与工程指南。项目版权归原作者 <strong>Paul Bakaus</strong> 所有（最初基于 Anthropic <code>frontend-design</code> 衍生），采用 <strong>Apache-2.0</strong> 开源协议，完整源码请访问 <a href="https://github.com/pbakaus/impeccable" target="_blank" rel="noopener noreferrer">github.com/pbakaus/impeccable ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏中文 Claude Code Skills 精选集</h2>
+        <p>452+ 人工核验第三方技能与 22 个原创中文技能持续维护，官网支持跨分类实时检索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#skills">精选目录</a>
+    <a href="/#original">原创技能</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var catalog = {
+    steer: {
+      label: 'Steer 风格转向（9 条）',
+      items: [
+        { cmd: 'bolder', target: 'the pricing cards', desc: '放大过于保守、平淡的界面层次，增强视觉焦点、字重对比与版面张力。' },
+        { cmd: 'quieter', target: 'the landing page', desc: '收敛过度喧宾夺主的视觉元素，把嘈杂页面压回克制、专业的信息节奏。' },
+        { cmd: 'distill', target: 'the dashboard header', desc: '大刀阔斧删掉多余卡片、装饰图标与冗余说明，只留核心任务路径。' },
+        { cmd: 'colorize', target: 'the analytics cards', desc: '打破全灰/纯黑白的死板后台感，为关键状态与数据维度注入克制的语义配色。' },
+        { cmd: 'typeset', target: 'the article hero', desc: '专项修复字体搭配、字号比例、行高与段宽节奏，解决“像默认网页”的问题。' },
+        { cmd: 'layout', target: 'the settings grid', desc: '校准留白、对齐基线与呼吸感，消除拥挤堆叠或无意义的双层卡片嵌套。' },
+        { cmd: 'animate', target: 'the checkout drawer', desc: '补充有物理反馈意义的过渡动画与微交互，而非花哨延迟加载。' },
+        { cmd: 'delight', target: 'the empty state', desc: '为空状态、完成态或关键里程碑注入适度的品牌个性与细节惊喜。' },
+        { cmd: 'overdrive', target: 'the launch showcase', desc: '面向高表现力展示页，启用 Shader、弹簧物理动效与滚动驱动视差。' }
+      ]
+    },
+    review: {
+      label: 'Review 诊断评审（2 条）',
+      items: [
+        { cmd: 'critique', target: 'the onboarding flow', desc: '从可用性启发式与设计师视角打分评审，按优先级列出最该先改哪一处。' },
+        { cmd: 'audit', target: 'the checkout page', desc: '输出技术质量审计报告，覆盖无障碍（a11y）、性能、主题切换与响应式断点，按 P0-P3 分级。' }
+      ]
+    },
+    finish: {
+      label: 'Finish 上线打磨（6 条）',
+      items: [
+        { cmd: 'polish', target: 'settings', desc: '上线前的最后一道全维度微调，对齐像素细节、悬浮态、边框与焦点环。' },
+        { cmd: 'harden', target: 'checkout', desc: '专项加固异常流：超长文本溢出、多语言（i18n）换行、报错态与边界输入。' },
+        { cmd: 'clarify', target: 'the error modal', desc: '重写晦涩、机器翻译感或模棱两可的界面按钮与提示文案。' },
+        { cmd: 'adapt', target: 'the pricing table', desc: '专门重构移动端、平板与窄屏下的布局折叠与触控热区（也支持原生 iOS/Android）。' },
+        { cmd: 'optimize', target: 'the hero media', desc: '修复阻塞渲染的图片、动画重排（layout shift）与首屏加载性能短板。' },
+        { cmd: 'onboard', target: 'the workspace empty state', desc: '重新设计首次启动引导、零数据空状态与下一步行动提示。' }
+      ]
+    },
+    live: {
+      label: 'Iterate 实时迭代（2 条）',
+      items: [
+        { cmd: 'live', target: 'http://localhost:5173', desc: '在本地开发服务器叠加浏览器浮层，直接点选页面元素切换变体并热写回源码。' },
+        { cmd: 'generate', target: 'the hero CTA card', desc: '无需手动点选，直接针对指定组件批量生成多个差异化视觉变体供挑选。' }
+      ]
+    },
+    setup: {
+      label: 'Plan 建档规划（4 条）',
+      items: [
+        { cmd: 'shape', target: 'the billing page', desc: '写代码前先用交互原型思维规划信息架构与页面节奏。' },
+        { cmd: 'init', target: '', desc: '扫描当前仓库并只问必须确认的问题，生成全局共享的 PRODUCT.md 产品上下文。' },
+        { cmd: 'document', target: '', desc: '从现有代码中反向提炼设计系统 Token 与排版规范，写入 DESIGN.md。' },
+        { cmd: 'extract', target: 'the card patterns', desc: '把页面里重复出现的样式与组件抽离回统一的设计系统层。' }
+      ]
+    }
+  };
+
+  var currentStage = 'steer';
+  var cmdGrid = document.getElementById('cmd-grid');
+
+  function selectCmd(stageKey, item) {
+    document.getElementById('cmd-title').textContent = '/impeccable ' + item.cmd;
+    document.getElementById('cmd-stage').textContent = catalog[stageKey].label;
+    document.getElementById('cmd-desc').textContent = item.desc;
+    var suffix = item.target ? (' ' + item.target) : '';
+    document.getElementById('cmd-usage').textContent =
+      'Claude Code / Cursor：/impeccable ' + item.cmd + suffix + '\n' +
+      'Codex CLI：$impeccable ' + item.cmd + suffix;
+  }
+
+  function renderStage(stageKey) {
+    currentStage = stageKey;
+    var group = catalog[stageKey];
+    while (cmdGrid.firstChild) cmdGrid.removeChild(cmdGrid.firstChild);
+    group.items.forEach(function (item, idx) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'cmd-chip' + (idx === 0 ? ' is-active' : '');
+      btn.textContent = item.cmd;
+      btn.addEventListener('click', function () {
+        cmdGrid.querySelectorAll('.cmd-chip').forEach(function (c) {
+          c.classList.toggle('is-active', c === btn);
+        });
+        selectCmd(stageKey, item);
+      });
+      cmdGrid.appendChild(btn);
+    });
+    selectCmd(stageKey, group.items[0]);
+  }
+
+  document.querySelectorAll('.stage-btn[data-stage]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-stage');
+      document.querySelectorAll('.stage-btn').forEach(function (b) {
+        b.classList.toggle('is-active', b === btn);
+      });
+      renderStage(key);
+    });
+  });
+
+  renderStage(currentStage);
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve();
+        else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

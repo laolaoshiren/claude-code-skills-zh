@@ -30,7 +30,10 @@
 <!-- detail-pages-start -->
 - [tt-a1i/archify 中文深度指南：99.7K+ Stars 交互式 HTML 架构图与 PR 可视化 Skill | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/archify/)
 - [JimLiu/baoyu-skills 中文深度指南：22 个自媒体与创作 Agent Skills 按需选型与安装 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/baoyu-skills/)
+- [heygen-com/hyperframes 中文深度指南：HTML 写视频、9 个官方 Skills 与 Remotion 对比 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/hyperframes/)
+- [pbakaus/impeccable 中文深度指南：62 条反 AI 味检测规则与 24 个 UI 设计指令 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/impeccable/)
 - [alibaba/open-code-review 中文深度指南：阿里混合架构 AI 代码审查工具与委托模式配置 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/open-code-review/)
+- [xpzouying/xiaohongshu-mcp 中文深度指南：小红书 MCP 部署、13 个工具与防踢号避坑 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/xiaohongshu-mcp/)
 - [ai-video-producer：中文八阶段 AI 视频流水线技能（防抽卡成本门禁） | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/skills/ai-video-producer/)
 - [api-tester：三档环境门禁与契约驱动 API 测试技能 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/skills/api-tester/)
 - [changelog-gen：双模式中文更新日志与发版说明生成器 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/skills/changelog-gen/)
