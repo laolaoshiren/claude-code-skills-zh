@@ -18,7 +18,7 @@
 
 每周维护：
 
-- 检查开放 PR 和 Issue，优先处理新增资源推荐、断链、描述错误。
+- 检查开放 PR、Issue 和 GitHub Discussions，优先处理新增资源推荐、断链、描述错误、投票反馈与提问；涉及商业合作或私人联系方式的留言先向维护者确认口径后再处理。
 - 搜索近期活跃的 Claude Code / Codex / Agent Skills 项目，补充 5-15 个高相关条目。
 - 运行 `python scripts/sync_readme_to_site.py --fetch-stars` 同步 README 徽章与统计口径、官网数据（含独立展示的「🔬 学术科研」分类与详情页内链 `detailUrl`）、多页 `docs/sitemap.xml`、`PROMO.md` 与 `docs/llms.txt`（含数量与独立中文详解页索引）。
 - 跑本地校验，确保 GitHub Actions 不报错。
@@ -224,6 +224,12 @@ README 是面向用户的项目首页，只保留项目价值、安装入口、�
 2. `generate_skills_js()` 会把命中 `skill-repo` 的第三方详情页路径以 `detailUrl:'/p/<slug>/'` 注入 `skillsData`（仅接受以单个 `/` 开头的安全站内路径，并转义脚本边界字符）；首页卡片使用 `<article class="skill-card">` 与安全 DOM API 渲染 `📖 中文详解` 与 `GitHub ↗`，严禁 `innerHTML` 或嵌套 `<a>`。
 3. `sync_sitemap_xml()` 自动生成多页 `docs/sitemap.xml`：首页固定 `priority: 1.0`、`changefreq: weekly`，每个独立详情页固定 `priority: 0.8`、`changefreq: monthly`；无实质变化时保持字节幂等、不无故推进 `lastmod`，新增页面写入当日 `lastmod` 且保留已有详情页的原 `lastmod`。
 4. `update_llms_detail_pages()` 自动维护 `docs/llms.txt` 中 `<!-- detail-pages-start -->` 与 `<!-- detail-pages-end -->` 之间的全部独立详解页 URL 与标题，便于搜索引擎与 AI 检索抓取。
+
+### 页面视觉与交互约定
+
+- 采用「统一外壳 + 领域灵魂」模式：复用 `docs/assets/detail-page.css` 保证导航栏、面包屑、安装 CTA 与底部品牌认知一致，同时按技能/项目所属领域覆写 `:root` 主题配色，并配备贴合该工具核心痛点的互动模块（如场景切换、命令/配置构建器、演练面板）。
+- 所有互动脚本一律使用安全 DOM API（`createElement` + `textContent`），严禁 `innerHTML` / `outerHTML` / `insertAdjacentHTML`。
+- 每个独立页至少包含 3 组有效 JSON-LD 结构化数据（`BreadcrumbList`、`SoftwareApplication` 或 `TechArticle`、`FAQPage`）。
 
 ## 原创 Skills 迭代方向
 
