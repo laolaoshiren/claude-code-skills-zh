@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>zh-code-reviewer：基于 git diff 的工程级中文代码审查技能 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：默认只读审查 git diff / PR 变更，按阻塞缺陷、重要改进、可选建议分级输出中文审查报告。带文件行号证据与测试覆盖检查，取消主观打分，兼容 Claude Code / Codex / Cursor / Gemini CLI。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="zh-code-reviewer">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/zh-code-reviewer/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="zh-code-reviewer：基于 git diff 的工程级中文代码审查技能">
+<meta property="og:description" content="默认只读、证据优先、严控误报：按🔴阻塞缺陷 / 🟡重要改进 / 🟢可选建议输出中文代码审查报告，不再拍脑袋打分。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/zh-code-reviewer/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="zh-code-reviewer 工程级中文代码审查技能">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="zh-code-reviewer：基于 git diff 的工程级中文代码审查技能">
+<meta name="twitter:description" content="只读审查 PR/git diff，按三级严重度输出精确文件行号、触发路径与最小修复方案，MIT 开源一键安装。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：工程代码审查（赛博青 + 告警红绿分层主题） */
+  :root {
+    --accent: #10b981;
+    --accent2: #38bdf8;
+  }
+  .sev-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+  .sev-btn {
+    border: 1px solid rgba(148,163,184,0.28); background: rgba(15,23,42,0.72);
+    color: #e2e8f0; border-radius: 10px; padding: 9px 14px; font-size: 0.9rem;
+    font-weight: 600; cursor: pointer; transition: all .18s ease;
+  }
+  .sev-btn:hover { border-color: rgba(56,189,248,0.65); transform: translateY(-1px); }
+  .sev-btn.is-active { background: rgba(16,185,129,0.18); border-color: #10b981; color: #a7f3d0; }
+  .sev-panel {
+    border: 1px solid rgba(148,163,184,0.22); border-radius: 14px;
+    background: rgba(10,15,28,0.86); padding: 18px 20px;
+  }
+  .sev-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; font-size: 0.85rem; color: #94a3b8; }
+  .sev-chip { padding: 3px 10px; border-radius: 999px; background: rgba(56,189,248,0.12); color: #7dd3fc; font-family: monospace; }
+  .sev-title { font-size: 1.05rem; font-weight: 700; color: #f8fafc; margin-bottom: 8px; }
+  .sev-detail { color: #cbd5e1; font-size: 0.94rem; line-height: 1.7; margin-bottom: 10px; }
+  .sev-fix { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.86rem; background: #070b14; border: 1px solid rgba(16,185,129,0.3); border-radius: 10px; padding: 12px 14px; color: #a7f3d0; white-space: pre-wrap; }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "zh-code-reviewer",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/zh-code-reviewer/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/zh-code-reviewer",
+  "description": "面向中文开发者的工程级只读代码审查技能：基于 git diff 与完整调用链上下文，按阻塞缺陷、重要改进、可选建议三级输出带文件行号与最小修复方案的中文审查报告。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "zh-code-reviewer", "item": "https://claude-skills.bt199.com/skills/zh-code-reviewer/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "zh-code-reviewer 会不会在审查时直接帮我改代码？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。zh-code-reviewer 默认严格只读，只分析 git diff / PR 变更并输出分级中文审查报告；除非你看完报告后明确要求按某条建议修改，否则绝不改动源码、配置或 Git 状态。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "为什么取消了常见的 8/10 打分制？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "主观打分没有客观工程标准，无法直接指导是否能合并 PR。zh-code-reviewer 改为按实际影响分成 🔴 阻塞缺陷（合并前必须修）、🟡 重要改进（强烈建议处理）、🟢 可选建议（非阻塞）三档，并在无问题时直接给出「未发现阻塞合并缺陷」，杜绝为了凑字数强行挑刺。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "它和 refactor-advisor、security-audit、dep-auditor 怎么分工？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "zh-code-reviewer 专职当前 diff / PR 变更的缺陷与风险审查；大型存量代码库坏味道盘点交给 refactor-advisor；源码专项安全渗透清单交给 security-audit；第三方 lockfile 漏洞与许可证审计交给 dep-auditor。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "能在 Codex、Cursor 或 Gemini CLI 里用吗？Windows 中文路径会乱码吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "可以。新版已完全移除 Claude 专属内部工具名硬编码，兼容所有支持 SKILL.md 的编码 Agent；且 Git 变更查看显式使用 git -c core.quotepath=false，避免 Windows 下中文文件路径被转义成八进制乱码。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">zh-code-reviewer</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-green">🔍 首屏推荐头牌</span>
+        <span class="pill pill-cyan">🔒 默认严格只读</span>
+        <span class="pill pill-purple">🧪 证据优先 · 零主观打分</span>
+      </div>
+      <h1><span class="accent-text">zh-code-reviewer</span>：基于 git diff 的工程级中文代码审查</h1>
+      <p class="hero-lead">告别泛泛而谈的「代码整体不错 8/10」和满屏缩进吐槽。基于真实 <code>git diff</code> 与上下游调用链上下文，过滤低价值格式噪声，按「阻塞缺陷 / 重要改进 / 可选建议」输出精确到 <code>文件:行号</code>、触发路径与最小修复方案的中文审查报告。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">PR / 提交前只读自查</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">适用工具</div>
+          <div class="metric-value">Claude Code / Codex / Cursor / Gemini CLI</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/zh-code-reviewer/SKILL.md" target="_blank" rel="noopener noreferrer">skills/zh-code-reviewer/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/zh-code-reviewer/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#demo" class="btn btn-cyan">🎛️ 交互预览分级输出</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#demo">交互式分级报告预览</a>
+      <a href="#workflow">5 步高信号审查流程</a>
+      <a href="#boundaries">与其他技能分工边界</a>
+      <a href="#install">4 种安装方式</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="demo">
+      <h2>🎛️ 交互式预览：不同严重级别会怎么汇报？</h2>
+      <p class="section-intro">点击下方 4 个标签，查看 <code>zh-code-reviewer</code> 在真实审查中如何区分缺陷等级、压制误报并给出最小修复代码：</p>
+      <div class="sev-tabs" role="tablist" aria-label="审查级别示例">
+        <button type="button" class="sev-btn is-active" data-sev="blocker">🔴 阻塞缺陷</button>
+        <button type="button" class="sev-btn" data-sev="major">🟡 重要改进</button>
+        <button type="button" class="sev-btn" data-sev="minor">🟢 可选建议</button>
+        <button type="button" class="sev-btn" data-sev="test">🧪 测试与待确认</button>
+      </div>
+      <div class="sev-panel" id="sev-panel" aria-live="polite">
+        <div class="sev-meta">
+          <span class="sev-chip" id="sev-loc">src/order/refund.ts:42-58</span>
+          <span id="sev-rule">合并前必须修复 · 并发与幂等缺陷</span>
+        </div>
+        <div class="sev-title" id="sev-title">退款接口缺少幂等键校验，并发重试会触发重复退款</div>
+        <div class="sev-detail" id="sev-detail">证据与触发路径：第 46 行先查询订单状态为 PAID，再调用第三方退款 SDK，最后于第 55 行更新状态；两次并发请求在状态回写前均可通过校验。</div>
+        <div class="sev-fix" id="sev-fix">// 最小修复：通过唯一幂等键（orderId + refundNo）在数据库层做条件更新后再调用外部退款
+const updated = await db.orders.updateMany({
+  where: { id: orderId, status: 'PAID' },
+  data: { status: 'REFUNDING', refundNo }
+});
+if (updated.count === 0) return { code: 'DUPLICATE_REFUND' };</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="workflow">
+      <h2>🧭 5 步高信号审查流程（先追踪调用链，再做误报三连问）</h2>
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>确定审查范围与仓库基准</h3>
+            <p>使用 <code>git -c core.quotepath=false status --short</code> 与 <code>diff --stat</code> 读取真实变更（防 Windows 中文路径转义），并先读项目既有 <code>AGENTS.md</code>、<code>tsconfig</code> 与 lint 规则，不拿个人喜好覆盖团队规范。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>追踪上下游调用链与契约</h3>
+            <p>读取变更所在的完整函数/类上下文，核查公开 API、Schema、CLI 行为和错误处理路径，识别隐式破坏性变更（breaking change）。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>五大高信号维度逐项排查</h3>
+            <p>聚焦：<strong>正确性与边界条件</strong>（含 UTF-8/GBK 与跨平台假设）、<strong>并发与资源泄漏</strong>、<strong>安全与越权注入</strong>、<strong>热路径性能退化（N+1 / 无界内存）</strong>、<strong>契约兼容与测试覆盖</strong>。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>误报自检三连问</h3>
+            <p>落笔前强制自检：① 真实运行路径是否可达？② 上游中间件或框架是否已拦截？③ 修复方案是否可执行且无新副作用？过滤掉可由 linter 自动处理的纯格式问题。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <h3>分级输出 + 诚实披露未跑验证</h3>
+            <p>输出含「总体结论 / 三级发现 / 测试覆盖检查 / 待确认问题」的标准中文报告；未实际跑测试时绝不宣称“测试通过”，发现敏感凭据仅报告行号并严格脱敏。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="boundaries">
+      <h2>🧩 与其他研发技能的清晰边界（避免装多后触发撞车）</h2>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>你的需求场景</th>
+              <th>推荐使用的技能</th>
+              <th>分工原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>合入 PR / 提交前查当前 <code>git diff</code> 缺陷</td>
+              <td><strong><code>zh-code-reviewer</code></strong></td>
+              <td>聚焦增量变更、只读高信号分级报告</td>
+            </tr>
+            <tr>
+              <td>团队级超大变更集 / CI 自动化行级卡点</td>
+              <td><a href="/p/open-code-review/"><code>alibaba/open-code-review</code></a></td>
+              <td>确定性分包管线 + 多语言规则引擎，防超大 PR 漏审</td>
+            </tr>
+            <tr>
+              <td>老项目全仓坏味道盘点与分阶段重构</td>
+              <td><code>refactor-advisor</code></td>
+              <td>面向存量架构债务规划，不局限于单次 diff</td>
+            </tr>
+            <tr>
+              <td>扫描 <code>package-lock.json</code> 等依赖 CVE 与许可证</td>
+              <td><code>dep-auditor</code></td>
+              <td>严格基于真实 lockfile 与公告核验，防臆造漏洞</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种安装方式（零外部依赖，复制即装）</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装插件包</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 zh-code-reviewer</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill zh-code-reviewer</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\zh-code-reviewer" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\zh-code-reviewer\*" "$HOME\.claude\skills\zh-code-reviewer\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/zh-code-reviewer
+cp -r claude-code-skills-zh/skills/zh-code-reviewer/* ~/.claude/skills/zh-code-reviewer/</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>审查完如果没有问题，它会强行挑刺凑字数吗？</h3>
+          <p>不会。规则要求若范围内未发现阻塞或重要缺陷，必须明确写「在本次审查范围内未发现阻塞合并的缺陷」，并列出覆盖范围与未跑验证项。</p>
+        </div>
+        <div class="faq-item">
+          <h3>发现代码里误提交了真实 Token 或密码会直接打印出来吗？</h3>
+          <p>不会。安全边界严禁回显真实凭据全文，仅报告所在文件与行号并提示脱敏轮换。</p>
+        </div>
+        <div class="faq-item">
+          <h3>已合入 VoltAgent/awesome-agent-skills 吗？</h3>
+          <p>是的，<code>laolaoshiren/zh-code-reviewer</code> 已被 37.5K+ Stars 的 <code>VoltAgent/awesome-agent-skills</code> 社区目录收录，现已在最新一轮中重构升级为 119 行工程级规范。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/api-tester/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 契约接口测试</span>
+            <h3>api-tester</h3>
+            <p>三档环境授权门禁 + 凭据零明文 + 国内 { code, msg, data } 业务信封契约测试。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/perf-profiler/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 性能剖析</span>
+            <h3>perf-profiler</h3>
+            <p>基于可复现基线和真实 profiler 证据定位慢接口、N+1 查询与内存瓶颈。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/p/open-code-review/">
+          <div>
+            <span class="related-tag">🛡️ 阿里开源 · 56.2K+ ⭐</span>
+            <h3>alibaba/open-code-review</h3>
+            <p>混合架构企业级审查 CLI，适合超大 PR 与 CI/CD 流水线自动化审查。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>zh-code-reviewer</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/zh-code-reviewer/SKILL.md" target="_blank" rel="noopener noreferrer">skills/zh-code-reviewer/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var samples = {
+    blocker: {
+      loc: 'src/order/refund.ts:42-58',
+      rule: '合并前必须修复 · 并发与幂等缺陷',
+      title: '退款接口缺少幂等键校验，并发重试会触发重复退款',
+      detail: '证据与触发路径：第 46 行先查询订单状态为 PAID，再调用第三方退款 SDK，最后于第 55 行更新状态；两次并发请求在状态回写前均可通过校验。',
+      fix: "// 最小修复：在数据库层用条件更新锁定状态后再调用外部退款\nconst updated = await db.orders.updateMany({\n  where: { id: orderId, status: 'PAID' },\n  data: { status: 'REFUNDING', refundNo }\n});\nif (updated.count === 0) return { code: 'DUPLICATE_REFUND' };"
+    },
+    major: {
+      loc: 'scripts/export_report.py:88',
+      rule: '强烈建议处理 · Windows GBK 编码隐患',
+      title: 'open() 写入中文报表未显式声明 encoding="utf-8"',
+      detail: '证据与触发路径：第 88 行直接调用 open(out_path, "w")，在 Windows 中文系统默认 CP936 环境下写入含 emoji 或特殊中文符号时抛出 UnicodeEncodeError。',
+      fix: '# 最小修复：显式指定 UTF-8 与统一 LF 换行\nwith open(out_path, "w", encoding="utf-8", newline="\\n") as f:\n    f.write(report_text)'
+    },
+    minor: {
+      loc: 'src/utils/date.ts:15',
+      rule: '非阻塞 · 可读性局部优化',
+      title: 'parseWindow(d) 参数命名偏模糊，未体现单位是天还是小时',
+      detail: '原因与建议：调用处传入的是天数，建议顺手改名为 windowDays，降低后续维护误传小时数的风险；不阻塞本次合并。',
+      fix: '// 可选优化：函数签名语义化\nexport function parseWindow(windowDays: number): number { ... }'
+    },
+    test: {
+      loc: '测试覆盖与待确认问题',
+      rule: '防盲目宣称通过 · 暴露契约缺口',
+      title: '已覆盖正常退款路径，但缺少并发重复点击与三方超时回滚用例',
+      detail: '待确认问题：当第三方退款网关返回超时（504）时，业务期望订单停留在 REFUNDING 等待对账任务，还是立即回退为 PAID？当前未运行单测（需本地 Redis）。',
+      fix: '# 建议补充的回归验证用例\n1. 同 orderId 并发 2 次退款请求仅允许 1 次调用下游 SDK\n2. 模拟网关 504 超时验证状态机与告警日志脱敏'
+    }
+  };
+  var btns = document.querySelectorAll('.sev-btn[data-sev]');
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-sev');
+      var item = samples[key];
+      if (!item) return;
+      btns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+      document.getElementById('sev-loc').textContent = item.loc;
+      document.getElementById('sev-rule').textContent = item.rule;
+      document.getElementById('sev-title').textContent = item.title;
+      document.getElementById('sev-detail').textContent = item.detail;
+      document.getElementById('sev-fix').textContent = item.fix;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve(); else reject(new Error('copy failed'));
+      } catch (err) { document.body.removeChild(area); reject(err); }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () { btn.classList.remove('copied'); btn.textContent = defaultLabel; }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

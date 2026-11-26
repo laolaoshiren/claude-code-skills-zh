@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>zh-docgen：证据驱动的中文技术文档生成器 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：先核验真实代码、路由与配置文件，再生成或更新 docs/ 架构设计、模块说明、API 参考与配置运维中文文档。零编造、保护人工沉淀内容、覆盖前先确认，兼容 Claude Code / Codex / Cursor / Gemini CLI。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="zh-docgen">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/zh-docgen/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="zh-docgen：证据驱动的中文技术文档生成器">
+<meta property="og:description" content="从真实代码与配置提取事实，生成架构设计、API 手册与配置运维中文文档，严禁编造接口参数与写入真实密钥，覆写前必确认。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/zh-docgen/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="zh-docgen 证据驱动的中文技术文档生成器">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="zh-docgen：证据驱动的中文技术文档生成器">
+<meta name="twitter:description" content="先读源码与配置再写 docs/ 技术手册：支持 API 参考、架构说明、配置运维手册，零编造参数、UTF-8 跨平台安全落盘。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：蓝图文档工程（钴蓝 + 天青技术手册主题） */
+  :root {
+    --accent: #3b82f6;
+    --accent2: #38bdf8;
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(59, 130, 246, 0.2) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(56, 189, 248, 0.12) 0%, transparent 50%);
+  }
+  .doc-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+  .doc-tab-btn {
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(15, 23, 42, 0.72);
+    color: #e2e8f0;
+    border-radius: 10px;
+    padding: 9px 15px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .doc-tab-btn:hover { border-color: rgba(56, 189, 248, 0.7); transform: translateY(-1px); }
+  .doc-tab-btn.is-active {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: #38bdf8;
+    color: #bae6fd;
+  }
+  .doc-stage {
+    border: 1px solid rgba(56, 189, 248, 0.26);
+    border-radius: 14px;
+    background: rgba(9, 14, 28, 0.88);
+    padding: 18px 20px;
+  }
+  .doc-stage-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .doc-path-badge {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(59, 130, 246, 0.16);
+    border: 1px solid rgba(59, 130, 246, 0.38);
+    color: #93c5fd;
+  }
+  .doc-guard-badge {
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(16, 185, 129, 0.14);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #6ee7b7;
+  }
+  .doc-evidence-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .doc-evidence-card {
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 11px;
+    padding: 12px 14px;
+  }
+  .doc-evidence-card h3 {
+    margin: 0 0 6px;
+    font-size: 0.86rem;
+    color: #7dd3fc;
+  }
+  .doc-evidence-card p {
+    font-size: 0.87rem;
+    color: #cbd5e1;
+    line-height: 1.62;
+  }
+  .doc-preview-code {
+    font-family: var(--mono);
+    font-size: 0.84rem;
+    line-height: 1.68;
+    background: #060a14;
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    border-radius: 11px;
+    padding: 14px 16px;
+    color: #dbeafe;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    margin-bottom: 12px;
+  }
+  .doc-summary-foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.84rem;
+    color: #94a3b8;
+    border-top: 1px solid rgba(148, 163, 184, 0.16);
+    padding-top: 10px;
+  }
+  .doc-summary-foot strong { color: #f8fafc; }
+  @media (max-width: 768px) {
+    .doc-evidence-grid { grid-template-columns: 1fr; }
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "zh-docgen",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/zh-docgen/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/zh-docgen",
+  "description": "面向中文开发者的证据驱动技术文档生成器：先核验真实源码、路由、类型定义与配置文件，再生成或更新 docs/ 架构设计、模块说明、API 参考与配置运维中文手册，严禁编造接口与写入密钥。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "zh-docgen", "item": "https://claude-skills.bt199.com/skills/zh-docgen/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "zh-docgen 和 zh-readme、ds-mapper 有什么区别？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "三者职责完全不重叠：zh-docgen 专注生成和更新 docs/ 目录下的架构设计、模块开发指南、API 参考和配置运维手册；开源项目首页 README.md 交给 zh-readme；仅需要带中文注释的目录树速览交给 ds-mapper。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "它会直接覆盖我手写的 docs/ 文档，或者编造不存在的 API 参数吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。zh-docgen 坚持证据驱动与保护人工沉淀原则：所有接口路径、参数、配置项与命令必须来自真实源码与配置文件，无法证实的内容标为「待补充」；更新已有文档前先完整阅读原文件、展示修改范围或 diff 摘要，经你确认后再以 UTF-8 写入。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "生成配置与运维手册时，会不会把 .env 里的真实密钥写进文档？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "严禁写入。安全边界明确规定只从 .env.example 与配置加载代码提取变量名、必填性和默认值说明，不得将 .env、配置文件或测试数据中的真实 Token、密码、内网地址写入技术文档，也不得顺手修改任何业务源码。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "生成的文档里如果包含启动或构建命令，会标注跨平台差异吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "会。文档落盘前会核对相对路径、文件名与代码块语言标识，并在涉及终端命令时注明 macOS / Linux 与 Windows PowerShell 差异；若未实际执行过构建或运行命令，绝不宣称命令已验证跑通。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">zh-docgen</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-cyan">📚 本仓原创 · 技术文档</span>
+        <span class="pill pill-green">🔎 证据驱动 · 零编造</span>
+        <span class="pill pill-purple">🛡️ 覆写前必确认 · UTF-8 安全</span>
+      </div>
+      <h1><span class="accent-text">zh-docgen</span>：基于真实代码库的中文技术文档生成器</h1>
+      <p class="hero-lead">告别“看目录名猜架构、凭印象编 API 参数”的水文档。<code>zh-docgen</code> 先读取项目元信息、路由定义、类型契约与配置加载代码，再生成或增量更新 <code>docs/</code> 下的架构设计、模块指南、API 手册与配置运维文档，保护已有人工沉淀，覆写落盘前必须确认。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">docs/ 架构 · API · 运维手册</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">适用工具</div>
+          <div class="metric-value">Claude Code / Codex / Cursor / Gemini CLI</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/zh-docgen/SKILL.md" target="_blank" rel="noopener noreferrer">skills/zh-docgen/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/zh-docgen/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#demo" class="btn btn-cyan">🎛️ 体验文档类型与防编造规则</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#demo">交互式文档类型切换</a>
+      <a href="#workflow">4 步证据驱动工作流</a>
+      <a href="#safety">核心原则与安全红线</a>
+      <a href="#boundaries">与其他技能分工边界</a>
+      <a href="#install">4 种安装方式</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="demo">
+      <h2>🎛️ 交互式文档类型切换：不同手册如何执行「证据防编造」？</h2>
+      <p class="section-intro">点击下方 3 种高频文档类型，查看 <code>zh-docgen</code> 如何锁定真实代码证据、处理未证实字段（标为「待补充」而非脑补）并输出可核验的文档生成汇总：</p>
+
+      <div class="doc-tabs" role="tablist" aria-label="文档类型切换">
+        <button type="button" class="doc-tab-btn is-active" data-doc="api" role="tab" aria-selected="true">🔌 API 参考手册</button>
+        <button type="button" class="doc-tab-btn" data-doc="arch" role="tab" aria-selected="false">🏗️ 架构设计说明</button>
+        <button type="button" class="doc-tab-btn" data-doc="config" role="tab" aria-selected="false">⚙️ 配置与运维参考</button>
+      </div>
+
+      <div class="doc-stage" aria-live="polite">
+        <div class="doc-stage-head">
+          <span class="doc-path-badge" id="doc-target-path">目标路径：docs/api-reference.md（落盘前需确认）</span>
+          <span class="doc-guard-badge" id="doc-guard-tag">防编造规则：仅提取真实路由与 Schema</span>
+        </div>
+
+        <div class="doc-evidence-grid">
+          <div class="doc-evidence-card">
+            <h3>📌 必须核验的源码证据</h3>
+            <p id="doc-evidence-source">路由注册文件（如 src/routes/orders.ts）、控制器签名、请求/响应 TypeScript 类型或 Pydantic Schema、真实错误处理分支与 JSDoc / docstring。</p>
+          </div>
+          <div class="doc-evidence-card">
+            <h3>🚫 防编造与缺口处理红线</h3>
+            <p id="doc-anti-fab">禁止凭路径名臆造分页参数、隐藏状态码或未在代码中实现的限流规则；线上网关超时、鉴权 Token 申请流程等源码未体现的信息，一律标为「待补充」。</p>
+          </div>
+        </div>
+
+        <pre class="doc-preview-code" id="doc-snippet">### POST /api/v2/orders/refund
+
+- **证据来源**：`src/routes/orders.ts:28`、`src/schemas/refund.ts:12`
+- **请求体参数**：
+  | 字段 | 类型 | 必填 | 说明 |
+  |------|------|------|------|
+  | `orderId` | `string` | 是 | 订单主键（UUID 校验见 `refund.ts:14`） |
+  | `refundNo` | `string` | 是 | 幂等退款单号，重复提交返回 `409` |
+  | `reason` | `string` | 否 | 退款说明，最大 200 字符 |
+- **真实错误码**：`400 INVALID_ORDER` / `409 DUPLICATE_REFUND`
+- **待补充项**：线上网关单日退款限额需人工确认</pre>
+
+        <div class="doc-summary-foot">
+          <span><strong>交付汇总检查：</strong><span id="doc-deliver-check">已核对路由路径、Schema 字段与错误分支；未改动任何业务源码；目标文件存在时先输出 diff 摘要。</span></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="workflow">
+      <h2>🧭 4 步证据驱动工作流（从源码盘点到安全交付）</h2>
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>盘点项目与明确文档目标</h3>
+            <p>先确认文档类型（架构文档 / 模块说明 / API 参考 / 配置与运维手册）与目标路径（如 <code>docs/architecture.md</code>）；读取 <code>package.json</code>、<code>pyproject.toml</code>、<code>go.mod</code>、<code>Cargo.toml</code>、<code>Makefile</code>、已有 <code>README.md</code> 与 <code>docs/</code>，防止文档口径互相打架。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>提取真实代码与配置事实</h3>
+            <p><strong>架构与模块</strong>追踪入口文件、分层依赖、数据存储与外部集成，只画真实组件的 Mermaid 图；<strong>API 参考</strong>直接从路由、控制器与类型定义提签名与错误路径；<strong>配置与命令</strong>仅来自 <code>.env.example</code>、配置加载代码和真实 scripts。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>按需组织结构并预览确认</h3>
+            <p>不硬塞无关章节，保留已有文档中的业务背景、历史决策记录和人工注意事项；若目标路径已存在文档，先展示待修改范围或 diff 摘要，取得用户确认后再执行落盘；仅要求起草时直接输出正文。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>跨平台校验与结构化汇总</h3>
+            <p>核对文档内相对链接、文件路径、真实命令与代码块语言标识，涉及终端命令时标注 macOS / Linux 与 Windows PowerShell 差异，统一 UTF-8 编码写入，最后输出包含「生成/更新文件、证据来源、已验证项、待补充项」的中文汇总。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="safety">
+      <h2>🛡️ 核心原则与安全红线</h2>
+      <div class="grid-2">
+        <div class="callout callout-cyan">
+          <div class="callout-title">✅ 4 条硬核编写准则</div>
+          <ul class="prose-list">
+            <li><strong>证据驱动，零编造</strong>：每个模块名、配置项、环境变量、CLI 参数和 API 路径必须有仓库源码支撑；查不到的明确标「待补充」。</li>
+            <li><strong>保护人工沉淀内容</strong>：更新既有 <code>docs/</code> 前先全文通读，保留团队踩坑记录和架构决策，禁止整篇覆盖重写。</li>
+            <li><strong>落盘先确认</strong>：默认先确认目标路径与是否覆盖已有文件，避免意外污染工作树。</li>
+            <li><strong>中英文表达规范</strong>：简体中文自然解释，文件名、配置键、命令和技术术语保持英文原样。</li>
+          </ul>
+        </div>
+        <div class="callout callout-red">
+          <div class="callout-title">🚫 绝不越界的安全边界</div>
+          <ul class="prose-list">
+            <li><strong>零凭据泄露</strong>：严禁将 <code>.env</code>、配置文件或测试数据里的真实 Token、密码、私有内网地址写入技术文档。</li>
+            <li><strong>不碰业务源码</strong>：不顺手修改任何业务代码，也不删除现有文档目录。</li>
+            <li><strong>不虚报验证结果</strong>：未实际执行过文档里的启动、测试或构建命令时，绝不声称命令已验证跑通。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="boundaries">
+      <h2>🧩 与其他文档/结构技能的分工边界</h2>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>你的需求场景</th>
+              <th>推荐使用的技能</th>
+              <th>分工原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>补全 <code>docs/</code> 架构设计、模块开发指南、API 或配置运维手册</td>
+              <td><strong><code>zh-docgen</code></strong></td>
+              <td>深挖源码、类型、配置与错误处理，输出内部可维护技术手册</td>
+            </tr>
+            <tr>
+              <td>撰写或重写开源项目首页 <code>README.md</code></td>
+              <td><a href="/skills/zh-readme/"><code>zh-readme</code></a></td>
+              <td>聚焦首屏价值定位、快速安装与开源转化，而非细粒度内部文档</td>
+            </tr>
+            <tr>
+              <td>快速看陌生项目的目录树、模块职责与启动入口</td>
+              <td><a href="/skills/ds-mapper/"><code>ds-mapper</code></a></td>
+              <td>纯只读轻量化目录地图导览，3 层结构一眼看懂仓库布局</td>
+            </tr>
+            <tr>
+              <td>把英文 <code>SKILL.md</code> / <code>AGENTS.md</code> 无损汉化</td>
+              <td><a href="/skills/skill-translator/"><code>skill-translator</code></a></td>
+              <td>专职锁定 frontmatter、代码块与 CLI 参数的跨语言无损迁移</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种安装方式（零外部依赖，复制即装）</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装插件包</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 zh-docgen</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill zh-docgen</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\zh-docgen" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\zh-docgen\*" "$HOME\.claude\skills\zh-docgen\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/zh-docgen
+cp -r claude-code-skills-zh/skills/zh-docgen/* ~/.claude/skills/zh-docgen/</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>zh-docgen 和 zh-readme、ds-mapper 有什么区别？</h3>
+          <p><code>zh-docgen</code> 专攻 <code>docs/</code> 下的架构设计、模块开发指南、API 参考与配置运维手册；开源项目首页 README 编写交给 <a href="/skills/zh-readme/"><code>zh-readme</code></a>；仅需快速生成带中文注释的目录树导览则交给 <a href="/skills/ds-mapper/"><code>ds-mapper</code></a>。</p>
+        </div>
+        <div class="faq-item">
+          <h3>更新已有的 docs/ 文档时，会把我手写的业务背景删掉吗？</h3>
+          <p>不会。技能规则要求更新既有文档前必须先完整阅读原文件，保留有效业务背景、架构决策记录和人工注意事项，并先展示待修改范围或 diff 摘要，经你确认后再写入。</p>
+        </div>
+        <div class="faq-item">
+          <h3>源码里找不到某些线上运维参数时，它会自己编一个默认值吗？</h3>
+          <p>严禁编造。所有环境变量、默认值、API 参数和错误码必须来自真实源码或 <code>.env.example</code>；源码未体现的信息会在文档及交付汇总的「待补充项」中明确列出，提醒人工补齐。</p>
+        </div>
+        <div class="faq-item">
+          <h3>Windows 环境下生成的 Markdown 文档会出现中文乱码吗？</h3>
+          <p>不会。技能明确要求写入文件统一采用 UTF-8 编码，并在运维/启动命令章节对 macOS / Linux 与 Windows PowerShell 差异做显式说明。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 同类原创技能站内互链</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/zh-readme/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 开源首页</span>
+            <h3>zh-readme</h3>
+            <p>先读仓库事实再写像人写的中文 README，兼顾快速安装命令与国内访问体验。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/ds-mapper/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 目录结构地图</span>
+            <h3>ds-mapper</h3>
+            <p>只读扫描代码库生成带中文注释的 3 层目录树、模块职责表与启动入口建议。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/skill-translator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 英文 Skill 汉化</span>
+            <h3>skill-translator</h3>
+            <p>把高星英文 SKILL.md / AGENTS.md 无损转为中文触发版，附安全与 Windows 预检。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>zh-docgen</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/zh-docgen/SKILL.md" target="_blank" rel="noopener noreferrer">skills/zh-docgen/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var docModes = {
+    api: {
+      path: '目标路径：docs/api-reference.md（落盘前需确认）',
+      guard: '防编造规则：仅提取真实路由与 Schema',
+      evidence: '路由注册文件（如 src/routes/orders.ts）、控制器签名、请求/响应 TypeScript 类型或 Pydantic Schema、真实错误处理分支与 JSDoc / docstring。',
+      antiFab: '禁止凭路径名臆造分页参数、隐藏状态码或未在代码中实现的限流规则；线上网关超时、鉴权 Token 申请流程等源码未体现的信息，一律标为「待补充」。',
+      snippet: '### POST /api/v2/orders/refund\n\n- **证据来源**：`src/routes/orders.ts:28`、`src/schemas/refund.ts:12`\n- **请求体参数**：\n  | 字段 | 类型 | 必填 | 说明 |\n  |------|------|------|------|\n  | `orderId` | `string` | 是 | 订单主键（UUID 校验见 `refund.ts:14`） |\n  | `refundNo` | `string` | 是 | 幂等退款单号，重复提交返回 `409` |\n  | `reason` | `string` | 否 | 退款说明，最大 200 字符 |\n- **真实错误码**：`400 INVALID_ORDER` / `409 DUPLICATE_REFUND`\n- **待补充项**：线上网关单日退款限额需人工确认',
+      deliver: '已核对路由路径、Schema 字段与错误分支；未改动任何业务源码；目标文件存在时先输出 diff 摘要。'
+    },
+    arch: {
+      path: '目标路径：docs/architecture.md（保留已有决策记录）',
+      guard: '防编造规则：Mermaid 图只画真实存在的模块',
+      evidence: '应用入口文件（src/index.ts / cmd/main.go）、核心服务分层、数据库与缓存客户端初始化代码、消息队列及外部 SDK 集成点。',
+      antiFab: '绝不因为“典型微服务架构”就凭空画进不存在的 Kafka、Redis 或 API 网关；先通读现有 docs/architecture.md，保留历史 ADR 决策背景。',
+      snippet: '## 模块关系（基于真实依赖流向）\n\n```mermaid\nflowchart LR\n  API["src/routes/ HTTP 路由层"] --> SVC["src/services/ 领域服务层"]\n  SVC --> DB["src/db/prisma.ts (PostgreSQL)"]\n  SVC --> PAY["src/integrations/wechat-pay.ts"]\n```\n\n- **已知限制（源自源码）**：`wechat-pay.ts:64` 仅实现单笔退款回调，批量对账任务尚未接入（待补充排期）。',
+      deliver: '已追踪入口文件至持久层调用链，无虚构组件；所有相对路径引用与 Mermaid 节点均与仓库一致。'
+    },
+    config: {
+      path: '目标路径：docs/deployment-config.md（严禁写入密钥）',
+      guard: '防编造规则：命令与变量仅取自 .env.example 与配置代码',
+      evidence: '.env.example、配置加载与校验模块（如 src/config.ts）、package.json scripts / Makefile / Dockerfile 中的真实命令。',
+      antiFab: '严禁把 .env 或测试配置里的真实 Token、密码、内网 IP 写进文档；未实际执行过启动/构建命令时，不宣称已验证跑通，并标注 Windows 与 Unix 命令差异。',
+      snippet: '## 环境变量参考（源自 `.env.example` 与 `src/config.ts`）\n\n| 变量名 | 必填 | 默认值 | 说明 |\n|--------|------|--------|------|\n| `DATABASE_URL` | 是 | 无 | PostgreSQL 连接串（示例占位：`postgres://user:pass@localhost:5432/app`） |\n| `LOG_LEVEL` | 否 | `info` | 日志级别，见 `src/config.ts:19` |\n| `PORT` | 否 | `3000` | HTTP 监听端口 |\n\n> Windows PowerShell 传参请使用 `$env:LOG_LEVEL="debug"; npm start`（勿直接照搬 Bash 前缀写法）。',
+      deliver: '已脱敏全部凭据占位符，注明 Windows PowerShell 与 macOS/Linux 命令差异；未实际运行服务，已如实标注待验证。'
+    }
+  };
+
+  var tabs = document.querySelectorAll('.doc-tab-btn[data-doc]');
+  tabs.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-doc');
+      var item = docModes[key];
+      if (!item) return;
+      tabs.forEach(function (t) {
+        var active = t === btn;
+        t.classList.toggle('is-active', active);
+        t.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      document.getElementById('doc-target-path').textContent = item.path;
+      document.getElementById('doc-guard-tag').textContent = item.guard;
+      document.getElementById('doc-evidence-source').textContent = item.evidence;
+      document.getElementById('doc-anti-fab').textContent = item.antiFab;
+      document.getElementById('doc-snippet').textContent = item.snippet;
+      document.getElementById('doc-deliver-check').textContent = item.deliver;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve(); else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

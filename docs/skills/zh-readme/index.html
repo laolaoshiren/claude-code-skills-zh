@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>zh-readme：去 AI 味的中文开源项目 README 生成与优化技能 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：先读真实代码、包管理配置与 LICENSE，再写 30 秒说清「是什么、适合谁、怎么装」的中文 README。告别空泛 AI 腔，兼顾 Windows PowerShell 与 macOS 命令，覆写已有 README 前必须确认。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="zh-readme">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/zh-readme/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="zh-readme：去 AI 味的中文开源项目 README 生成与优化技能">
+<meta property="og:description" content="先分析真实仓库再动笔：用人话讲清痛点、差异和 30 秒安装路径，拒绝「革命性、优雅领先」式空话，覆写前保护原有有效说明。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/zh-readme/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="zh-readme 去 AI 味中文 README 生成技能">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="zh-readme：去 AI 味的中文开源项目 README 生成技能">
+<meta name="twitter:description" content="30 秒转化公式 + 真实仓库取证 + 跨平台安装命令检查，MIT 开源一键安装。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：开源文档与转化写作（青绿 + 紫罗兰编辑室主题） */
+  :root {
+    --accent: #14b8a6;
+    --accent2: #a855f7;
+  }
+  .contrast-switch { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0; }
+  .cs-btn {
+    border: 1px solid rgba(148,163,184,0.28); background: rgba(15,23,42,0.72);
+    color: #e2e8f0; border-radius: 10px; padding: 9px 14px; font-size: 0.9rem;
+    font-weight: 600; cursor: pointer; transition: all .18s ease;
+  }
+  .cs-btn.is-active { border-color: #14b8a6; background: rgba(20,184,166,0.18); color: #99f6e4; }
+  .cs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 760px) { .cs-grid { grid-template-columns: 1fr; } }
+  .cs-card { border-radius: 14px; padding: 18px 20px; border: 1px solid rgba(148,163,184,0.2); background: rgba(10,15,28,0.84); }
+  .cs-card.is-ai { border-color: rgba(244,63,94,0.4); }
+  .cs-card.is-human { border-color: rgba(20,184,166,0.45); }
+  .cs-label { font-size: 0.82rem; font-weight: 700; margin-bottom: 10px; display: inline-block; padding: 3px 10px; border-radius: 999px; }
+  .cs-card.is-ai .cs-label { background: rgba(244,63,94,0.16); color: #fda4af; }
+  .cs-card.is-human .cs-label { background: rgba(20,184,166,0.16); color: #5eead4; }
+  .cs-text { font-size: 0.95rem; line-height: 1.75; color: #e2e8f0; margin-bottom: 10px; white-space: pre-wrap; }
+  .cs-why { font-size: 0.85rem; color: #94a3b8; line-height: 1.6; }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "zh-readme",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/zh-readme/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/zh-readme",
+  "description": "面向中文开源项目与内部仓库的 README.md 生成与优化助手：先读代码、配置和 LICENSE 再动笔，去掉 AI 翻译腔与空泛宣传词，补齐跨平台安装命令，覆写前必须确认。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "zh-readme", "item": "https://claude-skills.bt199.com/skills/zh-readme/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "zh-readme 会不会直接把我原来手写的 README.md 覆写丢掉？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。规则要求若仓库已有 README.md，必须先保留有效徽章、人工说明与真实入口，先向用户列出保留项与改动摘要，获得明确确认后才会以 UTF-8 编码落盘。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "为什么很多人用普通 Prompt 写的中文 README 让人一眼不想点 Star？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "普通生成常堆砌「革命性、极其强大、优雅领先」等空泛形容词，且凭项目名编造不存在的 CLI 参数或只给 macOS 专属命令。zh-readme 强制先读取 package.json、pyproject.toml、Makefile、LICENSE 和入口源码，确保每条命令与路径均来自真实证据。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "zh-readme 和 zh-docgen、ds-mapper 有什么区别？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "zh-readme 专注项目门面首页（30 秒说清是什么、适合谁、怎么装）；编写 docs/ 下的深度架构与完整 API 手册请用 zh-docgen；只想快速输出目录树结构地图请用 ds-mapper。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">zh-readme</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-green">📝 首屏转化门面</span>
+        <span class="pill pill-cyan">🔎 先读源码再动笔</span>
+        <span class="pill pill-purple">✨ 去 AI 腔 / 防编造</span>
+      </div>
+      <h1><span class="accent-text">zh-readme</span>：先分析真实仓库，再写像人写的中文 README</h1>
+      <p class="hero-lead">帮开源作者和研发团队打造 30 秒看懂价值的项目首页。强制先读取 <code>package.json</code> / <code>pyproject.toml</code> / <code>LICENSE</code> 与入口代码再动笔，拒绝空泛 AI 宣传词，补齐 Windows PowerShell 与 macOS 跨平台安装命令，覆写前先展示摘要确认。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">开源首页编写与转化优化</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">核心防线</div>
+          <div class="metric-value">真实取证 + 覆写前确认</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/zh-readme/SKILL.md" target="_blank" rel="noopener noreferrer">skills/zh-readme/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/zh-readme/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#contrast" class="btn btn-cyan">👀 看 AI 腔 vs 人话对比</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#contrast">AI 腔 vs 真实人话对比</a>
+      <a href="#formula">30 秒首屏转化公式</a>
+      <a href="#install">4 种安装方式</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="contrast">
+      <h2>👀 交互式对比：为什么它写的 README 更像真人维护者写的？</h2>
+      <p class="section-intro">切换 3 个常见 README 段落，直观对比普通 AI 生成与 <code>zh-readme</code> 的写法差异：</p>
+      <div class="contrast-switch" role="tablist" aria-label="README 写法对比">
+        <button type="button" class="cs-btn is-active" data-case="hero">1. 首屏价值主张</button>
+        <button type="button" class="cs-btn" data-case="install">2. 安装命令块</button>
+        <button type="button" class="cs-btn" data-case="limits">3. 缺失信息与限制</button>
+      </div>
+      <div class="cs-grid" aria-live="polite">
+        <div class="cs-card is-ai">
+          <span class="cs-label">❌ 典型 AI 腔（劝退访客）</span>
+          <div class="cs-text" id="cs-ai">一个革命性、极其强大、优雅领先的现代化 AI 驱动开发平台，助力开发者全面提升生产力！</div>
+          <div class="cs-why" id="cs-ai-why">问题：通篇空泛形容词，看完不知道它到底解决什么具体场景，也不敢装。</div>
+        </div>
+        <div class="cs-card is-human">
+          <span class="cs-label">✅ zh-readme 实话风格（提升点 Star 率）</span>
+          <div class="cs-text" id="cs-human">把本地 OpenAPI 文件或 Express/FastAPI 路由转成可运行接口测试的 CLI，适合缺专职 QA 的小团队在合入 PR 前做回归检查。</div>
+          <div class="cs-why" id="cs-human-why">收益：一句话说清「是什么 + 适合谁 + 解决什么痛点」，技术名词保留英文，中文自然克制。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="formula">
+      <h2>🧭 5 步取证工作流与交付前自检清单</h2>
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>读取真实仓库资产</h3>
+            <p>优先检查 <code>package.json</code>、<code>pyproject.toml</code>、<code>Makefile</code>、<code>Cargo.toml</code>、<code>go.mod</code>、<code>LICENSE</code> 与入口代码，绝不凭仓库名猜功能。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>打磨 30 秒首屏四件套</h3>
+            <p>首屏清晰回答「解决什么问题、适合谁用、30 秒怎么装、在线演示/官网在哪」，GitHub 原生地址优先，国内镜像仅作访问困难补充。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>核验跨平台命令与数据口径</h3>
+            <p>确保 Windows PowerShell 不出现 <code>&amp;&amp;</code> 或裸 <code>cp -r</code> 陷阱；官网、徽章、版本号与数量口径全仓统一不打架。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>保护已有内容，确认后再覆写</h3>
+            <p>仓库已有 <code>README.md</code> 时，先列出保留项与改动摘要，取得维护者确认后再以 UTF-8 落盘，信息不足处标「待补充」绝不编造。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种安装方式</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 zh-readme</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill zh-readme</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\zh-readme" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\zh-readme\*" "$HOME\.claude\skills\zh-readme\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/zh-readme
+cp -r claude-code-skills-zh/skills/zh-readme/* ~/.claude/skills/zh-readme/</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>适合拿来重写老开源项目的 README 吗？</h3>
+          <p>非常适合。它会先盘点原 README 里的徽章、鸣谢与有效说明，只重构首屏价值主张、补齐真实安装命令和结构导航，不会粗暴清空你的历史积累。</p>
+        </div>
+        <div class="faq-item">
+          <h3>和 zh-docgen 怎么区分？</h3>
+          <p><code>zh-readme</code> 专注根目录门面首页与上手转化；如果要生成 <code>docs/</code> 下的模块架构手册或 API 参考文档，使用 <code>zh-docgen</code>。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/skill-translator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 技能本地化</span>
+            <h3>skill-translator</h3>
+            <p>把海外英文 SKILL.md / AGENTS.md 无损本地化为中文触发版并预检安全风险。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/zh-code-reviewer/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 代码审查</span>
+            <h3>zh-code-reviewer</h3>
+            <p>基于 git diff 的分级中文只读代码审查，合入前先揪出阻塞缺陷。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/p/archify/">
+          <div>
+            <span class="related-tag">💻 交互架构图 · 99.7K+ ⭐</span>
+            <h3>tt-a1i/archify</h3>
+            <p>写完 README 后，还可以给大型项目配一份离线可交互 HTML 架构图。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>zh-readme</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/zh-readme/SKILL.md" target="_blank" rel="noopener noreferrer">skills/zh-readme/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var cases = {
+    hero: {
+      ai: '一个革命性、极其强大、优雅领先的现代化 AI 驱动开发平台，助力开发者全面提升生产力！',
+      aiWhy: '问题：通篇空泛形容词，看完不知道它到底解决什么具体场景，也不敢装。',
+      human: '把本地 OpenAPI 文件或 Express/FastAPI 路由转成可运行接口测试的 CLI，适合缺专职 QA 的小团队在合入 PR 前做回归检查。',
+      humanWhy: '收益：一句话说清「是什么 + 适合谁 + 解决什么痛点」，技术名词保留英文，中文自然克制。'
+    },
+    install: {
+      ai: 'git clone https://github.com/xxx/demo.git && cp -r demo/* ~/.tool/',
+      aiWhy: '问题：在 Windows PowerShell 5.1 下 && 直接报语法错；首次安装目录不存在时 cp -r 也会失败。',
+      human: '# macOS / Linux\nmkdir -p ~/.tool && cp -r demo/* ~/.tool/\n# Windows PowerShell 5.1+\nNew-Item -ItemType Directory -Force "$HOME\\.tool" | Out-Null\nCopy-Item -Recurse -Force ".\\demo\\*" "$HOME\\.tool\\"',
+      humanWhy: '收益：区分系统给出真实可复制命令，不让访客卡死在首屏第 30 秒。'
+    },
+    limits: {
+      ai: '性能提升 10 倍，兼容全平台所有工具，零配置生产级可用！',
+      aiWhy: '问题：编造未经验证的性能倍数与兼容性，一旦实测翻车直接毁掉项目口碑。',
+      human: '当前实测支持 Node.js 20+ 与 Python 3.11+；生产环境写入需显式传 --confirm，基准压测数据待补充。',
+      humanWhy: '收益：真实核验前置条件与限制，信息不足处坦诚标「待补充」，信任感远高于浮夸宣传。'
+    }
+  };
+  var btns = document.querySelectorAll('.cs-btn[data-case]');
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var c = cases[btn.getAttribute('data-case')];
+      if (!c) return;
+      btns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+      document.getElementById('cs-ai').textContent = c.ai;
+      document.getElementById('cs-ai-why').textContent = c.aiWhy;
+      document.getElementById('cs-human').textContent = c.human;
+      document.getElementById('cs-human-why').textContent = c.humanWhy;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text; area.setAttribute('readonly', ''); area.style.position = 'fixed'; area.style.opacity = '0';
+      document.body.appendChild(area); area.select();
+      try { var ok = document.execCommand('copy'); document.body.removeChild(area); if (ok) resolve(); else reject(new Error('copy failed')); }
+      catch (err) { document.body.removeChild(area); reject(err); }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied'); btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () { btn.classList.remove('copied'); btn.textContent = defaultLabel; }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

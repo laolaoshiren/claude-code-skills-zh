@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>env-manager：环境变量与 .env 脱敏核查、模板生成技能 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：只读扫描 .env* 与源码引用、核查 .gitignore 与前端公开前缀泄露，生成脱敏 .env.example 与校验模板。严守凭据零回显、Windows UTF-8 写入保护与修改前确认。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="env-manager">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/env-manager/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="env-manager：环境变量与 .env 脱敏核查与模板生成技能">
+<meta property="og:description" content="只提变量名与赋值状态绝不回显真实 Secret，拦截 NEXT_PUBLIC_/VITE_ 误暴露，支持 Windows UTF-8 中文注释安全读写。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/env-manager/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="env-manager 环境变量与 .env 安全管理技能">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="env-manager：环境变量与 .env 脱敏核查与模板生成技能">
+<meta name="twitter:description" content="对比源码引用找出缺失配置、排查 .gitignore 泄露和客户端前缀越界、安全生成 .env.example（零回显真实密钥）。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：密钥保险箱与脱敏核查（琥珀金 + 安全翠绿） */
+  :root {
+    --accent: #eab308;
+    --accent2: #22c55e;
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(234, 179, 8, 0.16) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(34, 197, 94, 0.11) 0%, transparent 50%);
+  }
+  .detail-hero h1 .accent-text {
+    background: linear-gradient(135deg, #facc15, #4ade80);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .env-presets {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  @media (max-width: 760px) {
+    .env-presets { grid-template-columns: 1fr; }
+  }
+  .env-btn {
+    text-align: left;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(15, 23, 42, 0.72);
+    border-radius: 12px;
+    padding: 13px 15px;
+    color: #e2e8f0;
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+  }
+  .env-btn:hover {
+    border-color: rgba(250, 204, 21, 0.65);
+    transform: translateY(-1px);
+  }
+  .env-btn.is-active {
+    border-color: #eab308;
+    background: rgba(234, 179, 8, 0.14);
+  }
+  .env-btn strong {
+    display: block;
+    font-size: 0.94rem;
+    color: #f8fafc;
+    margin-bottom: 4px;
+  }
+  .env-btn span {
+    display: block;
+    font-size: 0.81rem;
+    color: #94a3b8;
+  }
+  .env-demo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  @media (max-width: 820px) {
+    .env-demo-grid { grid-template-columns: 1fr; }
+  }
+  .env-pane {
+    border: 1px solid rgba(234, 179, 8, 0.34);
+    border-radius: 14px;
+    background: rgba(12, 16, 26, 0.92);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .env-pane-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .env-pane-head h3 {
+    margin: 0;
+    font-size: 0.98rem;
+    color: #f8fafc;
+  }
+  .env-tag {
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(34, 197, 94, 0.16);
+    color: #86efac;
+    border: 1px solid rgba(34, 197, 94, 0.38);
+  }
+  .env-tag.is-warn {
+    background: rgba(234, 179, 8, 0.16);
+    color: #fde047;
+    border-color: rgba(234, 179, 8, 0.42);
+  }
+  .env-findings {
+    margin: 0;
+    padding-left: 18px;
+    color: #cbd5e1;
+    font-size: 0.87rem;
+    line-height: 1.75;
+  }
+  .env-code {
+    background: #070a10;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 0.81rem;
+    color: #fef9c3;
+    white-space: pre-wrap;
+    line-height: 1.66;
+    margin: 0;
+    flex: 1;
+  }
+  .env-utf8-bar {
+    margin-top: 12px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid rgba(34, 197, 94, 0.34);
+    font-size: 0.86rem;
+    color: #bbf7d0;
+    line-height: 1.6;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "env-manager",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/env-manager/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/env-manager",
+  "description": "环境变量与 .env 安全管理助手，只读扫描 .env* 文件与源码环境变量引用、核查 .gitignore 与前端公开前缀泄露，并在确认后生成脱敏 .env.example 与校验模板，内置 Windows UTF-8 写入保护与凭据零回显原则。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "env-manager", "item": "https://claude-skills.bt199.com/skills/env-manager/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "让 env-manager 扫描本地 .env 文件，它会把我的真实 API Key 打印出来吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "绝对不会。env-manager 严守「凭据零回显」红线：扫描 .env* 时只提取变量名、来源文件和是否为空，严禁在终端输出、校验报告、.env.example 或聊天记录中打印任何真实 API Key、Token 或密码原文。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "静态扫描发现某些变量没在代码里引用，它会自动帮我删掉吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。很多环境变量是被 CI 流水线、Docker 容器、云平台或动态拼接代码隐式读取的。env-manager 会把这类变量标为「静态扫描未见引用（待人工确认候选）」，绝不自动删除，且任何写入 .env 或 .env.example 的动作都必须先展示差异并取得确认。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "在 Windows 下生成带中文注释的 .env.example 为什么强调 UTF-8？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Windows 中文环境下 Python 等脚本默认可能采用 CP936/GBK 编码，直接读写带中文说明或 Emoji 的 .env / .env.example 容易触发 UnicodeDecodeError 或写入乱码。env-manager 要求脚本显式声明 encoding=\"utf-8\"，保证跨平台无乱码。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "前端框架里哪些环境变量前缀会暴露到浏览器？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Next.js 的 NEXT_PUBLIC_、Vite 的 VITE_、Create React App 的 REACT_APP_、Nuxt 的 NUXT_PUBLIC_ 和 Vue CLI 的 VUE_APP_ 都会进入客户端产物或运行时公开配置。数据库密码、JWT 密钥、支付私钥等后端敏感变量严禁加这些前缀，Docker 也不应把密钥写入 ARG 留在镜像层。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">env-manager</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-amber">🔐 凭据零回显扫描</span>
+        <span class="pill pill-green">📄 .env.example 脱敏生成</span>
+        <span class="pill pill-cyan">🪟 Windows UTF-8 写入保护</span>
+      </div>
+      <h1><span class="accent-text">env-manager</span>：环境变量与 <code>.env</code> 安全核查和模板生成</h1>
+      <p class="hero-lead">面向多环境配置整理、新人拉库缺变量、前端打包误漏密钥与 <code>.gitignore</code> 体检的原创中文技能。只读对比 <code>.env*</code> 与源码引用，<strong>绝不回显真实 Secret 原文、默认不改写真实 <code>.env</code>、严禁误删隐式变量、强制跨平台 UTF-8 编码安全</strong>。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">.env 脱敏盘点与 Schema 生成</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">安全护栏</div>
+          <div class="metric-value">零回显 + 先确认后写 + UTF-8</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/env-manager/SKILL.md" target="_blank" rel="noopener noreferrer">skills/env-manager/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/env-manager/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#env-demo" class="btn btn-cyan">🧪 试跑脱敏核查演示</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#env-demo">脱敏核查与模板生成演示</a>
+      <a href="#prefix-table">前端公开前缀与 Docker 速查</a>
+      <a href="#checklist">安全核查清单与边界</a>
+      <a href="#install">4 种零报错安装命令</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="env-demo">
+      <h2>🧪 交互式 <code>.env</code> 模板生成与脱敏核查演示</h2>
+      <p class="section-intro">切换典型项目栈，直观查看 <code>env-manager</code> 如何只提变量名不回显真实值、拦截前端前缀泄露，并生成带格式约束的脱敏 <code>.env.example</code>：</p>
+
+      <div class="env-presets" role="tablist" aria-label="项目环境核查场景">
+        <button type="button" class="env-btn is-active" data-preset="nextjs" aria-pressed="true">
+          <strong>⚡ Next.js + PostgreSQL</strong>
+          <span>拦截 NEXT_PUBLIC_ 误暴露与缺失配置</span>
+        </button>
+        <button type="button" class="env-btn" data-preset="fastapi" aria-pressed="false">
+          <strong>🐍 FastAPI + Redis + Docker</strong>
+          <span>检测 os.getenv 缺失项与 ARG 镜像层风险</span>
+        </button>
+        <button type="button" class="env-btn" data-preset="vite" aria-pressed="false">
+          <strong>🎨 Vite 前端 + CI 隐式变量</strong>
+          <span>VITE_ 边界拦截 + 严禁误删 CI 隐式变量</span>
+        </button>
+      </div>
+
+      <div class="env-demo-grid" aria-live="polite">
+        <div class="env-pane">
+          <div class="env-pane-head">
+            <h3>📋 只读脱敏核查报告（零明文回显）</h3>
+            <span class="env-tag is-warn" id="env-risk-tag">发现 2 项阻断风险</span>
+          </div>
+          <ul class="env-findings" id="env-findings">
+            <li>✅ 已定义且已引用：APP_ENV（已设）、DATABASE_URL（已设，值已脱敏）</li>
+            <li>❌ 代码已引用但模板缺失：SENDGRID_API_KEY（src/mail.ts）</li>
+            <li>🚨 客户端前缀泄露风险：NEXT_PUBLIC_JWT_SECRET 会被打入浏览器 Bundle，须去除 NEXT_PUBLIC_ 前缀</li>
+            <li>🔍 Git 跟踪核查：执行 git ls-files ".env*" 确认 .env.local 未被误提交进版本库</li>
+          </ul>
+        </div>
+        <div class="env-pane">
+          <div class="env-pane-head">
+            <h3>📄 生成的脱敏 .env.example（确认后写入）</h3>
+            <span class="env-tag" id="env-tpl-tag">零真实密钥 · 仅占位符</span>
+          </div>
+          <pre class="env-code" id="env-template"># 应用基础配置
+APP_ENV=development            # development | staging | production
+NEXT_PUBLIC_API_BASE=https://api.example.com
+
+# 数据库与认证（严禁加 NEXT_PUBLIC_ 前缀）
+DATABASE_URL=                  # 必填，格式：postgresql://user:pass@host:5432/db
+JWT_SECRET=                    # 必填，至少 32 位高熵随机字符串
+
+# 邮件服务（补齐源码引用缺口）
+SENDGRID_API_KEY=              # 必填，生产环境通过 Secrets 注入</pre>
+        </div>
+      </div>
+
+      <div class="env-utf8-bar" id="env-utf8-note">
+        <strong>🪟 Windows UTF-8 写入保护与确认门禁：</strong>生成或更新 <code>.env.example</code> / 校验 Schema（Zod / Pydantic Settings）前先展示 diff 并等待你确认；在 Windows 下由脚本读写含中文注释的文件时，强制显式声明 <code>encoding="utf-8"</code>，彻底规避 CP936/GBK 报错或乱码。
+      </div>
+    </section>
+
+    <section class="section-card" id="prefix-table">
+      <h2>🚦 前端框架客户端公开前缀与 Docker 速查</h2>
+      <p class="section-intro">大量密钥事故并非来自黑客入侵，而是开发者随手给后端密钥加了框架公开前缀，直接打进了浏览器 JS 产物或容器镜像层：</p>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>框架 / 运行时</th>
+              <th>客户端暴露前缀 / 危险指令</th>
+              <th>常见本地文件</th>
+              <th>安全边界说明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Next.js</strong></td>
+              <td><code>NEXT_PUBLIC_</code></td>
+              <td><code>.env.local</code></td>
+              <td>后端私密变量（数据库口令、JWT 密钥、支付私钥）严禁加此前缀</td>
+            </tr>
+            <tr>
+              <td><strong>Vite</strong></td>
+              <td><code>VITE_</code></td>
+              <td><code>.env</code> / <code>.env.local</code></td>
+              <td>会在构建期静态替换进前端 Bundle，任何访客可见</td>
+            </tr>
+            <tr>
+              <td><strong>Create React App</strong></td>
+              <td><code>REACT_APP_</code></td>
+              <td><code>.env</code></td>
+              <td>会打入前端构建产物，仅允许放公开配置</td>
+            </tr>
+            <tr>
+              <td><strong>Nuxt</strong></td>
+              <td><code>NUXT_PUBLIC_</code></td>
+              <td><code>.env</code></td>
+              <td>属于运行时公开配置，服务端敏感项应放私有 runtimeConfig</td>
+            </tr>
+            <tr>
+              <td><strong>Vue CLI</strong></td>
+              <td><code>VUE_APP_</code></td>
+              <td><code>.env</code></td>
+              <td>会打入前端构建产物，不可存放私有凭证</td>
+            </tr>
+            <tr>
+              <td><strong>Docker</strong></td>
+              <td><code>ARG</code> vs <code>ENV</code></td>
+              <td><code>compose.yml</code></td>
+              <td>勿把敏感密钥写入 <code>ARG</code> 导致明文留存在镜像构建历史层</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="checklist">
+      <h2>🛡️ 安全核查清单与职责边界</h2>
+      <div class="grid-2">
+        <div class="info-box is-good">
+          <h3>✅ 6 项核心安全核查</h3>
+          <ul class="prose-list">
+            <li>扫描与报告只展示变量名及脱敏状态，<strong>绝不回显真实 Secret</strong>；</li>
+            <li>确认 <code>.env</code> 及含密钥本地文件已写入 <code>.gitignore</code> 且 <code>git ls-files ".env*"</code> 为空；</li>
+            <li><code>.env.example</code> 与源码 <code>process.env</code> / <code>import.meta.env</code> / <code>os.getenv</code> / <code>os.Getenv</code> / <code>env::var</code> 同步；</li>
+            <li>后端敏感变量未误加前端公开前缀，生产环境走 GitHub Secrets / Vault / 云 KMS；</li>
+            <li>按需产出 Zod / Pydantic Settings / <code>.env.schema.json</code> 校验规则与 monorepo <code>env_file</code> 挂载方案。</li>
+          </ul>
+        </div>
+        <div class="info-box is-bad">
+          <h3>🚫 严格修改边界与分工</h3>
+          <ul class="prose-list">
+            <li>默认不自动删除或改写真实 <code>.env</code>；写入任何模板或 Schema 前必须先展示差异并获确认；</li>
+            <li>静态扫描未发现引用的变量仅标「待人工确认候选」，严禁自动删除（可能由 CI/容器/框架隐式读取）；</li>
+            <li>全仓库注入/越权漏洞审计 → 请转 <a href="/skills/security-audit/">security-audit</a>；第三方依赖 CVE 核查 → 请转 <a href="/skills/dep-auditor/">dep-auditor</a>。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种零报错安装方式</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装全部原创技能</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 env-manager</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill env-manager</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\env-manager" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\env-manager\*" "$HOME\.claude\skills\env-manager\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/env-manager
+cp -r claude-code-skills-zh/skills/env-manager/* ~/.claude/skills/env-manager/</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-cyan">
+        <div class="callout-title">💡 推荐触发指令示例</div>
+        <p>安装后可直接输入：“只读扫描当前仓库所有 <code>.env*</code> 与源码环境变量引用，检查 <code>.gitignore</code> 和前端公开前缀风险，先出脱敏报告并展示 <code>.env.example</code> 差异，不要直接覆盖文件。”</p>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>让 env-manager 扫描本地 .env 文件，它会把我的真实 API Key 打印出来吗？</h3>
+          <p>绝对不会。<code>env-manager</code> 严守「凭据零回显」红线：扫描 <code>.env*</code> 时只提取变量名、来源文件和是否为空，严禁在终端输出、校验报告、<code>.env.example</code> 或聊天记录中打印任何真实 API Key、Token 或密码原文。</p>
+        </div>
+        <div class="faq-item">
+          <h3>静态扫描发现某些变量没在代码里引用，它会自动帮我删掉吗？</h3>
+          <p>不会。很多环境变量是被 CI 流水线、Docker 容器、云平台或动态拼接代码隐式读取的。<code>env-manager</code> 会把这类变量标为「静态扫描未见引用（待人工确认候选）」，绝不自动删除，且任何写入 <code>.env</code> 或 <code>.env.example</code> 的动作都必须先展示差异并取得确认。</p>
+        </div>
+        <div class="faq-item">
+          <h3>在 Windows 下生成带中文注释的 .env.example 为什么强调 UTF-8？</h3>
+          <p>Windows 中文环境下 Python 等脚本默认可能采用 CP936/GBK 编码，直接读写带中文说明或 Emoji 的 <code>.env</code> / <code>.env.example</code> 容易触发 <code>UnicodeDecodeError</code> 或写入乱码。<code>env-manager</code> 要求脚本显式声明 <code>encoding="utf-8"</code>，保证跨平台无乱码。</p>
+        </div>
+        <div class="faq-item">
+          <h3>前端框架里哪些环境变量前缀会暴露到浏览器？</h3>
+          <p>Next.js 的 <code>NEXT_PUBLIC_</code>、Vite 的 <code>VITE_</code>、Create React App 的 <code>REACT_APP_</code>、Nuxt 的 <code>NUXT_PUBLIC_</code> 和 Vue CLI 的 <code>VUE_APP_</code> 都会进入客户端产物或运行时公开配置。数据库密码、JWT 密钥、支付私钥等后端敏感变量严禁加这些前缀，Docker 也不应把密钥写入 <code>ARG</code> 留在镜像层。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关安全与测试原创技能</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/security-audit/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 源码安全</span>
+            <h3>security-audit</h3>
+            <p>排查源码中的硬编码凭据、注入与越权缺陷，发现疑似泄露时联动给出密钥轮换建议。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/dep-auditor/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 依赖审计</span>
+            <h3>dep-auditor</h3>
+            <p>不上传私有 registry 凭据、基于真实 lockfile 只读审计依赖漏洞与许可证事实。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/api-tester/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 接口测试</span>
+            <h3>api-tester</h3>
+            <p>内置三档环境门禁与凭据零明文原则，跑本地测试前先核查 .env 不会暗连共享库。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>env-manager</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/env-manager/SKILL.md" target="_blank" rel="noopener noreferrer">skills/env-manager/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var presets = {
+    nextjs: {
+      riskTag: '发现 2 项阻断风险',
+      tplTag: '零真实密钥 · 仅占位符',
+      findings: [
+        '✅ 已定义且已引用：APP_ENV（已设）、DATABASE_URL（已设，值已脱敏）',
+        '❌ 代码已引用但模板缺失：SENDGRID_API_KEY（src/mail.ts）',
+        '🚨 客户端前缀泄露风险：NEXT_PUBLIC_JWT_SECRET 会被打入浏览器 Bundle，须去除 NEXT_PUBLIC_ 前缀',
+        '🔍 Git 跟踪核查：执行 git ls-files ".env*" 确认 .env.local 未被误提交进版本库'
+      ],
+      template: '# 应用基础配置\nAPP_ENV=development            # development | staging | production\nNEXT_PUBLIC_API_BASE=https://api.example.com\n\n# 数据库与认证（严禁加 NEXT_PUBLIC_ 前缀）\nDATABASE_URL=                  # 必填，格式：postgresql://user:pass@host:5432/db\nJWT_SECRET=                    # 必填，至少 32 位高熵随机字符串\n\n# 邮件服务（补齐源码引用缺口）\nSENDGRID_API_KEY=              # 必填，生产环境通过 Secrets 注入',
+      utf8: 'Windows UTF-8 写入保护与确认门禁：生成或更新 .env.example / Zod 校验规则前先展示差异并等待确认；Windows 下脚本读写中文注释文件显式声明 encoding="utf-8"，避免 CP936/GBK 报错。'
+    },
+    fastapi: {
+      riskTag: '发现 1 项镜像层风险 + 1 项缺口',
+      tplTag: '支持 Pydantic Settings 模板',
+      findings: [
+        '✅ 已定义且已引用：APP_PORT（已设）、REDIS_URL（已设，值已脱敏）',
+        '❌ 代码已引用但模板缺失：SENTRY_DSN（app/core/telemetry.py:14 via os.getenv）',
+        '🚨 Docker 构建风险：Dockerfile 使用 ARG DB_PASSWORD 传入密码，会残留于镜像历史层，应改为运行时 ENV / Secrets 挂载',
+        '🔒 疑似硬编码敏感信息：app/auth.py:29（已脱敏，仅报文件:行号）'
+      ],
+      template: '# FastAPI 服务配置\nAPP_ENV=development            # development | staging | production\nAPP_PORT=8000                  # 服务端口 (1-65535)\n\n# 存储与缓存（勿写入 Dockerfile ARG）\nDB_HOST=localhost\nDB_PORT=5432\nDB_PASSWORD=                   # 必填，运行时通过 Secrets 注入\nREDIS_URL=                     # 必填，格式：redis://host:6379/0\n\n# 观测告警\nSENTRY_DSN=                    # 可选，生产环境建议配置',
+      utf8: 'Windows UTF-8 写入保护与确认门禁：Python 读写带中文注释的 .env / .env.example 时必须显式传入 encoding="utf-8"，避免 Windows 中文系统默认 GBK 触发 UnicodeDecodeError。'
+    },
+    vite: {
+      riskTag: '拦截 1 项前端泄露 + 保护 2 项候选',
+      tplTag: '零误删 CI 隐式变量',
+      findings: [
+        '🚨 客户端前缀泄露风险：VITE_OSS_ACCESS_KEY_SECRET 会直接打包进前端静态资源，必须迁回后端服务',
+        '⚠️ 静态扫描未见引用（待人工确认候选）：DEPLOY_WEBHOOK_URL、SENTRY_AUTH_TOKEN（可能由 CI 构建流程隐式读取，严禁自动删除）',
+        '✅ .gitignore 校验：已忽略 .env.local 与 .env.*.local，且保留 .env.example 入库',
+        '🔐 凭据零回显：全流程仅报告变量名与是否为空，未打印任何真实值'
+      ],
+      template: '# Vite 公开前端配置（仅放可对浏览器公开的项）\nVITE_APP_TITLE=My App\nVITE_API_BASE_URL=https://api.example.com\n\n# 以下变量由 CI/部署平台读取，待人工确认后保留于 CI Secrets\n# DEPLOY_WEBHOOK_URL=          # CI 通知地址\n# SENTRY_AUTH_TOKEN=           # 仅构建上传 sourcemap 使用，勿加 VITE_ 前缀',
+      utf8: 'Windows UTF-8 写入保护与确认门禁：未发现源码引用的变量绝不擅自删除；任何对 .env.example 或真实 .env 的改动均须先展示 diff 并取得用户确认，且统一以 UTF-8 编码写入。'
+    }
+  };
+
+  var btns = document.querySelectorAll('.env-btn[data-preset]');
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var data = presets[btn.getAttribute('data-preset')];
+      if (!data) return;
+      btns.forEach(function (b) {
+        var active = b === btn;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      document.getElementById('env-risk-tag').textContent = data.riskTag;
+      document.getElementById('env-tpl-tag').textContent = data.tplTag;
+      var ul = document.getElementById('env-findings');
+      while (ul.firstChild) ul.removeChild(ul.firstChild);
+      data.findings.forEach(function (txt) {
+        var li = document.createElement('li');
+        li.textContent = txt;
+        ul.appendChild(li);
+      });
+      document.getElementById('env-template').textContent = data.template;
+      document.getElementById('env-utf8-note').textContent = '🪟 ' + data.utf8;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve(); else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

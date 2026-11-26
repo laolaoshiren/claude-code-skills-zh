@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eslint-fix：锁定本地版本、限定范围的 ESLint 安全修复技能 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：安全诊断并修复 ESLint error、warning 与配置兼容问题。优先使用项目锁定的包管理器与本地 lint script，先只读基线与 --fix-dry-run 预览再限定范围修复，严禁裸 npx 拉最新版、随意禁用规则或批量改写无关源码。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="eslint-fix">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/eslint-fix/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="eslint-fix：锁定本地版本、限定范围的 ESLint 安全修复技能">
+<meta property="og:description" content="预检锁定版本 → 只读基线与 dry-run 预览 → 限定范围修复 → 复验通过。绝不为消错而加 eslint-disable 或改写整仓格式。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/eslint-fix/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="eslint-fix 安全诊断与限定范围修复技能">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="eslint-fix：锁定本地版本、限定范围的 ESLint 安全修复技能">
+<meta name="twitter:description" content="区分可自动修复、语义修改与配置授权三类问题，避免裸 npx 破坏版本锁与大面积无关 diff。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：Lint 引擎与安全复验（紫罗兰引擎 + 翠绿复验通过） */
+  :root {
+    --accent: #7c3aed;
+    --accent2: #10b981;
+  }
+  .ef-pipe {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0 16px;
+  }
+  @media (max-width: 720px) { .ef-pipe { grid-template-columns: 1fr; } }
+  .ef-stage {
+    border: 1px solid rgba(148,163,184,0.22); background: rgba(15,23,42,0.7);
+    border-radius: 12px; padding: 11px 14px;
+  }
+  .ef-stage.is-lit { border-color: rgba(16,185,129,0.52); background: rgba(16,185,129,0.1); }
+  .ef-stage.is-block { border-color: rgba(244,63,94,0.52); background: rgba(244,63,94,0.1); }
+  .ef-stage-num { font-size: 0.74rem; font-weight: 800; color: #a78bfa; text-transform: uppercase; margin-bottom: 3px; }
+  .ef-stage-name { font-size: 0.9rem; font-weight: 700; color: #f8fafc; }
+  .ef-stage-note { font-size: 0.8rem; color: #94a3b8; margin-top: 3px; }
+  .ef-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+  .ef-btn {
+    border: 1px solid rgba(148,163,184,0.28); background: rgba(15,23,42,0.75);
+    color: #e2e8f0; border-radius: 10px; padding: 9px 14px; font-size: 0.88rem;
+    font-weight: 600; cursor: pointer; transition: all .18s ease;
+  }
+  .ef-btn:hover { border-color: rgba(124,58,237,0.65); }
+  .ef-btn.is-active { border-color: #7c3aed; background: rgba(124,58,237,0.22); color: #ddd6fe; }
+  .ef-card {
+    border: 1px solid rgba(124,58,237,0.38); border-radius: 14px;
+    background: rgba(10,15,28,0.9); padding: 18px 20px;
+  }
+  .ef-verdict {
+    display: inline-block; padding: 4px 11px; border-radius: 999px;
+    font-size: 0.8rem; font-weight: 700; margin-bottom: 10px;
+    background: rgba(16,185,129,0.16); color: #6ee7b7;
+  }
+  .ef-verdict.is-warn { background: rgba(245,158,11,0.18); color: #fde68a; }
+  .ef-verdict.is-stop { background: rgba(244,63,94,0.18); color: #fda4af; }
+  .ef-card h3 { margin: 0 0 8px; font-size: 1.04rem; color: #f8fafc; }
+  .ef-card p { margin: 0 0 12px; color: #cbd5e1; font-size: 0.92rem; line-height: 1.68; }
+  .ef-split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 720px) { .ef-split { grid-template-columns: 1fr; } }
+  .ef-box {
+    border-radius: 10px; padding: 12px 14px;
+    background: rgba(17,24,39,0.85); border: 1px solid rgba(148,163,184,0.18);
+  }
+  .ef-box.is-do { border-color: rgba(16,185,129,0.36); }
+  .ef-box.is-dont { border-color: rgba(244,63,94,0.38); }
+  .ef-box strong { display: block; font-size: 0.82rem; margin-bottom: 6px; }
+  .ef-box.is-do strong { color: #6ee7b7; }
+  .ef-box.is-dont strong { color: #fda4af; }
+  .ef-box span { display: block; font-size: 0.88rem; color: #cbd5e1; line-height: 1.62; }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "eslint-fix",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/eslint-fix/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/eslint-fix",
+  "description": "安全诊断并修复 ESLint error、warning 与配置兼容问题的原创中文技能：优先使用项目锁定的包管理器与既有 lint script，先建只读基线与 dry-run 预览，限定范围修复后复验通过，不随意关闭规则或拉取未锁定版本。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "eslint-fix", "item": "https://claude-skills.bt199.com/skills/eslint-fix/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "为什么 eslint-fix 明确禁止直接跑裸 npx eslint？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "在未安装或版本未锁定的环境下，裸 npx eslint 可能联网拉取最新大版本（如 ESLint 9），与项目现有的 .eslintrc.*、插件或 TypeScript 解析器不兼容，导致误报或破坏环境。技能优先运行仓库既有的 lint script，并核对 lockfile 与 devDependencies。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "它会为了快速消除红线而顺手加上 eslint-disable 或全局 ignore 吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。技能严禁为消除报错而默认禁用规则、加入全局 ignore、降低规则严重级别或擅自改动 Prettier 与 ESLint 的执行顺序；需要配置调整时必须单独说明原因并取得用户授权。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "遇到 no-explicit-any 或 React Hooks 依赖告警时怎么处理？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "这类规则属于语义与类型问题，不在安全自动修复范畴内。eslint-fix 会先将其与格式规则分流，结合类型定义、调用方和运行路径做针对性修改，并在改完后按风险补跑类型检查、相关测试或构建。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "普通终端报错和 ESLint 报错分别该用哪个技能？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ESLint 规则诊断、限定范围自动修复与配置兼容排查使用 eslint-fix；如果是单条编译失败、运行时异常或 Windows 终端报错需要中文翻译与根因分析，请使用 error-translator。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">eslint-fix</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-purple">🔍 ESLint 安全诊断修复</span>
+        <span class="pill pill-green">🔒 锁定本地工具链版本</span>
+        <span class="pill pill-amber">🚫 拒绝随意禁用规则</span>
+      </div>
+      <h1><span class="accent-text">eslint-fix</span>：预检锁定版本、限定范围的 ESLint 安全修复技能</h1>
+      <p class="hero-lead">解决 AI 跑 lint 时常见的三大翻车：裸跑 <code>npx</code> 拉错大版本、全仓 <code>--fix</code> 制造海量无关格式 diff、以及随手加 <code>eslint-disable</code> 掩盖语义缺陷。坚持「预检锁定版本 → 只读基线与 dry-run 预览 → 限定范围修复 → 复验通过」闭环。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">Lint 诊断 / 限范围修复</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">核心护栏</div>
+          <div class="metric-value">禁裸 npx / 禁随手关规则</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/eslint-fix/SKILL.md" target="_blank" rel="noopener noreferrer">skills/eslint-fix/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/eslint-fix/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#judge" class="btn btn-cyan">⚖️ 体验修复边界判断器</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#judge">修复边界判断器</a>
+      <a href="#workflow">5 步安全修复流程</a>
+      <a href="#rules">规则分级与安全红线</a>
+      <a href="#install">4 种安装方式</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="judge">
+      <h2>⚖️ 交互式 ESLint 修复边界判断器</h2>
+      <p class="section-intro">点击 4 种真实工程场景，查看 <code>eslint-fix</code> 在「预检锁定版本 → 限范围修复 → 复验通过」链路中的精确处理边界：</p>
+
+      <div class="ef-pipe" aria-label="三阶段安全闭环">
+        <div class="ef-stage is-lit" id="ef-st-1">
+          <div class="ef-stage-num">Stage 1</div>
+          <div class="ef-stage-name">预检锁定版本</div>
+          <div class="ef-stage-note" id="ef-st-1-note">读 package.json、lockfile 与本地 lint script</div>
+        </div>
+        <div class="ef-stage is-lit" id="ef-st-2">
+          <div class="ef-stage-num">Stage 2</div>
+          <div class="ef-stage-name">限范围预览与修复</div>
+          <div class="ef-stage-note" id="ef-st-2-note">--fix-dry-run 确认范围，只改目标文件</div>
+        </div>
+        <div class="ef-stage is-lit" id="ef-st-3">
+          <div class="ef-stage-num">Stage 3</div>
+          <div class="ef-stage-name">复验通过与 Diff 核查</div>
+          <div class="ef-stage-note" id="ef-st-3-note">重跑目标 lint + 按风险跑类型检查或测试</div>
+        </div>
+      </div>
+
+      <div class="ef-tabs" role="tablist" aria-label="ESLint 问题场景">
+        <button type="button" class="ef-btn is-active" data-case="autofix">1. 格式与机械规则（semi / prefer-const）</button>
+        <button type="button" class="ef-btn" data-case="semantic">2. 语义规则（no-explicit-any / Hooks）</button>
+        <button type="button" class="ef-btn" data-case="missing">3. 缺失依赖或升级 ESLint 配置</button>
+        <button type="button" class="ef-btn" data-case="suppress">4. 用 eslint-disable 快速消红线？</button>
+      </div>
+
+      <div class="ef-card" aria-live="polite">
+        <span class="ef-verdict" id="ef-verdict">✅ 允许限范围自动修复（需先 dry-run 预览）</span>
+        <h3 id="ef-title">格式类规则经只读基线与预览确认后，仅对目标文件执行 --fix</h3>
+        <p id="ef-desc">如 semi、quotes、indent、no-trailing-spaces、comma-dangle、arrow-parens、prefer-const 等常见可自动修复规则，先确认不与用户未提交改动重叠，再限定在指定文件范围内执行。</p>
+        <div class="ef-split">
+          <div class="ef-box is-do">
+            <strong>✅ 技能会执行</strong>
+            <span id="ef-do">1) 用项目锁定包管理器跑只读基线并记录版本与 error/warning 数；2) 用 --fix-dry-run 预览预计改动；3) 仅对确认文件执行 --fix 并复跑 lint 与 git diff 检查。</span>
+          </div>
+          <div class="ef-box is-dont">
+            <strong>🚫 明确禁止</strong>
+            <span id="ef-dont">不默认扫描或 --fix 整个大型仓库；不打乱项目原有的 Prettier 与 ESLint 执行顺序；不凭 dry-run 直接宣称已编译通过。</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="workflow">
+      <h2>🧭 5 步安全修复工作流</h2>
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>识别项目工具链与版本锁</h3>
+            <p>读取 <code>package.json</code>（scripts、devDependencies、packageManager）、npm/pnpm/Yarn/Bun lockfile，以及 <code>eslint.config.*</code>、<code>.eslintrc.*</code>、Prettier 与 TypeScript 配置。优先运行仓库已有 lint script。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>建立只读基线</h3>
+            <p>对用户指定或本轮改动范围执行只读检查，记录实际命令、ESLint 版本、退出状态、error/warning 数量与规则分布，区分基线已有问题和本轮引入问题。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>预览可修复范围与冲突检查</h3>
+            <p>使用 <code>--fix-dry-run</code> 或 JSON 输出评估改动，核对 <code>git diff</code> 是否与用户修改重叠，并将报错拆分为「可自动修复」「需理解语义」「需配置决策」三类。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>限定范围精准修复</h3>
+            <p>仅对已确认文件执行 <code>--fix</code>；遇到 <code>no-explicit-any</code>、未处理 Promise 或 React Hooks 依赖等语义规则时结合类型与调用方修改，绝不机械替换或默认关闭规则。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <h3>多维度复验与 Diff 收尾</h3>
+            <p>重新运行目标范围 lint，按改动风险补跑类型检查、相关测试或构建；最后核对 <code>git diff</code>，确认无 lockfile、构建产物或无关格式变动，并记录未解决规则与原因。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="rules">
+      <h2>🛡️ 三类规则分流与安全红线</h2>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>问题类别</th>
+              <th>典型规则 / 表现</th>
+              <th>eslint-fix 处理方式</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>可自动修复类</strong></td>
+              <td><code>semi</code>、<code>quotes</code>、<code>indent</code>、<code>no-trailing-spaces</code>、<code>comma-dangle</code>、<code>arrow-parens</code>、<code>prefer-const</code></td>
+              <td>经 <code>--fix-dry-run</code> 确认无大面积意外 diff 后，限定目标文件执行 <code>--fix</code> 并复验。</td>
+            </tr>
+            <tr>
+              <td><strong>代码语义类</strong></td>
+              <td><code>no-explicit-any</code>、未处理 Promise、React Hooks 依赖告警</td>
+              <td>结合类型定义、调用方与运行路径手工修复，改完按风险运行类型检查与测试。</td>
+            </tr>
+            <tr>
+              <td><strong>依赖与配置决策类</strong></td>
+              <td>本地缺失 ESLint、<code>.eslintrc.*</code> 迁移至 <code>eslint.config.*</code>、Prettier 规则冲突</td>
+              <td>不擅自安装依赖、改 lockfile 或修改配置文件；先报告诊断结果，获明确授权后再变更。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-red">
+        <div class="callout-title">🚫 绝不越过的 4 条工程底线</div>
+        <ul class="prose-list">
+          <li><strong>不跑未锁定的裸 <code>npx</code>：</strong>避免联网拉取最新大版本导致配置不兼容或污染环境。</li>
+          <li><strong>不覆盖工作树已有修改：</strong>目标文件存在未提交重叠改动时，先向用户报告。</li>
+          <li><strong>不为消错关闭规则：</strong>不默认插入 <code>eslint-disable</code>、全局 ignore 或下调规则级别。</li>
+          <li><strong>不虚报验证状态：</strong>对应 lint、类型检查或构建命令必须真实运行并退出码为 0，才声称已修复。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种安装方式</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 eslint-fix</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill eslint-fix</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\eslint-fix" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\eslint-fix\*" "$HOME\.claude\skills\eslint-fix\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/eslint-fix
+cp -r claude-code-skills-zh/skills/eslint-fix/* ~/.claude/skills/eslint-fix/</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>为什么禁止在仓库里直接执行裸 npx eslint？</h3>
+          <p>裸 <code>npx</code> 在本地未命中版本时可能直接从网络下载最新版 ESLint，容易与项目既有的 <code>.eslintrc.*</code>、插件版本或 Node 版本冲突。<code>eslint-fix</code> 只使用仓库已有 lint script 或已确认锁定安装的本地包管理器执行方式。</p>
+        </div>
+        <div class="faq-item">
+          <h3>大型 Monorepo 跑一次会不会把几百个无关文件全格式化了？</h3>
+          <p>不会。规则明确要求先对用户指定或本轮相关文件建立只读基线，并做 <code>--fix-dry-run</code> 预览；可能产生大面积格式 diff 或改动逻辑时必须先征得用户确认。</p>
+        </div>
+        <div class="faq-item">
+          <h3>它能帮我把旧版 .eslintrc 迁移到 ESLint 9 flat config 吗？</h3>
+          <p>可以诊断配置兼容问题并给出迁移方案，但修改 ESLint / Prettier 配置文件、升级依赖或改动 lockfile 属于高影响操作，技能会先汇报差异并等待你明确授权再执行。</p>
+        </div>
+        <div class="faq-item">
+          <h3>Windows 和 macOS/Linux 上跑项目 lint 有什么区别？</h3>
+          <p><code>eslint-fix</code> 要求跨平台优先调用项目已有 npm/pnpm/Yarn/Bun scripts 与标准路径，不硬编码某个 shell 的专属语法，降低 Windows PowerShell 5.1 下的命令报错概率。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/error-translator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 报错翻译排障</span>
+            <h3>error-translator</h3>
+            <p>把编译失败、运行时异常与 Windows 终端报错翻译成自然中文并给出最小修复。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/test-generator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 契约单元测试</span>
+            <h3>test-generator</h3>
+            <p>修完语义类 Lint 告警后，补齐核心函数与模块契约的最小回归单元测试。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/zh-code-reviewer/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 代码审查</span>
+            <h3>zh-code-reviewer</h3>
+            <p>基于 git diff 做分级中文只读代码审查，与 ESLint 静态规则形成互补。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>eslint-fix</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/eslint-fix/SKILL.md" target="_blank" rel="noopener noreferrer">skills/eslint-fix/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var cases = {
+    autofix: {
+      stages: ['lit', 'lit', 'lit'],
+      notes: [
+        '读 package.json、lockfile 与本地 lint script',
+        '--fix-dry-run 确认范围，只改目标文件',
+        '重跑目标 lint + 核查 git diff 无无关变更'
+      ],
+      verdictClass: '',
+      verdict: '✅ 允许限范围自动修复（需先 dry-run 预览）',
+      title: '格式类规则经只读基线与预览确认后，仅对目标文件执行 --fix',
+      desc: '如 semi、quotes、indent、no-trailing-spaces、comma-dangle、arrow-parens、prefer-const 等常见可自动修复规则，先确认不与用户未提交改动重叠，再限定在指定文件范围内执行。',
+      doText: '1) 用项目锁定包管理器跑只读基线并记录版本与 error/warning 数；2) 用 --fix-dry-run 预览预计改动；3) 仅对确认文件执行 --fix 并复跑 lint 与 git diff 检查。',
+      dontText: '不默认扫描或 --fix 整个大型仓库；不打乱项目原有的 Prettier 与 ESLint 执行顺序；不凭 dry-run 直接宣称已编译通过。'
+    },
+    semantic: {
+      stages: ['lit', 'lit', 'lit'],
+      notes: [
+        '锁定项目 ESLint + TypeScript 配置基线',
+        '人工理解类型与调用方，拒绝机械替换',
+        '重跑 lint + 必须按风险跑类型检查或测试'
+      ],
+      verdictClass: 'is-warn',
+      verdict: '⚠️ 需结合代码语义手工修改，并扩大复验范围',
+      title: 'no-explicit-any、未处理 Promise、React Hooks 依赖绝不机械套改',
+      desc: '语义类告警往往牵涉真实类型契约或异步副作用，改动逻辑前必须先向用户确认可能的影响范围，并在修改后补跑类型检查、相关测试或构建。',
+      doText: '阅读相关类型定义、调用方与运行路径，给出最小语义修复；改完后重跑 lint、tsc/类型检查与相关单元测试，并记录剩余未解决项。',
+      dontText: '不为了通过检查把类型强行写成 unknown/any 断言或忽略 Promise 异常；未实际运行构建或测试时不声称「可编译」。'
+    },
+    missing: {
+      stages: ['block', 'block', 'block'],
+      notes: [
+        '检测到缺失本地依赖或需迁移配置文件 → 暂停',
+        '等待用户明确授权后再决定是否安装/改配置',
+        '授权执行后重新建立基线并复验'
+      ],
+      verdictClass: 'is-warn',
+      verdict: '⏸️ 触发授权门禁：先报告，不自动联网下载或改配置',
+      title: '缺失依赖、升级版本或迁移 eslint.config.* 必须先取得明确授权',
+      desc: '仅当确认 ESLint 已被当前项目锁定并安装时才执行本地命令；发现未安装依赖或配置版本不兼容时，先清晰列出原因与可选操作。',
+      doText: '读取 package.json 与 lockfile 报告缺失项或配置冲突点，列出建议的包管理器安装命令或迁移步骤，由开发者决定是否执行。',
+      dontText: '严禁跑未锁定依赖、可能联网拉最新版的裸 npx eslint；未经明确授权绝不修改 lockfile、ESLint 配置、Prettier 配置或项目脚本。'
+    },
+    suppress: {
+      stages: ['lit', 'block', 'block'],
+      notes: [
+        '只读基线已定位具体违规规则与文件行号',
+        '拒绝通过禁用规则或全局 ignore 掩盖问题',
+        '改为按真实代码语义修复或单列说明原因'
+      ],
+      verdictClass: 'is-stop',
+      verdict: '🚫 明确拒绝：禁止为消错默认关闭规则或加全局 ignore',
+      title: '不靠 eslint-disable、降低规则级别或改 formatter 顺序凑绿灯',
+      desc: '压掉告警只会把隐患留在主分支。除非用户明确要求且有充分业务理由，否则不能通过注释屏蔽、放宽配置或全局 ignore 绕过检查。',
+      doText: '解释规则触发的真实原因与潜在风险，提供安全的源码修复方案；若当前无法一次性修完，在报告的「未解决问题与原因」中如实记录。',
+      dontText: '绝不默认添加 eslint-disable-next-line、写入 .eslintignore 屏蔽业务目录，或把 error 降级为 off/warn。'
+    }
+  };
+
+  function applyStage(id, mode, note) {
+    var el = document.getElementById(id);
+    var noteEl = document.getElementById(id + '-note');
+    el.classList.toggle('is-lit', mode === 'lit');
+    el.classList.toggle('is-block', mode === 'block');
+    noteEl.textContent = note;
+  }
+
+  var btns = document.querySelectorAll('.ef-btn[data-case]');
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var c = cases[btn.getAttribute('data-case')];
+      if (!c) return;
+      btns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+      applyStage('ef-st-1', c.stages[0], c.notes[0]);
+      applyStage('ef-st-2', c.stages[1], c.notes[1]);
+      applyStage('ef-st-3', c.stages[2], c.notes[2]);
+      var v = document.getElementById('ef-verdict');
+      v.className = 'ef-verdict' + (c.verdictClass ? ' ' + c.verdictClass : '');
+      v.textContent = c.verdict;
+      document.getElementById('ef-title').textContent = c.title;
+      document.getElementById('ef-desc').textContent = c.desc;
+      document.getElementById('ef-do').textContent = c.doText;
+      document.getElementById('ef-dont').textContent = c.dontText;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text; area.setAttribute('readonly', ''); area.style.position = 'fixed'; area.style.opacity = '0';
+      document.body.appendChild(area); area.select();
+      try { var ok = document.execCommand('copy'); document.body.removeChild(area); if (ok) resolve(); else reject(new Error('copy failed')); }
+      catch (err) { document.body.removeChild(area); reject(err); }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied'); btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () { btn.classList.remove('copied'); btn.textContent = defaultLabel; }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

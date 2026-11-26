@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>git-workflow：按动作拆分授权与零误伤工作树的 Git 安全流技能 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：安全处理 Git 状态检查、原子提交、分支管理、推送、PR 创建与 rebase 历史整理。严格隔离每个动作的授权边界，保护工作树已有未提交改动，禁止未经授权的 git add . 与 force push。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="git-workflow">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/git-workflow/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="git-workflow：按动作拆分授权与零误伤工作树的 Git 安全流技能">
+<meta property="og:description" content="生成 commit message 不等于自动提交，commit 不等于 push，提 PR 不等于合并；严禁 force push 与无差别 git add .，保护本地未跟踪资产。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/git-workflow/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="git-workflow 安全 Git 工作流技能">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="git-workflow：按动作拆分授权与零误伤工作树的 Git 安全流技能">
+<meta name="twitter:description" content="严格区分只读审查、原子提交、分支推送与 PR 创建授权，严禁 git push --force 与覆盖脏工作树，MIT 开源一键安装。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制配色：Git 分支流与提交安全门禁（赤橙 + 琥珀主题） */
+  :root {
+    --accent: #ea580c;
+    --accent2: #fb923c;
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(234, 88, 12, 0.2) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(0, 206, 201, 0.09) 0%, transparent 50%);
+  }
+  .detail-hero h1 .accent-text {
+    background: linear-gradient(135deg, #fb923c, #fde047);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .nav-star, .btn-primary, .step-num {
+    background: linear-gradient(135deg, #ea580c, #f97316);
+    box-shadow: 0 4px 18px rgba(234, 88, 12, 0.32);
+  }
+  .gate-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+  .gate-btn {
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(15, 23, 42, 0.72);
+    color: #e2e8f0;
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .gate-btn:hover { border-color: rgba(251, 146, 60, 0.65); color: #fff; }
+  .gate-btn.is-active {
+    border-color: #f97316;
+    background: rgba(234, 88, 12, 0.18);
+    color: #fed7aa;
+  }
+  .gate-panel {
+    border: 1px solid rgba(251, 146, 60, 0.34);
+    border-radius: 14px;
+    background: rgba(10, 14, 24, 0.9);
+    padding: 18px 20px;
+  }
+  .gate-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .gate-head h3 { margin: 0; font-size: 1.08rem; color: #f8fafc; }
+  .gate-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 11px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    border: 1px solid rgba(251, 146, 60, 0.45);
+    background: rgba(234, 88, 12, 0.14);
+    color: #fdba74;
+  }
+  .gate-badge.is-safe {
+    border-color: rgba(0, 184, 148, 0.45);
+    background: rgba(0, 184, 148, 0.14);
+    color: #55efc4;
+  }
+  .gate-badge.is-danger {
+    border-color: rgba(255, 118, 117, 0.5);
+    background: rgba(255, 118, 117, 0.15);
+    color: #ff9f9e;
+  }
+  .gate-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+  @media (max-width: 780px) { .gate-grid { grid-template-columns: 1fr; } }
+  .gate-cell {
+    background: rgba(17, 24, 39, 0.85);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .gate-cell.is-red {
+    border-color: rgba(255, 118, 117, 0.34);
+    background: rgba(255, 118, 117, 0.06);
+  }
+  .gate-cell strong {
+    display: block;
+    font-size: 0.83rem;
+    color: #fdba74;
+    margin-bottom: 6px;
+  }
+  .gate-cell.is-red strong { color: #ff9f9e; }
+  .gate-cell p { margin: 0; font-size: 0.89rem; color: #cbd5e1; line-height: 1.62; }
+  .gate-cmd {
+    margin-top: 12px;
+    padding: 10px 13px;
+    border-radius: 9px;
+    background: #070a12;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: #fed7aa;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "git-workflow",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/git-workflow/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/git-workflow",
+  "description": "安全处理 Git 状态检查、原子提交、分支管理、推送、PR 创建与 rebase 历史整理的原创中文技能：按动作拆分授权，保护已有与未跟踪修改，禁止未经授权的 git add . 与 force push。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "git-workflow", "item": "https://claude-skills.bt199.com/skills/git-workflow/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "为什么 git-workflow 禁止顺手执行 git add . 或 git add -A？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "开发者的本地工作树里经常存在未完成的草稿、临时脚本或无关模块的修改。存在无关改动时使用 git add . 或 git add -A 会把用户资产错误混入提交，因此技能强制逐个暂存本轮相关文件，并在 commit 前用 git diff --cached 复核。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "让它生成 commit message 或创建提交，会自动 git push 或发 PR 吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。git-workflow 把分析状态、暂存提交、切换分支、推送远程、创建 PR 以及合并/关闭 Issue 严格拆分为独立授权动作，互不推导；只执行用户明确要求的那一步。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "什么情况下允许 rebase，对 force push 的红线是什么？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "rebase 必须先获得用户明确授权且工作树与暂存区均干净（不擅自 stash），绝不对公共分支或他人依赖的已发布提交执行 rebase。任何情况下禁止 git push --force；确需更新已授权重写的私有分支时，只能在重新确认远程状态后使用 --force-with-lease。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "提交前如何做测试验证？如果项目基线原本就有失败怎么办？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "提交前会先检查验证脚本是否会下载依赖或触发外部副作用（有副作用需先授权），再运行与改动相关的测试、lint 或构建并记录真实命令与退出码；基线已有失败会如实单独说明，绝不把未运行或失败的检查标为通过。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">git-workflow</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-amber">🌿 分级授权 Git 安全流</span>
+        <span class="pill pill-cyan">📦 原子提交 + 结构化 PR</span>
+        <span class="pill pill-green">🛡️ 禁 force push · 护脏工作树</span>
+      </div>
+      <h1><span class="accent-text">git-workflow</span>：按动作隔离授权与零误伤工作树的 Git 安全助手</h1>
+      <p class="hero-lead">解决 AI 编程助手最常见也最致命的 Git 越权问题——顺手 <code>git add .</code> 混入草稿、私自 <code>git push</code>、自动 <code>stash</code> 或强推覆盖远程历史。严格按「只读审查 → 逐文件暂存与原子提交 → fetch 校验推送 → 证据化 PR 创建」执行，每一步只做用户明确授权的动作。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">Commit / 分支 / Push / PR</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">核心护栏</div>
+          <div class="metric-value">动作独立授权 · 禁 --force</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/git-workflow/SKILL.md" target="_blank" rel="noopener noreferrer">skills/git-workflow/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/git-workflow/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#gate" class="btn btn-cyan">🚦 交互安全门禁选择器</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#gate">交互式安全门禁选择器</a>
+      <a href="#workflow">5 步规范工作流</a>
+      <a href="#boundaries">授权矩阵与 Rebase 红线</a>
+      <a href="#install">4 种安装方式</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="gate">
+      <h2>🚦 交互式 Git 操作安全门禁选择器</h2>
+      <p class="section-intro">点击下方 4 类日常 Git 场景，查看 <code>git-workflow</code> 对应的授权等级、必跑前置命令、边界约束与绝对红线：</p>
+      <div class="gate-tabs" role="tablist" aria-label="Git 操作安全门禁类型">
+        <button type="button" class="gate-btn is-active" role="tab" aria-selected="true" data-gate="readonly">🔍 只读审查</button>
+        <button type="button" class="gate-btn" role="tab" aria-selected="false" data-gate="commit">📦 常规提交</button>
+        <button type="button" class="gate-btn" role="tab" aria-selected="false" data-gate="push">🚀 分支推送</button>
+        <button type="button" class="gate-btn" role="tab" aria-selected="false" data-gate="pr">🔀 PR 创建与历史整理</button>
+      </div>
+      <div class="gate-panel" aria-live="polite">
+        <div class="gate-head">
+          <h3 id="gate-title">只读审查：状态盘点与 Commit / PR 文案起草</h3>
+          <span id="gate-badge" class="gate-badge is-safe">默认只读 · 零写入副作用</span>
+        </div>
+        <div class="gate-grid">
+          <div class="gate-cell">
+            <strong>1. 授权与适用边界</strong>
+            <p id="gate-scope">查看工作树、未跟踪文件、分支 upstream 关系、远程差异，以及起草 Conventional Commits 提交说明或 PR 描述，均不改动暂存区与提交历史。</p>
+          </div>
+          <div class="gate-cell">
+            <strong>2. 必做前置核验</strong>
+            <p id="gate-check">先阅读仓库 AGENTS.md、CONTRIBUTING.md 与近期 git log 风格，同时检查未暂存与已暂存 diff，绝不只看 staged diff 下结论。</p>
+          </div>
+          <div class="gate-cell is-red">
+            <strong>3. 绝对禁止红线</strong>
+            <p id="gate-ban">生成 commit message 不等于允许 git add / git commit；不得在只读分析阶段擅自清理未跟踪文件、修改分支或自动执行 stash。</p>
+          </div>
+        </div>
+        <div class="gate-cmd" id="gate-cmd">git status --short --branch &amp;&amp; git diff &amp;&amp; git diff --cached &amp;&amp; git log --oneline -10</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="workflow">
+      <h2>🧭 5 步可验证 Git 工作流</h2>
+      <p class="section-intro">每一步都以仓库真实状态和退出码为依据，优先使用非交互命令，拒绝凭记忆猜分支名或补跑假验证：</p>
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>读取仓库规则与完整状态</h3>
+            <p>先读 <code>AGENTS.md</code>、<code>CONTRIBUTING.md</code> 和 CI 说明，再执行 <code>git status --short --branch</code>、<code>git diff</code>、<code>git diff --cached</code>、<code>git log --oneline -10</code>、<code>git remote -v</code> 与 <code>git branch -vv</code>，完整掌握未跟踪文件和 upstream 偏移。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>拆分授权并逐文件精确暂存</h3>
+            <p>存在无关修改时严禁 <code>git add .</code> / <code>git add -A</code>；仅逐个 <code>git add &lt;file&gt;</code> 选中本轮改动，并用 <code>git diff --cached</code> 复核，避免把本地草稿或调试文件混入提交。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>按真实 Diff 规划原子提交</h3>
+            <p>根据实际改动判定 <code>feat / fix / docs / refactor / test / perf / chore</code>，沿用仓库近期提交语言和 scope；一个提交只表达一项可独立验证的变更，仅在确认应自动关闭时写入 <code>Closes #123</code>。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>安全验证后提交并核验 HEAD</h3>
+            <p>先确认测试/lint 脚本不会私自拉依赖或触发外部副作用，再运行相关验证并记录真实结果；commit 后执行 <code>git status --short --branch</code> 与 <code>git show --stat --oneline HEAD</code> 核验落盘状态；推送前必先 <code>git fetch</code> 检查远程新提交。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <h3>生成结构化、可复核的 PR 描述</h3>
+            <p>仅在用户要求时创建 PR，文案固定包含「变更摘要、关键改动、验证结果、风险与回滚、关联 Issue」，只勾选真实跑过的检查项，最后用中文汇报已执行动作、commit SHA、推送/PR 链接及待定项。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="boundaries">
+      <h2>⚖️ 动作权限拆分表与 Rebase / Force-Push 红线</h2>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Git 动作</th>
+              <th>默认权限与门禁</th>
+              <th>风险等级</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>状态检查、生成 commit message / PR 文案</strong></td>
+              <td>只读，可直接执行，不改动仓库状态</td>
+              <td><span class="pill pill-green">只读安全</span></td>
+            </tr>
+            <tr>
+              <td><strong>逐文件暂存（git add）、创建 commit</strong></td>
+              <td>仅用户要求后执行，只选本轮文件并用 <code>git diff --cached</code> 复核</td>
+              <td><span class="risk-med">需明确要求</span></td>
+            </tr>
+            <tr>
+              <td><strong>创建或切换分支</strong></td>
+              <td>仅用户明确要求时执行；流程需要但未获授权时先说明原因征求同意</td>
+              <td><span class="risk-med">需明确要求</span></td>
+            </tr>
+            <tr>
+              <td><strong>fetch、push、创建 PR</strong></td>
+              <td>分别确认在请求范围内，互不推导；push 前必须先 <code>git fetch</code></td>
+              <td><span class="risk-med">逐项授权</span></td>
+            </tr>
+            <tr>
+              <td><strong>merge PR、关闭 Issue、发布 Release</strong></td>
+              <td>高影响外部状态变更，必须获得明确指令</td>
+              <td><span class="risk-high">严格授权</span></td>
+            </tr>
+            <tr>
+              <td><strong>rebase、改写已发布历史、强推远程</strong></td>
+              <td>高风险；绝不对公共分支 rebase，禁止 <code>--force</code>，遇冲突立即停止上报</td>
+              <td><span class="risk-high">高危红线</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="grid-2" style="margin-top:1.1rem;">
+        <div class="info-box is-good">
+          <h3>工作树与历史保护机制</h3>
+          <ul class="prose-list">
+            <li>把已有未提交改动、未跟踪文件和无关修改视为<strong>用户资产</strong>，不覆盖、不回退；</li>
+            <li>rebase 前要求工作树与暂存区完全干净，必要时在用户允许下先建本地备份引用；</li>
+            <li>发生合并/变基冲突时立即停止，列出冲突文件与可选方案，不擅自猜测业务归属。</li>
+          </ul>
+        </div>
+        <div class="info-box is-bad">
+          <h3>明确禁止的越权行为</h3>
+          <ul class="prose-list">
+            <li>严禁 <code>git push --force</code>；私有分支经授权重写后，仅允许先确认远程状态再用 <code>--force-with-lease</code>；</li>
+            <li>严禁未经授权自动 <code>git stash</code>、<code>git reset --hard</code> 或丢弃用户本地修改；</li>
+            <li>严禁把未运行或基线原本失败的检查项在 PR 描述里勾选为「已通过」。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种安装方式</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 git-workflow</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill git-workflow</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\git-workflow" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\git-workflow\*" "$HOME\.claude\skills\git-workflow\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/git-workflow
+cp -r claude-code-skills-zh/skills/git-workflow/* ~/.claude/skills/git-workflow/</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>为什么 git-workflow 禁止顺手执行 git add . 或 git add -A？</h3>
+          <p>日常开发中工作树里常常留有草稿、调试代码或另一项任务的未提交文件。存在无关改动时执行 <code>git add .</code> 会把无关资产混进提交历史；<code>git-workflow</code> 要求逐个暂存本轮文件，并在提交前用 <code>git diff --cached</code> 二次核验。</p>
+        </div>
+        <div class="faq-item">
+          <h3>让它生成 commit message 或创建提交，会自动 git push 或发 PR 吗？</h3>
+          <p>不会。分析状态、暂存提交、切换分支、推送远程、发起 PR 与合并 PR 均按独立授权处理，互不自动推导，确保远端分支状态完全在你的掌控之内。</p>
+        </div>
+        <div class="faq-item">
+          <h3>什么情况下允许 rebase，对 force push 的红线是什么？</h3>
+          <p>仅在用户明确授权、工作树与暂存区干净且目标不是公共分支或他人依赖提交时才可执行 rebase；任何情况下禁止 <code>git push --force</code>，已授权重写的私有分支也只能在重新确认远程状态后使用 <code>--force-with-lease</code>。</p>
+        </div>
+        <div class="faq-item">
+          <h3>提交前如何做测试验证？如果项目基线原本就有失败怎么办？</h3>
+          <p>运行验证前会先确认脚本不会私自下载依赖或调用外部服务，再跑与改动相关的测试/lint/构建并附真实退出状态；基线已有失败会如实单列，绝不伪造通过。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/zh-code-reviewer/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 中文代码审查</span>
+            <h3>zh-code-reviewer</h3>
+            <p>commit 或提 PR 前先做一轮只读中文 diff 审查，把逻辑漏洞、并发和边界问题拦在本地。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/github-actions-gen/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 安全 CI/CD 生成</span>
+            <h3>github-actions-gen</h3>
+            <p>为提交与 PR 配齐最小权限、40 位 SHA 固定和超时保护的 GitHub Actions 流水线。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/zh-readme/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 中文 README 生成</span>
+            <h3>zh-readme</h3>
+            <p>仓库功能迭代并准备发版时，基于真实项目代码同步更新清晰可复制的中文文档。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>git-workflow</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/git-workflow/SKILL.md" target="_blank" rel="noopener noreferrer">skills/git-workflow/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var gates = {
+    readonly: {
+      title: '只读审查：状态盘点与 Commit / PR 文案起草',
+      badge: '默认只读 · 零写入副作用',
+      badgeClass: 'gate-badge is-safe',
+      scope: '查看工作树、未跟踪文件、分支 upstream 关系、远程差异，以及起草 Conventional Commits 提交说明或 PR 描述，均不改动暂存区与提交历史。',
+      check: '先阅读仓库 AGENTS.md、CONTRIBUTING.md 与近期 git log 风格，同时检查未暂存与已暂存 diff，绝不只看 staged diff 下结论。',
+      ban: '生成 commit message 不等于允许 git add / git commit；不得在只读分析阶段擅自清理未跟踪文件、修改分支或自动执行 stash。',
+      cmd: 'git status --short --branch && git diff && git diff --cached && git log --oneline -10'
+    },
+    commit: {
+      title: '常规提交：逐文件暂存、验证与原子 Commit',
+      badge: '需明确要求 · 严格限文件范围',
+      badgeClass: 'gate-badge',
+      scope: '仅在用户要求提交后执行，把本轮可独立验证的改动规划为原子 commit，沿用项目既有语言、type 与 scope 规范。',
+      check: '先确认验证脚本无外部副作用，运行对应测试/lint/构建并记录退出码；逐个暂存目标文件后用 git diff --cached 复核，提交后核对 HEAD。',
+      ban: '存在无关改动时严禁 git add . 或 git add -A；严禁把未运行或失败的验证项写成通过；提交完成后不自动推导执行 push。',
+      cmd: 'git add <target-file> && git diff --cached && git commit -m "feat(scope): 简短中文描述" && git show --stat --oneline HEAD'
+    },
+    push: {
+      title: '分支推送：先 Fetch 对齐远端 · 严禁 Force Push',
+      badge: '单独授权 · 影响远端状态',
+      badgeClass: 'gate-badge',
+      scope: '仅在用户明确授权推送或建/切分支时执行；先核对 git remote -v 与 git branch -vv，确认目标远端与追踪分支无误。',
+      check: '推送前必先运行 git fetch，检查 upstream 是否存在未整合的新提交；有远程新提交时先安全整合，而非直接覆盖。',
+      ban: '绝对禁止 git push --force。只有经用户明确授权重写的私有分支，且重新核实远端状态后，才允许使用 --force-with-lease。',
+      cmd: 'git remote -v && git branch -vv && git fetch && git status --short --branch'
+    },
+    pr: {
+      title: 'PR 创建与历史整理：证据化模板 + Rebase 高危门禁',
+      badge: '高风险门禁 · 严控外部与历史写操作',
+      badgeClass: 'gate-badge is-danger',
+      scope: '创建 PR 需明确在请求范围内，文案固定含变更摘要、关键改动、验证结果、风险与回滚、关联 Issue；merge、关闭 Issue、发 Release 须另行授权。',
+      check: '若涉及 rebase：要求工作树与暂存区均干净，先 fetch 确认目标基线，必要时经用户同意建本地备份引用，只勾选真实完成的检查项。',
+      ban: '绝不对公共分支或他人依赖的已发布提交执行 rebase；禁止擅自 stash；遇冲突立即停止并上报文件清单与方案，禁止盲目覆盖。',
+      cmd: 'gh pr create --title "feat(scope): 变更标题" --body "## 变更摘要\\n...\\n## 验证结果\\n...\\n## 风险与回滚\\n..."'
+    }
+  };
+
+  var btns = document.querySelectorAll('.gate-btn[data-gate]');
+  var titleEl = document.getElementById('gate-title');
+  var badgeEl = document.getElementById('gate-badge');
+  var scopeEl = document.getElementById('gate-scope');
+  var checkEl = document.getElementById('gate-check');
+  var banEl = document.getElementById('gate-ban');
+  var cmdEl = document.getElementById('gate-cmd');
+
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var item = gates[btn.getAttribute('data-gate')];
+      if (!item) return;
+      btns.forEach(function (b) {
+        var active = b === btn;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      titleEl.textContent = item.title;
+      badgeEl.textContent = item.badge;
+      badgeEl.className = item.badgeClass;
+      scopeEl.textContent = item.scope;
+      checkEl.textContent = item.check;
+      banEl.textContent = item.ban;
+      cmdEl.textContent = item.cmd;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve(); else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

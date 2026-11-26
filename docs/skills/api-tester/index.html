@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>api-tester：三档环境门禁与契约驱动 API 测试技能 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：依据真实 OpenAPI、路由与拦截器生成并验证 HTTP/REST/GraphQL/gRPC 接口测试。内置三档环境授权门禁、凭据零明文、Spec Drift 偏差暴露与国内 { code, msg, data } 业务信封支持。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="api-tester">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/api-tester/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="api-tester：三档环境门禁与契约驱动 API 测试技能">
+<meta property="og:description" content="不瞎猜状态码、不擅自向线上发写请求、严守凭据零明文：支持无 OpenAPI 降级取证链与国内 HTTP 200 业务信封契约。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/api-tester/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="api-tester 契约驱动 API 测试技能">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="api-tester：三档环境门禁与契约驱动 API 测试技能">
+<meta name="twitter:description" content="区分生成测试与三档环境执行授权，自动暴露 OpenAPI 与代码实现冲突（Spec Drift），附 PowerShell curl.exe 避坑。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：接口契约与环境门禁（电光蓝 + 琥珀护栏） */
+  :root {
+    --accent: #3b82f6;
+    --accent2: #f59e0b;
+  }
+  .gate-picker { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
+  @media (max-width: 720px) { .gate-picker { grid-template-columns: 1fr; } }
+  .gate-opt {
+    text-align: left; border: 1px solid rgba(148,163,184,0.28); background: rgba(15,23,42,0.75);
+    border-radius: 12px; padding: 14px 16px; color: #e2e8f0; cursor: pointer; transition: all .18s ease;
+  }
+  .gate-opt:hover { border-color: rgba(59,130,246,0.65); }
+  .gate-opt.is-active { border-color: #f59e0b; background: rgba(245,158,11,0.14); }
+  .gate-opt strong { display: block; font-size: 0.96rem; color: #f8fafc; margin-bottom: 4px; }
+  .gate-opt span { font-size: 0.84rem; color: #94a3b8; }
+  .gate-result {
+    border: 1px solid rgba(245,158,11,0.38); border-radius: 14px;
+    background: rgba(12,18,32,0.9); padding: 18px 20px;
+  }
+  .gate-badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 0.82rem; font-weight: 700; margin-bottom: 10px; background: rgba(59,130,246,0.18); color: #93c5fd; }
+  .gate-result h3 { margin: 0 0 8px; font-size: 1.04rem; color: #f8fafc; }
+  .gate-result p { margin: 0 0 10px; color: #cbd5e1; font-size: 0.93rem; line-height: 1.7; }
+  .gate-checklist { margin: 0; padding-left: 18px; color: #fde68a; font-size: 0.9rem; line-height: 1.8; }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "api-tester",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/api-tester/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/api-tester",
+  "description": "依据真实 OpenAPI、路由代码和响应拦截器生成并验证 HTTP / REST / GraphQL / gRPC 接口测试，内置三档环境授权门禁、凭据零明文原则与 Spec Drift 契约偏差暴露。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "api-tester", "item": "https://claude-skills.bt199.com/skills/api-tester/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "我们项目没有写 OpenAPI / Swagger 文档，还能用 api-tester 吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "完全可以。api-tester 内置了无 OpenAPI 时的标准降级取证链：自动按「路由注册表 + 鉴权/参数校验中间件 → Controller 入参与返回分支 → 全局响应拦截器与业务错误码枚举 → 现有前端/SDK 调用方」提取真实契约，并在报告中标注哪些断言是由代码反推、待业务确认的。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "国内项目普遍返回 HTTP 200 加 { code, msg, data } 业务信封，它能正确断言吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "可以。技能专门要求排查全局响应拦截器和业务错误码枚举，不会机械地只校验 HTTP 400/401/404，而是按项目真实采用的 HTTP 状态码与业务 code 字段生成断言。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "跑本地 localhost 测试时为什么还要查环境变量？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "很多团队本地启动 localhost 服务，但 .env 里的 DATABASE_URL、REDIS_URL 或短信/支付/邮件三方 SDK 实际连着共享测试环境甚至真实外部服务。档位 2 门禁会强制先核查配置是否指向隔离实例，避免本地跑测试误改共享库或发真实通知。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "如果 OpenAPI 文档和真实代码实现不一致（Spec Drift）怎么处理？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "严禁擅自修改业务代码或文档去凑测试绿灯。api-tester 会将冲突断言标为 skip/todo 并附注释，同时在报告的「契约偏差与风险发现」专栏单列暴露，交由团队判断到底该修代码还是更新文档。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">api-tester</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-purple">🧪 契约驱动接口测试</span>
+        <span class="pill pill-cyan">🛡️ 三档环境授权门禁</span>
+        <span class="pill pill-green">🔐 凭据零明文</span>
+      </div>
+      <h1><span class="accent-text">api-tester</span>：按真实契约生成并安全验证 API 测试</h1>
+      <p class="hero-lead">覆盖 HTTP / REST / GraphQL / gRPC 路由与网络契约层测试。既支持 OpenAPI/Swagger，也内置<strong>无文档降级取证链</strong>与国内高频 <code>HTTP 200 + { code, msg, data }</code> 业务信封识别；通过<strong>三档环境门禁</strong>做到离线单测不瞎拦、本地/远程写操作绝不误伤生产。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">接口测试与 Spec Drift 排查</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">安全护栏</div>
+          <div class="metric-value">三档环境门禁 + 凭据零明文</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/api-tester/SKILL.md" target="_blank" rel="noopener noreferrer">skills/api-tester/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/api-tester/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#gate-tool" class="btn btn-cyan">🎛️ 测测你的环境档位</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#gate-tool">三档环境授权交互判别</a>
+      <a href="#contract">无 OpenAPI 取证链与冲突处置</a>
+      <a href="#install">4 种安装方式与 PowerShell 避坑</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="gate-tool">
+      <h2>🎛️ 交互式判别：你的测试环境属于哪一档门禁？</h2>
+      <p class="section-intro">点击当前测试环境类型，查看 <code>api-tester</code> 实际会执行哪些安全检查（避免一刀切阻断离线单测，也防止本地服务暗连共享库）：</p>
+      <div class="gate-picker" role="tablist" aria-label="环境档位选择">
+        <button type="button" class="gate-opt is-active" data-tier="t1">
+          <strong>档位 1 · 进程内离线测试</strong>
+          <span>supertest / FastAPI TestClient / Go httptest / MockMvc</span>
+        </button>
+        <button type="button" class="gate-opt" data-tier="t2">
+          <strong>档位 2 · 本地服务进程</strong>
+          <span>localhost / 127.0.0.1 / 本地 Docker Compose</span>
+        </button>
+        <button type="button" class="gate-opt" data-tier="t3">
+          <strong>档位 3 · 远程 / 第三方环境</strong>
+          <span>共享 dev / staging / prod / 付费外部 API</span>
+        </button>
+      </div>
+      <div class="gate-result" aria-live="polite">
+        <span class="gate-badge" id="gate-badge">档位 1：核实隔离后可直接运行，无需机械追问</span>
+        <h3 id="gate-title">纯进程内 Mock / 内存隔离库模式</h3>
+        <p id="gate-desc">快速验证不会外连真实数据库、消息队列或付费外部 API 后，直接复用仓库锁定测试命令运行回归，保证日常开发流丝滑不被打断。</p>
+        <ul class="gate-checklist" id="gate-list">
+          <li>核实测试客户端走进程内注入，不发真实外网请求</li>
+          <li>使用项目锁定的 test script，严禁裸 npx 临时拉最新版</li>
+          <li>凭据仅通过测试变量/环境变量名引用，绝不读真实 .env 明文</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="contract">
+      <h2>📋 契约取证链与 Spec Drift 三级处置</h2>
+      <div class="grid-2">
+        <div class="info-box is-good">
+          <h3>无 OpenAPI 时的国内项目取证链</h3>
+          <ul class="clean-list">
+            <li>1. 路由注册表、鉴权/限流/参数校验中间件与 DTO/Validator；</li>
+            <li>2. Controller / Handler 的入参解构、分支条件与返回语句；</li>
+            <li>3. <strong>全局响应拦截器与业务错误码枚举</strong>（精准识别 <code>HTTP 200 + { code, msg, data }</code> 信封）；</li>
+            <li>4. 现有前端/SDK 调用方、存量测试及数据库约束。</li>
+          </ul>
+        </div>
+        <div class="info-box is-good">
+          <h3>契约缺失或冲突（Spec Drift）三级处置</h3>
+          <ul class="clean-list">
+            <li><strong>规范与实现一致</strong>：生成精确状态码、业务码与字段结构正式断言；</li>
+            <li><strong>无文档但代码可达</strong>：生成现状回归用例，并显式标注「代码反推，待业务确认」；</li>
+            <li><strong>文档与代码冲突</strong>：严禁擅改代码凑绿灯！标 <code>skip/todo</code> 并在报告单列「契约偏差与风险发现」。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 安装方式与 Windows PowerShell 调试避坑</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 api-tester</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill api-tester</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\api-tester" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\api-tester\*" "$HOME\.claude\skills\api-tester\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/api-tester
+cp -r claude-code-skills-zh/skills/api-tester/* ~/.claude/skills/api-tester/</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-warn">
+        <strong>Windows PowerShell 调试避坑：</strong>PowerShell 中 <code>curl</code> 默认是 <code>Invoke-WebRequest</code> 别名，直接粘贴带单引号 JSON 的 Unix <code>curl</code> 命令必报错；手工复现请显式使用 <code>curl.exe</code> 或直接跑项目测试框架，且严禁在命令中展开 <code>.env</code> 明文 Token。
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>我只让它生成接口测试代码，它会自动发请求打接口吗？</h3>
+          <p>不会。技能明确区分「生成测试」与「执行测试」——只要求生成测试时仅产出代码，且输出状态会诚实标为 <code>仅生成未执行</code>。</p>
+        </div>
+        <div class="faq-item">
+          <h3>什么时候该用 api-tester，什么时候用 test-generator？</h3>
+          <p>HTTP / REST / GraphQL / gRPC 路由与网络契约验证用 <code>api-tester</code>；纯函数、工具类、领域模型或模块内部单元测试用 <code>test-generator</code>，压测与火焰图定位交 <code>perf-profiler</code>。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/zh-code-reviewer/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 代码审查</span>
+            <h3>zh-code-reviewer</h3>
+            <p>基于 git diff 与调用链的分级中文只读代码审查，合入 PR 前先查阻塞缺陷。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/perf-profiler/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 性能剖析</span>
+            <h3>perf-profiler</h3>
+            <p>用可复现基线和真实 profiler 证据定位慢接口与数据库瓶颈，杜绝拍脑袋优化。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/skill-translator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 技能本地化</span>
+            <h3>skill-translator</h3>
+            <p>把海外高星英文测试与工程 Skill 无损转为中文触发版，先做安全与 Windows 预检。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>api-tester</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/api-tester/SKILL.md" target="_blank" rel="noopener noreferrer">skills/api-tester/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var tiers = {
+    t1: {
+      badge: '档位 1：核实隔离后可直接运行，无需机械追问',
+      title: '纯进程内 Mock / 内存隔离库模式',
+      desc: '快速验证不会外连真实数据库、消息队列或付费外部 API 后，直接复用仓库锁定测试命令运行回归，保证日常开发流丝滑不被打断。',
+      items: [
+        '核实测试客户端走进程内注入，不发真实外网请求',
+        '使用项目锁定的 test script，严禁裸 npx 临时拉最新版',
+        '凭据仅通过测试变量/环境变量名引用，绝不读真实 .env 明文'
+      ]
+    },
+    t2: {
+      badge: '档位 2：不能仅凭 localhost 判定安全，必须先核查依赖隔离',
+      title: '本地服务进程 / 本地 Docker 容器模式',
+      desc: '重点排查本地启动的服务是否暗连共享测试库或真实支付、短信、邮件、OSS 三方 SDK，确认隔离且有数据清理方案后再发送请求。',
+      items: [
+        '检查环境变量模板确认 DATABASE_URL / REDIS_URL 指向本地隔离实例',
+        '确认短信、邮件、支付、OSS 等三方回调处于 Mock 或沙箱状态',
+        '写操作强制带唯一测试标识并在成功/失败路径均执行 teardown 清理'
+      ]
+    },
+    t3: {
+      badge: '档位 3：最高风险，未经逐项明确授权严禁发请求',
+      title: '共享 dev / staging / 生产 / 付费外部 API 模式',
+      desc: '必须向用户逐项确认目标 Base URL、环境归属、测试账号权限、是否允许写操作、配额/计费影响以及数据清理方案；缺任一项立即停止执行。',
+      items: [
+        'GET 请求也不默认无副作用（可能触发审计日志、令牌消耗或状态变更）',
+        '凭据严格通过环境变量名传入，报告与日志中零明文回显',
+        '压测、模糊测试或大批量造数须单独授权并配置限流保护'
+      ]
+    }
+  };
+  var opts = document.querySelectorAll('.gate-opt[data-tier]');
+  opts.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var data = tiers[btn.getAttribute('data-tier')];
+      if (!data) return;
+      opts.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+      document.getElementById('gate-badge').textContent = data.badge;
+      document.getElementById('gate-title').textContent = data.title;
+      document.getElementById('gate-desc').textContent = data.desc;
+      var ul = document.getElementById('gate-list');
+      while (ul.firstChild) ul.removeChild(ul.firstChild);
+      data.items.forEach(function (txt) {
+        var li = document.createElement('li');
+        li.textContent = txt;
+        ul.appendChild(li);
+      });
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text; area.setAttribute('readonly', ''); area.style.position = 'fixed'; area.style.opacity = '0';
+      document.body.appendChild(area); area.select();
+      try { var ok = document.execCommand('copy'); document.body.removeChild(area); if (ok) resolve(); else reject(new Error('copy failed')); }
+      catch (err) { document.body.removeChild(area); reject(err); }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied'); btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () { btn.classList.remove('copied'); btn.textContent = defaultLabel; }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

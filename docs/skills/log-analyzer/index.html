@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>log-analyzer：大体积日志流式采样、编码排查与故障根因定位技能 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：解析多行或大体积本地/容器/云日志，去重聚类高频异常、串联 traceId 因果链并输出脱敏中文分析报告。大文件禁止整文件载入，兼容 Windows UTF-16LE 与 GBK 编码坑，访问生产 Docker/K8s/SLS 前必须授权。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="log-analyzer">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/log-analyzer/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="log-analyzer：大体积日志流式采样、编码排查与故障根因定位技能">
+<meta property="og:description" content="先查体积与 UTF-16LE/GBK 编码再流式过滤，按 traceId 区分源头异常与级联报错，严格脱敏凭据与隐私，生产只读门禁。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/log-analyzer/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="log-analyzer 大体积日志与故障根因分析技能">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="log-analyzer：大体积日志流式采样、编码排查与故障根因定位技能">
+<meta name="twitter:description" content="覆盖本地日志、Windows UTF-16LE/GBK 编码坑、Docker 与 K8s 生产只读授权门禁，默认脱敏零臆造。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：日志遥测与告警排障（信号橙告警 + 天空青链路） */
+  :root {
+    --accent: #f97316;
+    --accent2: #0ea5e9;
+  }
+  .la-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+  .la-btn {
+    border: 1px solid rgba(148,163,184,0.28); background: rgba(15,23,42,0.75);
+    color: #e2e8f0; border-radius: 10px; padding: 9px 14px; font-size: 0.88rem;
+    font-weight: 600; cursor: pointer; transition: all .18s ease;
+  }
+  .la-btn:hover { border-color: rgba(249,115,22,0.65); }
+  .la-btn.is-active { border-color: #f97316; background: rgba(249,115,22,0.16); color: #fed7aa; }
+  .la-panel {
+    border: 1px solid rgba(14,165,233,0.36); border-radius: 14px;
+    background: rgba(10,15,28,0.9); padding: 18px 20px;
+  }
+  .la-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .la-gate {
+    display: inline-block; padding: 4px 11px; border-radius: 999px;
+    font-size: 0.8rem; font-weight: 700; background: rgba(14,165,233,0.18); color: #7dd3fc;
+  }
+  .la-gate.is-auth { background: rgba(249,115,22,0.2); color: #fdba74; }
+  .la-enc { font-size: 0.8rem; color: #94a3b8; font-weight: 600; }
+  .la-panel h3 { margin: 0 0 8px; font-size: 1.04rem; color: #f8fafc; }
+  .la-panel p { margin: 0 0 12px; color: #cbd5e1; font-size: 0.92rem; line-height: 1.68; }
+  .la-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+  @media (max-width: 760px) { .la-grid { grid-template-columns: 1fr; } }
+  .la-cell {
+    background: rgba(17,24,39,0.86); border: 1px solid rgba(148,163,184,0.18);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .la-cell strong { display: block; font-size: 0.82rem; color: #7dd3fc; margin-bottom: 6px; }
+  .la-cell span { display: block; font-size: 0.88rem; color: #cbd5e1; line-height: 1.6; }
+  .la-sample {
+    font-family: var(--mono); font-size: 0.82rem; color: #e2e8f0;
+    background: #0b0b12; border: 1px solid rgba(249,115,22,0.3);
+    border-radius: 9px; padding: 10px 12px; white-space: pre-wrap; word-break: break-word;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "log-analyzer",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/log-analyzer/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/log-analyzer",
+  "description": "应用与系统日志文件分析助手：大文件流式采样不撑爆上下文，兼容 Windows UTF-16LE 与 GBK 编码，聚类高频异常并按 traceId 定位故障因果链；默认只读并脱敏，连接生产容器或云日志前必须授权。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "log-analyzer", "item": "https://claude-skills.bt199.com/skills/log-analyzer/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "几百 MB 的线上 .log 文件交给 log-analyzer 会不会撑爆上下文？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。技能第一条原则就是大文件先采样、禁止整文件直接载入：读取前先查文件体积、行数和首尾样例，超过数 MB 时按时间窗、告警级别、关键字或尾部（tail）分块流式筛选。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "为什么 Windows PowerShell 重定向出来的日志文件经常乱码或解析报错？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Windows PowerShell 5.1 使用 > 重定向生成的 .log 文件默认常为带 BOM 的 UTF-16LE，中文 Windows 终端或传统程序日志常为 GBK/CP936。log-analyzer 解析前会先识别文件编码与换行风格，避免直接按 UTF-8 读取触发乱码或 UnicodeDecodeError。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "它能直接连生产 Docker、Kubernetes 集群或阿里云 SLS 拉日志吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "默认只分析本地日志文件或你粘贴的片段。如需连接生产 Docker/Kubernetes、SSH 主机或 AWS CloudWatch / 阿里云 SLS 等云日志服务，必须先向你确认目标环境、查询时间窗与只读权限范围，严禁执行重启、清理或修改配置命令。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "log-analyzer 和 error-translator 什么时候该分别使用？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "多行日志、大体积 .log / JSONL / 容器日志聚类统计与故障因果链分析用 log-analyzer；如果只是单条或短段英文报错与异常堆栈需要中文翻译和代码修复建议，请使用 error-translator。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">log-analyzer</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-amber">📋 大体积日志流式排查</span>
+        <span class="pill pill-cyan">🔤 UTF-16LE / GBK 编码识别</span>
+        <span class="pill pill-green">🔐 生产只读授权与自动脱敏</span>
+      </div>
+      <h1><span class="accent-text">log-analyzer</span>：大体积日志流式采样、编码排查与故障因果链分析技能</h1>
+      <p class="hero-lead">面向线上/测试故障排查的应用与系统日志分析助手。读取前先查体积与编码（避开 Windows PowerShell <code>UTF-16LE</code> 与 <code>GBK/CP936</code> 乱码坑），大文件坚持分块流式采样、剥离变动参数去重聚类，并按 <code>traceId</code> 区分源头故障与级联次生报错。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">多行日志聚类与根因定位</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">核心护栏</div>
+          <div class="metric-value">大文件采样 + 生产授权 + 脱敏</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/log-analyzer/SKILL.md" target="_blank" rel="noopener noreferrer">skills/log-analyzer/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/log-analyzer/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#inspector" class="btn btn-cyan">🔎 体验日志源与编码排查器</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#inspector">日志源与编码排查器</a>
+      <a href="#workflow">4 步日志取证流程</a>
+      <a href="#guardrails">安全门禁与工具分工</a>
+      <a href="#install">4 种安装方式</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="inspector">
+      <h2>🔎 交互式日志源与编码排查器</h2>
+      <p class="section-intro">切换 4 类常见排障现场，查看 <code>log-analyzer</code> 的采样策略、生产连接授权门禁与 Windows 编码防坑动作：</p>
+
+      <div class="la-tabs" role="tablist" aria-label="日志源与编码场景">
+        <button type="button" class="la-btn is-active" data-source="local">1. 本地大体积日志（流式采样）</button>
+        <button type="button" class="la-btn" data-source="winenc">2. Windows 编码坑（UTF-16LE / GBK）</button>
+        <button type="button" class="la-btn" data-source="docker">3. Docker 容器日志</button>
+        <button type="button" class="la-btn" data-source="k8s">4. Kubernetes / 云日志（SLS / CloudWatch）</button>
+      </div>
+
+      <div class="la-panel" aria-live="polite">
+        <div class="la-head">
+          <span class="la-gate" id="la-gate">📂 本地只读 · 禁止整文件直接载入</span>
+          <span class="la-enc" id="la-enc">适用：Nginx / Spring Boot / JSONL / syslog</span>
+        </div>
+        <h3 id="la-title">先查体积、行数与首尾各 20 行样例，再按时间窗分块流式过滤</h3>
+        <p id="la-desc">面对几十 MB 甚至 GB 级应用日志，绝不一次性塞进上下文。先识别结构化（JSON Lines / Logfmt）或文本日志格式、统一标注时区（如 UTC+8 / UTC），再按级别与关键字定向采样。</p>
+        <div class="la-grid">
+          <div class="la-cell">
+            <strong>采样与聚类动作</strong>
+            <span id="la-sampling">按时间窗、FATAL/ERROR/WARN 或 tail 流式筛选，剥离 UUID、时间戳与 requestId 做相似异常去重聚类。</span>
+          </div>
+          <div class="la-cell">
+            <strong>因果链与指标核查</strong>
+            <span id="la-causal">按时间戳与 traceId 区分源头异常（如连接池超时）与级联次生报错；仅在日志含真实字段时统计 4xx/5xx 与 P50/P95/P99。</span>
+          </div>
+          <div class="la-cell">
+            <strong>脱敏与只读边界</strong>
+            <span id="la-safety">输出自动遮蔽密码、Token、Cookie、手机号、身份证与内网密钥；绝不清理、截断或轮转原日志文件。</span>
+          </div>
+        </div>
+        <div class="la-sample" id="la-sample">排查提示：检查文件体积与编码 → 锁定故障时间窗（明确 UTC+8 或 UTC）→ 抽取 Top 异常模式与代表性行号（如 app.log:18420）。</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="workflow">
+      <h2>🧭 4 步结构化日志取证流程</h2>
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>检查来源、体积与文件编码</h3>
+            <p>确认来源为本地文件、粘贴片段或经授权的只读输出；先查大小、编码（<code>UTF-8</code> / <code>UTF-16LE</code> / <code>GBK</code>）与首尾各 20 行样例，识别 JSON Lines、Logfmt、Nginx、Spring Boot、FastAPI、Go/Node 或系统日志格式。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>定向过滤、统一时区与去重聚类</h3>
+            <p>明确故障时间窗与时区（防止跨服务 UTC 与 UTC+8 错位误判因果），按 <code>FATAL</code>/<code>ERROR</code>/<code>WARN</code>、服务名或 <code>traceId</code> 过滤，并剥离变动参数对重复报错做模式聚类。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>异常峰值与因果链追溯</h3>
+            <p>统计 Top 异常次数、首次出现、峰值与恢复时间，通过时间戳和 <code>traceId</code> 区分“源头异常”与“级联次生报错”；仅在日志确实包含耗时或状态码字段时汇总 P50/P95/P99 与 4xx/5xx 分布。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>输出脱敏中文报告与证据等级</h3>
+            <p>输出含来源编码、Top 异常聚类表、根因证据等级（已实证 / 待进一步验证）及排查建议的结构化报告，每条结论都带真实行号或 <code>traceId</code> 证据，绝不臆造指标。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="guardrails">
+      <h2>🛡️ 生产连接门禁与工具分工</h2>
+      <div class="callout callout-red">
+        <div class="callout-title">🚨 生产环境与隐私的四道红线</div>
+        <ul class="prose-list">
+          <li><strong>大文件零整读：</strong>超过数 MB 的日志必须分块流式过滤，避免上下文溢出或内存暴涨。</li>
+          <li><strong>远程/生产连接前必须确认：</strong>连接生产 Docker、Kubernetes、SSH 主机或 AWS CloudWatch / 阿里云 SLS 前，先确认目标环境、查询时间窗与只读权限范围，严禁重启、清理或修改线上配置。</li>
+          <li><strong>严格脱敏：</strong>示例日志行与汇总表必须遮蔽密码、Authorization Header、Token、Cookie、手机号、身份证号和真实内网密钥。</li>
+          <li><strong>严禁破坏现场：</strong>只输出只读排查结论与改进建议，不擅自清理、截断或轮转线上日志文件。</li>
+        </ul>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>你的排查需求</th>
+              <th>推荐技能</th>
+              <th>选择理由</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>多行/大体积 .log、JSONL、容器或云日志故障定位</strong></td>
+              <td><code>log-analyzer</code></td>
+              <td>支持流式采样、编码检测、异常聚类、<code>traceId</code> 因果链与脱敏分析报告。</td>
+            </tr>
+            <tr>
+              <td><strong>单条或短段英文异常消息翻译与代码排障</strong></td>
+              <td><a href="/skills/error-translator/"><code>error-translator</code></a></td>
+              <td>保留原报错与标识符，给出自然中文翻译、堆栈业务帧根因和最小修复对比。</td>
+            </tr>
+            <tr>
+              <td><strong>慢接口、慢 SQL、内存与 CPU 热点压测剖析</strong></td>
+              <td><a href="/skills/perf-profiler/"><code>perf-profiler</code></a></td>
+              <td>围绕可复现基线、火焰图/查询计划和同条件前后复测做性能优化。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种安装方式</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 log-analyzer</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill log-analyzer</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\log-analyzer" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\log-analyzer\*" "$HOME\.claude\skills\log-analyzer\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/log-analyzer
+cp -r claude-code-skills-zh/skills/log-analyzer/* ~/.claude/skills/log-analyzer/</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>几百 MB 的线上 .log 文件会不会把上下文直接撑爆？</h3>
+          <p>不会。<code>log-analyzer</code> 禁止整文件直接载入，会先检测体积、行数与首尾样例，再通过时间窗、日志级别、关键字或尾部采样分块过滤。</p>
+        </div>
+        <div class="faq-item">
+          <h3>为什么专门强调 Windows UTF-16LE 和 GBK 编码坑？</h3>
+          <p>国内大量研发与运维在 Windows PowerShell 5.1 下习惯用 <code>&gt;</code> 重定向保存日志，默认会生成带 BOM 的 <code>UTF-16LE</code> 文件；而中文 Windows 终端或老系统常输出 <code>GBK / CP936</code>。先识编码再读，才能避免乱码和 <code>UnicodeDecodeError</code>。</p>
+        </div>
+        <div class="faq-item">
+          <h3>日志里如果没有耗时字段，报告会不会硬编 P95/P99？</h3>
+          <p>绝不会。规则明确约定只有当日志里真实存在对应字段时才统计 HTTP 4xx/5xx 与耗时分位，否则只在「改进建议」中提示补充埋点字段，杜绝虚构指标。</p>
+        </div>
+        <div class="faq-item">
+          <h3>贴一段包含 Bearer Token 或用户手机号的日志安全吗？</h3>
+          <p>技能要求所有输出报告中的示例日志行与聚类摘要自动脱敏密码、Authorization Header、Token、Cookie、手机号与身份证号；同时也建议你在上传生产日志前优先做好源头脱敏。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/error-translator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 报错翻译排障</span>
+            <h3>error-translator</h3>
+            <p>把日志里揪出来的单条英文异常堆栈翻译成自然中文并给出最小修复方案。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/perf-profiler/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 证据链性能剖析</span>
+            <h3>perf-profiler</h3>
+            <p>发现慢接口或 GC 抖动后，用可复现基线与 profiler 证据做精准性能优化。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/api-tester/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 接口契约测试</span>
+            <h3>api-tester</h3>
+            <p>定位线上 5xx 或业务错误码异常后，用契约测试固化接口回归验证。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>log-analyzer</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/log-analyzer/SKILL.md" target="_blank" rel="noopener noreferrer">skills/log-analyzer/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var sources = {
+    local: {
+      isAuth: false,
+      gate: '📂 本地只读 · 禁止整文件直接载入',
+      enc: '适用：Nginx / Spring Boot / JSONL / syslog',
+      title: '先查体积、行数与首尾各 20 行样例，再按时间窗分块流式过滤',
+      desc: '面对几十 MB 甚至 GB 级应用日志，绝不一次性塞进上下文。先识别结构化（JSON Lines / Logfmt）或文本日志格式、统一标注时区（如 UTC+8 / UTC），再按级别与关键字定向采样。',
+      sampling: '按时间窗、FATAL/ERROR/WARN 或 tail 流式筛选，剥离 UUID、时间戳与 requestId 做相似异常去重聚类。',
+      causal: '按时间戳与 traceId 区分源头异常（如连接池超时）与级联次生报错；仅在日志含真实字段时统计 4xx/5xx 与 P50/P95/P99。',
+      safety: '输出自动遮蔽密码、Token、Cookie、手机号、身份证与内网密钥；绝不清理、截断或轮转原日志文件。',
+      sample: '排查提示：检查文件体积与编码 → 锁定故障时间窗（明确 UTC+8 或 UTC）→ 抽取 Top 异常模式与代表性行号（如 app.log:18420）。'
+    },
+    winenc: {
+      isAuth: false,
+      gate: '🔤 编码预检 · 专治 Windows 乱码与解码失败',
+      enc: '重点覆盖：UTF-16LE（带 BOM）/ GBK / CP936 / CRLF',
+      title: '先测 BOM 与中文编码，避免直接按 UTF-8 读导致满屏乱码或崩溃',
+      desc: 'Windows PowerShell 5.1 使用 > 重定向生成的 .log 文件默认常为 UTF-16LE（带 BOM），而 CMD、传统 Java/C++ 程序或 Windows Event Log 导出文本常为 GBK/CP936。',
+      sampling: '先读取文件头字节与首尾 20 行确认真实编码和换行风格（CRLF/LF），再指定对应解码方式做流式过滤。',
+      causal: '还原正确中文业务报错与栈帧路径后，再做去重聚类，防止因字符截断把同一类异常拆散成噪声。',
+      safety: '只读解码转换在内存中完成，不擅自原地覆盖或转码原日志文件，保留取证原件完整性。',
+      sample: '避坑对照：PowerShell 重定向日志先查 UTF-16LE BOM（FF FE）；中文控制台日志遇到 UnicodeDecodeError 时切换 GBK/CP936 解析。'
+    },
+    docker: {
+      isAuth: true,
+      gate: '🔐 生产授权门禁 · 仅限经确认的只读拉取',
+      enc: '适用：Docker 容器 stdout / stderr 日志流',
+      title: '拉取生产容器日志前必须先确认目标环境、时间窗与只读权限',
+      desc: '默认仅分析本地日志；如需执行只读命令拉取 Docker 容器日志，必须先向用户确认容器范围、时间窗口（--since / --until）与行数上限（--tail），严禁触碰写操作。',
+      sampling: '始终带时间窗与行数限制拉取日志，避免无边界 docker logs 拖垮终端内存或塞满上下文。',
+      causal: '结合容器重启时间、OOMKilled 信号与应用异常时间戳，判断是内存泄漏、探针失败还是下游超时引发连锁故障。',
+      safety: '严禁执行 docker restart、stop、rm、prune 或任何修改容器环境变量与配置的命令；输出报告严格脱敏。',
+      sample: '门禁流程：向用户确认「环境 + 容器名 + 时间窗（如最近 30 分钟 UTC+8）+ 只读权限」→ 获批后再定向采样分析。'
+    },
+    k8s: {
+      isAuth: true,
+      gate: '🚨 高敏感生产门禁 · 集群 / 云日志需明确授权',
+      enc: '适用：Kubernetes Pod / 阿里云 SLS / AWS CloudWatch',
+      title: '跨 Pod 与云日志排查坚持只读授权、时区对齐与 traceId 串联',
+      desc: '连接 Kubernetes 生产集群、SSH 线上主机或阿里云 SLS / AWS CloudWatch 前，必须先获得用户对命名空间、集群上下文、时间窗和只读查询范围的明确确认。',
+      sampling: '按 namespace、label、Pod 与精确时间窗分片拉取；跨服务对比前先统一标注 UTC 与 UTC+8 时区。',
+      causal: '通过 traceId / requestId 串联网关、业务 Pod 与数据库报错，清晰区分「已实证根因」与「待进一步验证假设」。',
+      safety: '严禁修改集群配置、扩缩容、重启 Pod 或清理日志索引；严禁在报告中暴露凭据、Authorization Header 或内网密钥。',
+      sample: '门禁流程：核对当前 kube-context / 云账号只读范围 → 获用户确认时间窗 → 按 traceId 还原上游源头与下游级联报错。'
+    }
+  };
+
+  var btns = document.querySelectorAll('.la-btn[data-source]');
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var s = sources[btn.getAttribute('data-source')];
+      if (!s) return;
+      btns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+      var gateEl = document.getElementById('la-gate');
+      gateEl.classList.toggle('is-auth', Boolean(s.isAuth));
+      gateEl.textContent = s.gate;
+      document.getElementById('la-enc').textContent = s.enc;
+      document.getElementById('la-title').textContent = s.title;
+      document.getElementById('la-desc').textContent = s.desc;
+      document.getElementById('la-sampling').textContent = s.sampling;
+      document.getElementById('la-causal').textContent = s.causal;
+      document.getElementById('la-safety').textContent = s.safety;
+      document.getElementById('la-sample').textContent = s.sample;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text; area.setAttribute('readonly', ''); area.style.position = 'fixed'; area.style.opacity = '0';
+      document.body.appendChild(area); area.select();
+      try { var ok = document.execCommand('copy'); document.body.removeChild(area); if (ok) resolve(); else reject(new Error('copy failed')); }
+      catch (err) { document.body.removeChild(area); reject(err); }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied'); btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () { btn.classList.remove('copied'); btn.textContent = defaultLabel; }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

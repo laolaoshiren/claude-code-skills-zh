@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>i18n-helper：先盘点再改造、防 Hooks 崩溃的国际化助手技能 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：扫描业务源码硬编码 UI 文本、对账多语言 JSON/YAML/PO/Properties 缺失 key 并限范围安全替换。默认先出清单核对脏工作树，严防 React Hooks 作用域崩溃与 Windows GBK 乱码。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="i18n-helper">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/i18n-helper/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="i18n-helper：先盘点再改造、防 Hooks 崩溃的国际化助手技能">
+<meta property="og:description" content="覆盖 i18next、react-intl、vue-i18n、gettext 与 Java Properties：先出扫描清单与脏工作树检查，校验 React Hooks 作用域，显式 UTF-8 无 BOM 落盘并复验构建。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/i18n-helper/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="i18n-helper 代码库国际化助手技能">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="i18n-helper：先盘点再改造、防 Hooks 崩溃的国际化助手技能">
+<meta name="twitter:description" content="扫描硬编码 UI 文案、核对多语言缺失 key、防 React Hooks 作用域错误与 Windows UTF-8 乱码，MIT 开源一键安装。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制配色：多语言星海青 + 极光天蓝主题 */
+  :root {
+    --accent: #0891b2;
+    --accent2: #22d3ee;
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(8, 145, 178, 0.22) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(56, 189, 248, 0.12) 0%, transparent 50%);
+  }
+  .detail-hero h1 .accent-text {
+    background: linear-gradient(135deg, #22d3ee, #818cf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .nav-star, .btn-primary, .step-num {
+    background: linear-gradient(135deg, #0891b2, #06b6d4);
+    box-shadow: 0 4px 18px rgba(8, 145, 178, 0.34);
+  }
+  .i18n-stepper {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin: 16px 0;
+  }
+  @media (max-width: 780px) { .i18n-stepper { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .i18n-btn {
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(15, 23, 42, 0.72);
+    color: #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 0.87rem;
+    font-weight: 600;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .i18n-btn:hover { border-color: rgba(34, 211, 238, 0.7); color: #fff; }
+  .i18n-btn.is-active {
+    border-color: #22d3ee;
+    background: rgba(8, 145, 178, 0.22);
+    color: #cffafe;
+  }
+  .i18n-panel {
+    border: 1px solid rgba(34, 211, 238, 0.34);
+    border-radius: 14px;
+    background: rgba(8, 17, 26, 0.92);
+    padding: 18px 20px;
+  }
+  .i18n-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .i18n-head h3 { margin: 0; font-size: 1.08rem; color: #f8fafc; }
+  .i18n-stage {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 11px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    border: 1px solid rgba(34, 211, 238, 0.44);
+    background: rgba(8, 145, 178, 0.16);
+    color: #67e8f9;
+  }
+  .i18n-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+  @media (max-width: 780px) { .i18n-grid { grid-template-columns: 1fr; } }
+  .i18n-cell {
+    background: rgba(15, 25, 36, 0.88);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .i18n-cell.is-warn {
+    border-color: rgba(253, 203, 110, 0.34);
+    background: rgba(253, 203, 110, 0.06);
+  }
+  .i18n-cell strong {
+    display: block;
+    font-size: 0.83rem;
+    color: #67e8f9;
+    margin-bottom: 6px;
+  }
+  .i18n-cell.is-warn strong { color: #fde68a; }
+  .i18n-cell p { margin: 0; font-size: 0.89rem; color: #cbd5e1; line-height: 1.62; }
+  .i18n-sample {
+    margin-top: 12px;
+    padding: 11px 14px;
+    border-radius: 9px;
+    background: #060d15;
+    border: 1px solid rgba(34, 211, 238, 0.24);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: #a5f3fc;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "i18n-helper",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/i18n-helper/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/i18n-helper",
+  "description": "代码库国际化与本地化原创中文技能：扫描业务源码硬编码 UI 文本、对账多语言缺失 key 与占位符、严格遵循 React Hooks 作用域规则并以 UTF-8 无 BOM 落盘验证。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "i18n-helper", "item": "https://claude-skills.bt199.com/skills/i18n-helper/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "i18n-helper 和 skill-translator 有什么区别，什么时候该用哪个？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "i18n-helper 面向应用业务代码库（React、Vue、Next.js、Python、Java、Go），负责提取硬编码 UI 文案、接入多语言库与对账语言包缺失 key；而把第三方英文 SKILL.md、AGENTS.md 或 CLAUDE.md 本地化为中文，应使用 skill-translator。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "在 React 项目批量替换文案时为什么容易引发 Hooks 报错？i18n-helper 怎么防？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "普通工具函数、常量对象、类方法或模块顶层如果误插入 useTranslation() 会直接触发 React Hooks 规则崩溃。i18n-helper 在扫描清单阶段就标注每条文本的上下文类型，仅在函数组件或自定义 Hook 中使用 useTranslation()，非组件上下文强制改为参数传入 t、调用 i18n.t() 实例或保存 message key 在渲染层翻译。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "扫描完会直接把整个仓库的业务代码都改写吗？项目未装 i18n 依赖怎么办？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。默认只做只读扫描，先输出硬编码清单、建议 key 命名与受影响文件列表，并检查 git status 保护已有未提交改动；未安装 i18n 依赖时先报告并给出方案，未经用户明确授权绝不擅自 npm install / pip install 或批量改写源码。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Windows 环境下生成中文语言包为什么容易乱码，技能如何处理？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Windows 终端和脚本工具默认编码常为 CP936/GBK，直接写入中文 .json/.yaml/.po 极易破坏非 ASCII 字符。i18n-helper 要求所有语言包读写显式使用 UTF-8（无 BOM），并在改造后通过构建、类型检查与 git diff 复验编码合法性。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">i18n-helper</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-cyan">🌍 先扫描清单 · 再限范围改写</span>
+        <span class="pill pill-purple">⚛️ React Hooks 作用域门禁</span>
+        <span class="pill pill-green">📝 跨平台 UTF-8 无 BOM</span>
+      </div>
+      <h1><span class="accent-text">i18n-helper</span>：先盘点确认、防 Hooks 崩溃的代码库国际化助手</h1>
+      <p class="hero-lead">解决 AI 批量做多语言改造时的三大翻车现场：把日志/SQL 误当 UI 文案乱提、在普通工具函数里硬塞 <code>useTranslation()</code> 导致页面白屏、Windows 默认 GBK 写坏中文语言包。按四道门禁推进，支持 <code>i18next</code>、<code>react-intl</code>、<code>vue-i18n</code>、<code>gettext</code> 与 Java <code>Properties</code>。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">硬编码提取 / 缺失 key 对账</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">核心护栏</div>
+          <div class="metric-value">先清单确认 · 严防 Hooks 崩溃</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/i18n-helper/SKILL.md" target="_blank" rel="noopener noreferrer">skills/i18n-helper/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/i18n-helper/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#gates" class="btn btn-cyan">🚦 交互改造门禁预览</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#gates">交互式改造门禁预览</a>
+      <a href="#formats">语言包格式与对账报告</a>
+      <a href="#boundaries">触发边界与编码红线</a>
+      <a href="#install">4 种安装方式</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="gates">
+      <h2>🚦 交互式国际化改造门禁预览（4 步递进）</h2>
+      <p class="section-intro">点击以下 4 道递进门禁，预览 <code>i18n-helper</code> 从只读扫描到构建复验的每一步拦截规则与放行条件：</p>
+      <div class="i18n-stepper" role="tablist" aria-label="国际化改造四道门禁">
+        <button type="button" class="i18n-btn is-active" role="tab" aria-selected="true" data-stage="scan">1️⃣ 扫描硬编码清单</button>
+        <button type="button" class="i18n-btn" role="tab" aria-selected="false" data-stage="git">2️⃣ 确认脏工作树</button>
+        <button type="button" class="i18n-btn" role="tab" aria-selected="false" data-stage="hooks">3️⃣ React Hooks 作用域校验</button>
+        <button type="button" class="i18n-btn" role="tab" aria-selected="false" data-stage="utf8">4️⃣ UTF-8 落盘与构建复验</button>
+      </div>
+      <div class="i18n-panel" aria-live="polite">
+        <div class="i18n-head">
+          <h3 id="i18n-title">门禁 1：只读扫描硬编码 UI 文本并精准排噪</h3>
+          <span id="i18n-stage" class="i18n-stage">阶段 1 / 4 · 只读盘点</span>
+        </div>
+        <div class="i18n-grid">
+          <div class="i18n-cell">
+            <strong>核心动作</strong>
+            <p id="i18n-do">先读 package.json / pyproject.toml / go.mod / pom.xml 识别已有 i18n 设施与命名风格，再扫描目标目录中的前端或后端源文件，汇总面向用户的 UI 文本、表单校验与错误提示。</p>
+          </div>
+          <div class="i18n-cell is-warn">
+            <strong>重点排噪与拦截项</strong>
+            <p id="i18n-trap">自动排除日志调试信息、SQL、正则、URL、import 路径、代码注释、内部枚举与默认测试断言；每条候选均标注所在上下文（组件 / 纯函数 / 模板）。</p>
+          </div>
+          <div class="i18n-cell">
+            <strong>门禁放行条件</strong>
+            <p id="i18n-pass">输出完整「文件:行号 · 原文 · 建议 key · 上下文类型」清单，等待用户明确确认本次改造范围；未获确认绝不修改任何业务源码。</p>
+          </div>
+        </div>
+        <div class="i18n-sample" id="i18n-sample">src/App.tsx:42       | "欢迎使用"   -> page.welcome      | React 组件（可用 useTranslation）
+src/utils/errors.ts:9 | "网络异常"  -> err.networkFailed | 纯工具函数（禁用 Hook，改传参 t 或 i18n.t）</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="formats">
+      <h2>🗂️ 支持的多语言框架、文件格式与对账能力</h2>
+      <p class="section-intro">先匹配项目既有语言包结构（扁平点分或嵌套对象），再做基准语言与目标语言的完整性对账：</p>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>语言包格式</th>
+              <th>常见技术栈 / 框架</th>
+              <th>技能核查重点</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>JSON</strong> (<code>.json</code>)</td>
+              <td><code>i18next</code> / <code>react-i18next</code> / <code>react-intl</code> / <code>next-intl</code></td>
+              <td>保持扁平或嵌套风格一致，校验 JSON 合法性、缺失 key、孤儿 key 与 <code>{name}</code> / <code>{{count}}</code> 占位符一致</td>
+            </tr>
+            <tr>
+              <td><strong>YAML</strong> (<code>.yaml</code> / <code>.yml</code>)</td>
+              <td><code>vue-i18n</code> 等前后端配置</td>
+              <td>显式 UTF-8 无 BOM 写入，区分 <code>&lt;template&gt;</code> 内 <code>$t()</code>、<code>&lt;script setup&gt;</code> 内 <code>useI18n()</code> 与纯 TS 调用</td>
+            </tr>
+            <tr>
+              <td><strong>PO / POT</strong> (<code>.po</code>)</td>
+              <td>Python / C / Go 等 <code>gettext</code> 工作流</td>
+              <td>完整保留 <code>msgid</code> / <code>msgstr</code> 结构、上下文标记与复数规则，校验 <code>%s</code> 格式占位符</td>
+            </tr>
+            <tr>
+              <td><strong>Properties</strong> (<code>.properties</code>)</td>
+              <td>Java <code>Spring MessageSource</code></td>
+              <td>先核对项目规范要求 UTF-8 直写还是 <code>\uXXXX</code> 转义，再统一写入，避免混用导致乱码</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="boundaries">
+      <h2>⚖️ 触发边界与国际化编码红线</h2>
+      <div class="grid-2">
+        <div class="info-box is-good">
+          <h3>高可靠实践准则</h3>
+          <ul class="prose-list">
+            <li><strong>适用</strong>：业务代码硬编码 UI 文案提取、多语言库接入、语言包缺失 key 与占位符对账；</li>
+            <li>保留专有技术术语（API、SDK、HTTP、OAuth 等）与品牌名，不做机械直译；</li>
+            <li>日期、数字与货币优先采用 <code>Intl.DateTimeFormat</code> / <code>Intl.NumberFormat</code> 等 locale 感知 API；</li>
+            <li>改造后如实运行 <code>tsc --noEmit</code>、lint、构建或相关测试，未执行时明确标注「已修改、未执行构建验证」。</li>
+          </ul>
+        </div>
+        <div class="info-box is-bad">
+          <h3>明确禁止的越界与翻车写法</h3>
+          <ul class="prose-list">
+            <li><strong>不适用</strong>：汉化第三方英文 <code>SKILL.md</code> / <code>AGENTS.md</code> / <code>CLAUDE.md</code> → 请使用 <code>skill-translator</code>；</li>
+            <li>严禁在普通工具函数、常量定义、类方法或模块顶层调用 <code>useTranslation()</code> 等 React Hook；</li>
+            <li>严禁把文案和变量用 <code>+</code> 字符串拼接翻译，必须改为命名插值（如 <code>t('welcome', { name })</code>）或保留 <code>&lt;Trans&gt;</code>；</li>
+            <li>严禁未经用户授权执行 <code>npm install</code> / <code>pip install</code>、改写 lockfile 或覆盖工作树已有改动。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种安装方式</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 i18n-helper</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill i18n-helper</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\i18n-helper" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\i18n-helper\*" "$HOME\.claude\skills\i18n-helper\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/i18n-helper
+cp -r claude-code-skills-zh/skills/i18n-helper/* ~/.claude/skills/i18n-helper/</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>i18n-helper 和 skill-translator 有什么区别，什么时候该用哪个？</h3>
+          <p><code>i18n-helper</code> 面向前端/后端业务源码的多语言接入与缺失 key 巡检；如果你的目标是把英文 <code>SKILL.md</code>、<code>AGENTS.md</code> 或 <code>CLAUDE.md</code> 本地化为地道中文，请使用 <code>skill-translator</code>。</p>
+        </div>
+        <div class="faq-item">
+          <h3>在 React 项目批量替换文案时为什么容易引发 Hooks 报错？i18n-helper 怎么防？</h3>
+          <p>在普通函数、常量表或模块顶层调用 <code>useTranslation()</code> 会直接违反 React Hooks 规则并导致运行时崩溃。技能在扫描清单阶段即标注上下文类型，非组件场景强制改为传入 <code>t</code>、使用 <code>i18n.t()</code> 或返回 key 由组件层渲染翻译。</p>
+        </div>
+        <div class="faq-item">
+          <h3>扫描完会直接把整个仓库的业务代码都改写吗？项目未装 i18n 依赖怎么办？</h3>
+          <p>不会。默认先输出待确认清单并核对 <code>git status</code>；如果仓库尚未安装 i18n 依赖，会先给出选型与安装方案，未经明确授权绝不执行包安装或批量改码。</p>
+        </div>
+        <div class="faq-item">
+          <h3>Windows 环境下生成中文语言包为什么容易乱码，技能如何处理？</h3>
+          <p>Windows 默认代码页常为 CP936/GBK，直接落盘极易破坏 JSON/YAML/PO 中的中文字符。<code>i18n-helper</code> 强制全部语言文件以 UTF-8（无 BOM）读写，并在改造后用构建和 <code>git diff</code> 双重核验。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/skill-translator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 技能本地化翻译</span>
+            <h3>skill-translator</h3>
+            <p>需要把第三方英文 SKILL.md / AGENTS.md 精准本地化为中文同时保留代码与命令原样时使用。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/zh-code-reviewer/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 中文代码审查</span>
+            <h3>zh-code-reviewer</h3>
+            <p>批量提取多语言文案后做一轮 diff 审查，快速核验作用域、插值与边界回归。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/zh-readme/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 中文 README 生成</span>
+            <h3>zh-readme</h3>
+            <p>完成多语言适配后，同步补全面向中文开发者的项目 README 与多语言配置说明。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>i18n-helper</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/i18n-helper/SKILL.md" target="_blank" rel="noopener noreferrer">skills/i18n-helper/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var stages = {
+    scan: {
+      title: '门禁 1：只读扫描硬编码 UI 文本并精准排噪',
+      stage: '阶段 1 / 4 · 只读盘点',
+      doText: '先读 package.json / pyproject.toml / go.mod / pom.xml 识别已有 i18n 设施与命名风格，再扫描目标目录中的前端或后端源文件，汇总面向用户的 UI 文本、表单校验与错误提示。',
+      trap: '自动排除日志调试信息、SQL、正则、URL、import 路径、代码注释、内部枚举与默认测试断言；每条候选均标注所在上下文（组件 / 纯函数 / 模板）。',
+      pass: '输出完整「文件:行号 · 原文 · 建议 key · 上下文类型」清单，等待用户明确确认本次改造范围；未获确认绝不修改任何业务源码。',
+      sample: 'src/App.tsx:42       | "欢迎使用"   -> page.welcome      | React 组件（可用 useTranslation）\nsrc/utils/errors.ts:9 | "网络异常"  -> err.networkFailed | 纯工具函数（禁用 Hook，改传参 t 或 i18n.t）'
+    },
+    git: {
+      title: '门禁 2：核对脏工作树与依赖授权边界',
+      stage: '阶段 2 / 4 · 工作树保护',
+      doText: '改写前先执行 git status 检查工作树中已有未提交修改，核对已有语言包目录与缺失 key / 孤儿 key / 占位符差异，把改造范围锁定在用户确认的文件内。',
+      trap: '禁止覆盖用户已有未提交改动；如果项目尚未安装 react-i18next / vue-i18n 等依赖，禁止未经授权直接跑 npm install / pip install 或改写 lockfile。',
+      pass: '用户确认待改文件清单、语言包路径及是否安装依赖后，才进入限范围代码替换阶段。',
+      sample: 'git status --short\n# 若存在未提交修改：记录并避开无关改动\n# 语言包对账：zh-CN.json 45/45 (100%) | en-US.json 42/45 (缺失 3 个 key)'
+    },
+    hooks: {
+      title: '门禁 3：React Hooks 与框架作用域严格校验',
+      stage: '阶段 3 / 4 · 限范围替换',
+      doText: '仅在函数组件或自定义 Hook 中使用 const { t } = useTranslation()；Vue 严格区分 <template> 内 $t()、<script setup> 内 useI18n() 与纯 TS 模块调用。',
+      trap: '严禁在非组件工具函数、常量定义、类方法或模块顶层调用 React Hook；严禁用 + 拼接多语言文案，必须改用命名插值占位符或 <Trans> 组件。',
+      pass: '全部变量插值（{name} / {{count}} / %s）、复数规则与富文本节点均保持语义与作用域合法。',
+      sample: '// 正确（纯函数禁用 Hook）：\nexport function getErrMsg(t, code) { return t("err.code", { code }); }\n// 错误（会导致运行时 Hooks 崩溃）：\n// const { t } = useTranslation(); // 严禁写在普通工具函数或模块顶层'
+    },
+    utf8: {
+      title: '门禁 4：UTF-8 无 BOM 落盘与类型/构建复验',
+      stage: '阶段 4 / 4 · 编码与构建闭环',
+      doText: '生成或更新 .json / .yaml / .po / .properties 语言包时显式采用 UTF-8（无 BOM）编码写入，并运行项目现有的 tsc --noEmit、lint、构建或相关测试。',
+      trap: '防范 Windows 默认 CP936/GBK 写坏中文字符或引入非法 JSON 语法；若受环境限制未能运行构建，必须如实标注「已修改、未执行构建验证」。',
+      pass: '核对 git diff 确认零范围外修改、语言包全部合法 UTF-8、类型与构建检查结果透明汇报。',
+      sample: 'npx tsc --noEmit && npm run lint && git diff --stat\n# 核验要点：无 Hooks 作用域报错 · 无缺失 import · 语言包合法 UTF-8（无 BOM）'
+    }
+  };
+
+  var btns = document.querySelectorAll('.i18n-btn[data-stage]');
+  var titleEl = document.getElementById('i18n-title');
+  var stageEl = document.getElementById('i18n-stage');
+  var doEl = document.getElementById('i18n-do');
+  var trapEl = document.getElementById('i18n-trap');
+  var passEl = document.getElementById('i18n-pass');
+  var sampleEl = document.getElementById('i18n-sample');
+
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var item = stages[btn.getAttribute('data-stage')];
+      if (!item) return;
+      btns.forEach(function (b) {
+        var active = b === btn;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      titleEl.textContent = item.title;
+      stageEl.textContent = item.stage;
+      doEl.textContent = item.doText;
+      trapEl.textContent = item.trap;
+      passEl.textContent = item.pass;
+      sampleEl.textContent = item.sample;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve(); else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

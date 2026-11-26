@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>changelog-gen：双模式中文更新日志与发版说明生成器 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：从真实 Git 提交历史生成结构化中文 CHANGELOG 与 Release Notes，同时兼容 Conventional Commits 与中文自由提交历史，提供 SemVer 版本号建议，严禁编造 PR/CVE 编号或私自打 tag。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="changelog-gen">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/changelog-gen/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="changelog-gen：双模式中文更新日志与发版说明生成器">
+<meta property="og:description" content="兼容 Conventional Commits 与非规范中文提交降级归类，自动建议 SemVer 版本号，严守不编造 PR/CVE 编号、不私自打 git tag 红线。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/changelog-gen/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="changelog-gen 双模式中文更新日志生成器">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="changelog-gen：双模式中文更新日志与发版说明生成器">
+<meta name="twitter:description" content="基于真实 git log 生成中文 CHANGELOG / Release Notes：支持非规范提交降级归类、Windows 防中文乱码与零编造审计。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：发版里程碑（琥珀金 + 暖珊瑚版本发布主题） */
+  :root {
+    --accent: #f59e0b;
+    --accent2: #fb923c;
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.18) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(251, 146, 60, 0.12) 0%, transparent 50%);
+  }
+  .cl-switch-bar { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+  .cl-mode-btn {
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(20, 18, 28, 0.8);
+    color: #e2e8f0;
+    border-radius: 10px;
+    padding: 9px 15px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .cl-mode-btn:hover { border-color: rgba(251, 146, 60, 0.72); transform: translateY(-1px); }
+  .cl-mode-btn.is-active {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: #f59e0b;
+    color: #fde68a;
+  }
+  .cl-workspace {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  .cl-pane {
+    border: 1px solid rgba(245, 158, 11, 0.26);
+    border-radius: 14px;
+    background: rgba(12, 11, 20, 0.88);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .cl-pane-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .cl-pane-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fde68a;
+  }
+  .cl-ver-pill {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(251, 146, 60, 0.16);
+    border: 1px solid rgba(251, 146, 60, 0.42);
+    color: #fdba74;
+  }
+  .cl-code {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.68;
+    background: #07070e;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: #f1f5f9;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    margin: 0;
+    flex: 1;
+  }
+  .cl-audit-strip {
+    margin-top: 14px;
+    border: 1px solid rgba(255, 118, 117, 0.42);
+    background: rgba(255, 118, 117, 0.08);
+    border-radius: 12px;
+    padding: 12px 15px;
+  }
+  .cl-audit-label {
+    font-size: 0.84rem;
+    font-weight: 800;
+    color: #fca5a5;
+    margin-bottom: 4px;
+  }
+  .cl-audit-text {
+    font-size: 0.88rem;
+    color: #e2e8f0;
+    line-height: 1.65;
+  }
+  @media (max-width: 820px) {
+    .cl-workspace { grid-template-columns: 1fr; }
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "changelog-gen",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/changelog-gen/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/changelog-gen",
+  "description": "面向中文开发者的 Git 更新日志生成器：基于真实 git log 提炼结构化中文 CHANGELOG 与 Release Notes，支持 Conventional Commits 与中文自由提交双模式归类，提供 SemVer 版本建议，严禁编造 PR/CVE 编号或私自打 tag。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "changelog-gen", "item": "https://claude-skills.bt199.com/skills/changelog-gen/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "团队历史提交没有遵循 Conventional Commits，全是中文自由提交也能用吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "可以。changelog-gen 内置双模式归类：遇到非规范提交或中文自由格式历史时，自动降级为模式 B，结合提交标题与必要的 git show --stat 变更文件列表，按面向用户的实际影响归类为破坏性变更、新功能、问题修复、性能与体验优化、文档与维护，绝不凭标题瞎猜。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "生成更新日志时会不会顺手覆盖 CHANGELOG.md、打 git tag 或直接发布 Release？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "绝对不会。changelog-gen 默认只读起草草稿；写入或覆盖 CHANGELOG.md 前会先展示预览并取得确认，且严禁顺手执行 git tag、推送标签或创建 GitHub Release。如需暂存、提交或推送，请使用 git-workflow。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "提交里没有写 PR 号或 CVE 编号，它会自己编一个占位编号吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "严禁编造。零编造红线规定只引用提交记录或关联元数据中真实存在的 PR/Issue 编号和 CVE 编号；历史里没有编号时直接省略，也不允许编造未经实测的性能提升百分比。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "在 Windows 终端读取含中文路径的 Git 提交会乱码吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。读取范围提交时显式使用 git -c core.quotepath=false log 并采用 UTF-8 编码输出和追加写入，避免 Windows 下中文路径变成八进制转义或 GBK 乱码。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">changelog-gen</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-amber">📦 本仓原创 · 发版说明</span>
+        <span class="pill pill-green">🔀 双模式提交归类</span>
+        <span class="pill pill-cyan">🚫 禁编造 PR/CVE · 禁私自打 Tag</span>
+      </div>
+      <h1><span class="accent-text">changelog-gen</span>：基于真实 Git 历史的中文 CHANGELOG 生成器</h1>
+      <p class="hero-lead">发版前不用再把几百条 <code>git log</code> 复制粘贴给模型胡乱润色。<code>changelog-gen</code> 同时兼容标准 <strong>Conventional Commits</strong> 与<strong>非规范中文自由提交</strong>，自动合并 <code>wip / fix typo</code> 过程噪声、推导 Semantic Versioning 版本号，并严守「零编造编号、只读起草、绝不顺手打 tag」红线。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-star">CHANGELOG / Release Notes</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">适用工具</div>
+          <div class="metric-value">Claude Code / Codex / Cursor / Gemini CLI</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/changelog-gen/SKILL.md" target="_blank" rel="noopener noreferrer">skills/changelog-gen/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/changelog-gen/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#demo" class="btn btn-cyan">🎛️ 对比双模式归类与防编造红线</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#demo">双模式提交归类预览</a>
+      <a href="#workflow">4 步生成与 SemVer 规则</a>
+      <a href="#safety">发版安全与零编造红线</a>
+      <a href="#boundaries">与其他技能分工边界</a>
+      <a href="#install">4 种安装方式</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="demo">
+      <h2>🎛️ 交互式提交历史归类预览：规范提交 vs 非规范中文提交</h2>
+      <p class="section-intro">点击下方 3 个真实场景，观察 <code>changelog-gen</code> 如何在不同提交规范下自动切换归类策略、剔除过程噪声并执行「禁编造 PR / CVE / 性能比例」红线审计：</p>
+
+      <div class="cl-switch-bar" role="tablist" aria-label="提交历史模式切换">
+        <button type="button" class="cl-mode-btn is-active" data-cl="conventional" role="tab" aria-selected="true">📐 模式 A：Conventional Commits</button>
+        <button type="button" class="cl-mode-btn" data-cl="freeform" role="tab" aria-selected="false">🇨🇳 模式 B：非规范中文自由提交</button>
+        <button type="button" class="cl-mode-btn" data-cl="security" role="tab" aria-selected="false">🔒 安全与性能提交防夸大检验</button>
+      </div>
+
+      <div class="cl-workspace" aria-live="polite">
+        <div class="cl-pane">
+          <div class="cl-pane-head">
+            <span class="cl-pane-title" id="cl-input-title">真实 git log 输入（v1.2.0..HEAD）</span>
+            <span class="cl-ver-pill" id="cl-cmd-tag">quotepath=false</span>
+          </div>
+          <pre class="cl-code" id="cl-raw-log">a1c90f2 2026-11-24 feat(auth)!: 移除 /api/v1/users 改用 v2 接口 (#130)
+7b42e10 2026-11-24 feat(export): 支持批量 CSV 导出 (#134)
+4e91a03 2026-11-25 fix(page): 修复分页偏移量边界错误
+9d03c11 2026-11-25 chore: fix typo in comment
+c218b5e 2026-11-25 docs: 补充 Windows PowerShell 安装说明</pre>
+        </div>
+        <div class="cl-pane">
+          <div class="cl-pane-head">
+            <span class="cl-pane-title" id="cl-output-title">生成的中文 CHANGELOG 草稿</span>
+            <span class="cl-ver-pill" id="cl-ver-suggest">SemVer 建议：1.2.0 → 2.0.0</span>
+          </div>
+          <pre class="cl-code" id="cl-result">## [2.0.0] - 2026-11-25
+
+### ⚠️ Breaking Changes
+- **移除废弃接口 `/api/v1/users`**，统一迁移至 `/api/v2/users` (#130)
+
+### ✨ 新功能
+- 支持批量 CSV 数据导出 (#134)
+
+### 🐛 Bug 修复
+- 修复分页查询偏移量边界错误
+
+### 📝 文档更新
+- 补充 Windows PowerShell 安装说明</pre>
+        </div>
+      </div>
+
+      <div class="cl-audit-strip" aria-live="polite">
+        <div class="cl-audit-label" id="cl-audit-label">🛡️ 防编造与噪声过滤审计结论</div>
+        <div class="cl-audit-text" id="cl-audit-text">1）仅对提交中真实存在的 (#130)、(#134) 保留编号，4e91a03 未带 PR 号则直接省略不补编；2）自动折叠无用户价值的 `fix typo` 过程提交；3）检测到 `!` 破坏性标识，自动置顶 Breaking Changes 并建议主版本升至 2.0.0；4）仅输出草稿，未改动 CHANGELOG.md 且未执行 git tag。</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="workflow">
+      <h2>🧭 4 步生成流程与 SemVer 版本号规则</h2>
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>确定真实提交范围与历史风格</h3>
+            <p>先用 <code>git describe --tags --abbrev=0</code> 定位最近发布标签，再用 <code>git -c core.quotepath=false log --no-merges --pretty=format:"%h %ad %s" --date=short &lt;last-tag&gt;..HEAD</code> 跨平台读取真实提交；若已有 <code>CHANGELOG.md</code>，优先沿用其原有标题层级、日期格式与分类风格。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>双模式分类提交（规范精准识别 / 非规范降级读 diff）</h3>
+            <p>规范仓库按 <code>feat</code>、<code>fix</code>、<code>fix(security)</code>、<code>perf</code>、<code>refactor</code>、<code>docs</code>、<code>deps</code> 及 <code>BREAKING CHANGE:</code> / <code>!</code> 精准归类；非规范中文自由提交则结合 <code>git show --stat &lt;sha&gt;</code> 与必要 diff，按面向用户可见影响人工归纳，不看标题猜内容。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>推导 Semantic Versioning 版本号建议</h3>
+            <p>存在 Breaking Changes 主版本 +1（<code>1.2.0 → 2.0.0</code>）；存在新增功能次版本 +1（<code>1.2.0 → 1.3.0</code>）；仅修复、安全补丁或维护修订版本 +1（<code>1.2.0 → 1.2.1</code>）；预发布版本支持 <code>-alpha.1</code>、<code>-beta.1</code>、<code>-rc.1</code> 后缀。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>合并过程提交、预览确认后 UTF-8 追加</h3>
+            <p>合并同一功能的琐碎提交（如“fix typo”“wip”），省略无实质改动的空分类小节；写入 <code>CHANGELOG.md</code> 前展示完整预览，经你确认后再以 UTF-8 编码追加至文件顶部。</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>8 类标准图标与归类依据</h3>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>分类</th>
+              <th>Conventional 标识 / 归类依据</th>
+              <th>发版位置要求</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>⚠️ Breaking Changes</strong></td>
+              <td>含 <code>BREAKING CHANGE:</code>、<code>!</code> 或破坏兼容的接口/配置变更</td>
+              <td>必须置于最前并加粗提醒，必要时附迁移指引</td>
+            </tr>
+            <tr>
+              <td><strong>🔒 安全修复</strong></td>
+              <td><code>fix(security)</code> 或明确标注安全缺陷 / 真实 CVE</td>
+              <td>仅引用提交中真实存在的 CVE，绝不杜撰</td>
+            </tr>
+            <tr>
+              <td><strong>✨ 新功能 / 🐛 Bug 修复</strong></td>
+              <td><code>feat</code> / <code>fix</code> 或面向用户的新增能力与缺陷修复</td>
+              <td>聚焦用户可见变化，合并琐碎过程提交</td>
+            </tr>
+            <tr>
+              <td><strong>⚡ 性能优化 / ♻️ 重构体验</strong></td>
+              <td><code>perf</code> / 对用户或二次开发有感知的 <code>refactor</code></td>
+              <td>无实测数据时严禁编造“提速 50%”类比例</td>
+            </tr>
+            <tr>
+              <td><strong>📝 文档 / 📦 依赖与构建</strong></td>
+              <td><code>docs</code>、<code>deps</code>、<code>chore(deps)</code>、CI 与工程脚本</td>
+              <td>无实质变动时直接省略，不留空标题</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="safety">
+      <h2>🛡️ 发版安全与零编造红线</h2>
+      <div class="callout callout-red">
+        <div class="callout-title">🚫 三条绝对不可触碰的红线</div>
+        <ul class="prose-list">
+          <li><strong>绝不顺手打标签或发 Release</strong>：即使生成了完整发版说明，也绝不自动执行 <code>git tag</code>、推送标签或调用 GitHub Release API。</li>
+          <li><strong>零编造 PR / Issue / CVE 与性能数据</strong>：提交记录里没有编号就直接省略，禁止填写 <code>(#xxx)</code> 或瞎编 CVE；没有真实基准对比就不写具体性能百分比。</li>
+          <li><strong>脱敏内部敏感信息</strong>：生成的公开更新日志不得泄露内部敏感路径、测试凭据或私有内网域名。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="boundaries">
+      <h2>🧩 与其他研发技能的分工边界</h2>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>你的需求场景</th>
+              <th>推荐使用的技能</th>
+              <th>分工原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>基于真实 Git 历史生成中文更新日志、发版说明与版本号建议</td>
+              <td><strong><code>changelog-gen</code></strong></td>
+              <td>专职提炼发布变更与 SemVer 建议，默认只读起草不改 Git 状态</td>
+            </tr>
+            <tr>
+              <td>执行 <code>git add / commit / push</code>、建分支、创建 PR 或 rebase</td>
+              <td><code>git-workflow</code></td>
+              <td>涉及仓库写入与分支流转操作，与更新日志起草明确隔离</td>
+            </tr>
+            <tr>
+              <td>合入 PR 前做只读代码缺陷审查</td>
+              <td><a href="/skills/zh-code-reviewer/"><code>zh-code-reviewer</code></a></td>
+              <td>检查本次 diff 的并发、边界、安全缺陷，而非整理发版历史</td>
+            </tr>
+            <tr>
+              <td>更新项目首页说明或内部技术架构文档</td>
+              <td><a href="/skills/zh-readme/"><code>zh-readme</code></a> / <a href="/skills/zh-docgen/"><code>zh-docgen</code></a></td>
+              <td>前者面向仓库首页 README，后者面向 <code>docs/</code> 详细技术文档</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种安装方式（零外部依赖，复制即装）</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装插件包</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 changelog-gen</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill changelog-gen</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\changelog-gen" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\changelog-gen\*" "$HOME\.claude\skills\changelog-gen\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/changelog-gen
+cp -r claude-code-skills-zh/skills/changelog-gen/* ~/.claude/skills/changelog-gen/</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>仓库之前没打过任何 git tag，也能生成更新日志吗？</h3>
+          <p>可以。当 <code>git describe --tags --abbrev=0</code> 查不到旧标签时，技能会改用明确的起止提交区间或全量提交历史进行归类，不会直接报错中断。</p>
+        </div>
+        <div class="faq-item">
+          <h3>老项目里全是“修了个 bug”“更新接口”这种中文提交，它能分准吗？</h3>
+          <p>能。遇到非规范提交会自动切入模式 B，通过 <code>git show --stat &lt;sha&gt;</code> 和必要的真实 diff 核实实际影响，再按面向用户可见改动归类，而不是只靠模糊标题瞎猜。</p>
+        </div>
+        <div class="faq-item">
+          <h3>为什么严禁它顺手打 tag 或发布 GitHub Release？</h3>
+          <p>打 tag 与发布 Release 往往会直接触发 CI/CD 发包或生产部署。将「起草更新日志」与「执行发版动作」彻底解耦，能防止误发版造成不可逆事故。</p>
+        </div>
+        <div class="faq-item">
+          <h3>已有 CHANGELOG.md 用的是 Keep a Changelog 格式，会破坏原格式吗？</h3>
+          <p>不会。第 1 步就会检查现有 <code>CHANGELOG.md</code>，沿用你原来的标题层级、日期格式和分类风格，并在确认后以 UTF-8 编码追加到文件顶部。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 同类原创技能站内互链</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/zh-code-reviewer/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 代码审查</span>
+            <h3>zh-code-reviewer</h3>
+            <p>发版合入前基于 git diff 只读分级审查缺陷，输出精确文件行号与最小修复代码。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/zh-docgen/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 技术文档</span>
+            <h3>zh-docgen</h3>
+            <p>基于真实源码与配置生成或更新 docs/ 架构文档、API 手册与配置运维指南。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/zh-readme/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 开源首页</span>
+            <h3>zh-readme</h3>
+            <p>先分析仓库再撰写高转化、像人写的中文 README，与发版日志形成完整开源门面。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>changelog-gen</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/changelog-gen/SKILL.md" target="_blank" rel="noopener noreferrer">skills/changelog-gen/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var modes = {
+    conventional: {
+      inputTitle: '真实 git log 输入（v1.2.0..HEAD）',
+      cmdTag: '模式 A · 规范解析',
+      rawLog: 'a1c90f2 2026-11-24 feat(auth)!: 移除 /api/v1/users 改用 v2 接口 (#130)\n7b42e10 2026-11-24 feat(export): 支持批量 CSV 导出 (#134)\n4e91a03 2026-11-25 fix(page): 修复分页偏移量边界错误\n9d03c11 2026-11-25 chore: fix typo in comment\nc218b5e 2026-11-25 docs: 补充 Windows PowerShell 安装说明',
+      outputTitle: '生成的中文 CHANGELOG 草稿',
+      verSuggest: 'SemVer 建议：1.2.0 → 2.0.0',
+      result: '## [2.0.0] - 2026-11-25\n\n### ⚠️ Breaking Changes\n- **移除废弃接口 `/api/v1/users`**，统一迁移至 `/api/v2/users` (#130)\n\n### ✨ 新功能\n- 支持批量 CSV 数据导出 (#134)\n\n### 🐛 Bug 修复\n- 修复分页查询偏移量边界错误\n\n### 📝 文档更新\n- 补充 Windows PowerShell 安装说明',
+      auditLabel: '🛡️ 模式 A 审计结论：严格保留真实编号 + 折叠噪声',
+      auditText: '1）仅对提交中真实存在的 (#130)、(#134) 保留编号，4e91a03 未带 PR 号则直接省略不补编；2）自动折叠无用户价值的 `fix typo` 过程提交；3）检测到 `!` 破坏性标识，自动置顶 Breaking Changes 并建议主版本升至 2.0.0；4）仅输出草稿，未改动 CHANGELOG.md 且未执行 git tag。'
+    },
+    freeform: {
+      inputTitle: '非规范中文提交输入（触发 git show --stat 辅助）',
+      cmdTag: '模式 B · 降级归纳',
+      rawLog: 'f8210ab 2026-11-22 加上飞书 webhook 通知\n3a19d04 2026-11-23 wip 临时保存一下\n6c44e92 2026-11-23 修复导入中文 Excel 表格乱码问题\n8b07f15 2026-11-24 改了下列表查询逻辑 [diff: 补索引与分页缓存]\n2d55a19 2026-11-25 顺手删掉没用的调试日志',
+      outputTitle: '按用户可见影响归纳的中文草稿',
+      verSuggest: 'SemVer 建议：1.2.0 → 1.3.0',
+      result: '## [1.3.0] - 2026-11-25\n\n### ✨ 新功能\n- 新增飞书 Webhook 消息通知支持\n\n### 🐛 Bug 修复\n- 修复导入含中文字符 Excel 表格时的编码乱码问题\n\n### ⚡ 性能优化\n- 优化列表查询逻辑，补充索引并减少重复查询',
+      auditLabel: '🛡️ 模式 B 审计结论：查 diff 防瞎猜 + 剔除内部过程噪声',
+      auditText: '1）标题“改了下列表查询逻辑”意图不清，先查 `git show --stat 8b07f15` 核实真实改动后才归入性能优化；2）剔除 `wip` 与删调试日志等对用户无感知提交；3）全量提交均无 PR 编号，输出中绝不凭空杜撰 `(#101)`；4）因含新增功能且无破坏性变更，建议次版本升至 1.3.0。'
+    },
+    security: {
+      inputTitle: '安全修复与性能提交（检验零夸大红线）',
+      cmdTag: '零编造红线校验',
+      rawLog: 'e4110c8 2026-11-24 fix(security): 校验租户归属防止越权读取订单\n5a90d31 2026-11-25 perf(list): 改用虚拟滚动减少大列表 DOM 节点\n1c77b20 2026-11-25 chore(deps): 升级 axios 至 1.7.9',
+      outputTitle: '合规脱敏的中文补丁发版说明',
+      verSuggest: 'SemVer 建议：1.2.0 → 1.2.1',
+      result: '## [1.2.1] - 2026-11-25\n\n### 🔒 安全修复\n- 修复订单查询缺少租户归属校验的越权风险\n\n### ⚡ 性能优化\n- 大列表改用虚拟滚动渲染，减少重复 DOM 节点开销\n\n### 📦 依赖与构建\n- 升级核心依赖 `axios` 至 `1.7.9`',
+      auditLabel: '🛡️ 安全与性能红线校验通过：零 CVE 杜撰、零虚构百分比',
+      auditText: '1）提交 e4110c8 未标注 CVE 编号，严格省略而不硬凑 CVE 占位符，同时不泄露私有接口内网路径；2）提交 5a90d31 未附 benchmark 数据，绝不夸大写成“渲染提速 80%”；3）仅含安全修复、优化与依赖升级，建议修订版本升至 1.2.1，且不留空小节标题。'
+    }
+  };
+
+  var btns = document.querySelectorAll('.cl-mode-btn[data-cl]');
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-cl');
+      var item = modes[key];
+      if (!item) return;
+      btns.forEach(function (b) {
+        var active = b === btn;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      document.getElementById('cl-input-title').textContent = item.inputTitle;
+      document.getElementById('cl-cmd-tag').textContent = item.cmdTag;
+      document.getElementById('cl-raw-log').textContent = item.rawLog;
+      document.getElementById('cl-output-title').textContent = item.outputTitle;
+      document.getElementById('cl-ver-suggest').textContent = item.verSuggest;
+      document.getElementById('cl-result').textContent = item.result;
+      document.getElementById('cl-audit-label').textContent = item.auditLabel;
+      document.getElementById('cl-audit-text').textContent = item.auditText;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve(); else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

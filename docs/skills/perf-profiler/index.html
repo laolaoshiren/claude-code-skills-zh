@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>perf-profiler：基于可复现基线与证据链的性能剖析技能 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：用可复现基线和真实 profiler 证据定位慢接口、慢 SQL、内存泄漏与网络瓶颈。严格区分已测量、静态推断与待验证，不虚构提升百分比，生产环境操作必须授权。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="perf-profiler">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/perf-profiler/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="perf-profiler：基于可复现基线与证据链的性能剖析技能">
+<meta property="og:description" content="先建基线、再拿 profiler/火焰图/查询计划证据、最小改动后同条件复测，绝不靠猜代码瞎优化或编造耗时下降百分比。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/perf-profiler/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="perf-profiler 证据链性能分析技能">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="perf-profiler：基于可复现基线与证据链的性能剖析技能">
+<meta name="twitter:description" content="定位慢接口、N+1 查询、内存热点与网络瀑布，严格区分实测与静态推断，MIT 开源一键安装。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：性能剖析与遥测火焰图（琥珀橙 + 遥测青主题） */
+  :root {
+    --accent: #f59e0b;
+    --accent2: #06b6d4;
+  }
+  .triage-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+  .tr-btn {
+    border: 1px solid rgba(148,163,184,0.28); background: rgba(15,23,42,0.72);
+    color: #e2e8f0; border-radius: 10px; padding: 9px 14px; font-size: 0.9rem;
+    font-weight: 600; cursor: pointer; transition: all .18s ease;
+  }
+  .tr-btn.is-active { border-color: #f59e0b; background: rgba(245,158,11,0.16); color: #fde68a; }
+  .tr-box {
+    border: 1px solid rgba(6,182,212,0.34); border-radius: 14px;
+    background: rgba(10,15,28,0.88); padding: 18px 20px;
+  }
+  .tr-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 12px; }
+  @media (max-width: 760px) { .tr-row { grid-template-columns: 1fr; } }
+  .tr-cell { background: rgba(17,24,39,0.85); border: 1px solid rgba(148,163,184,0.18); border-radius: 10px; padding: 12px 14px; }
+  .tr-cell strong { display: block; font-size: 0.84rem; color: #67e8f9; margin-bottom: 6px; }
+  .tr-cell p { margin: 0; font-size: 0.9rem; color: #cbd5e1; line-height: 1.6; }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "perf-profiler",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/perf-profiler/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/perf-profiler",
+  "description": "基于可复现基线和 profiler 证据分析慢接口、慢查询、内存和网络瓶颈的原创中文技能：先建基线再取证，最小改动后同条件复测，严禁虚构性能提升比例。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "perf-profiler", "item": "https://claude-skills.bt199.com/skills/perf-profiler/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "如果当前机器无法启动项目跑压测，perf-profiler 会瞎编提升百分比吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "绝对不会。技能内置三级证据等级（已测量 / 静态推断 / 待验证）：无法运行时只做静态分析并将发现标为「待验证候选」，只有真实完成同条件前后测量后，才允许写具体耗时、百分比或「已改善」结论。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "生产环境能直接让它跑 EXPLAIN ANALYZE 或压测吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不行。默认只在本地或指定测试环境做只读分析；生产环境的 profiling、压测、EXPLAIN ANALYZE 及索引、缓存、连接池、CDN 配置变更必须先获得用户明确授权并准备回滚方案。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "为什么要求一次只改一个主要热点而不是一口气优化五处？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "同时改动多个变量会导致无法独立归因，甚至引入隐藏正确性回归。perf-profiler 要求按证据最强、影响最大的热点优先做最小改动，并保留同条件复测与回滚方式。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">perf-profiler</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-purple">⚡ 证据链性能剖析</span>
+        <span class="pill pill-cyan">📊 基线 + 同条件复测</span>
+        <span class="pill pill-green">🛡️ 生产授权门禁</span>
+      </div>
+      <h1><span class="accent-text">perf-profiler</span>：用可复现基线和真实证据定位性能瓶颈</h1>
+      <p class="hero-lead">拒绝把「代码看起来慢」当成瓶颈结论，拒绝凭空编造「优化后提速 60%」。按「定指标 → 建基线 → 采 profiler/火焰图/执行计划证据 → 单点最小改动 → 同条件复测」五步闭环，定位慢接口、慢 SQL、内存与网络瓶颈。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">慢接口 / SQL / 内存排查</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">证据分级</div>
+          <div class="metric-value">已测量 / 静态推断 / 待验证</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/perf-profiler/SKILL.md" target="_blank" rel="noopener noreferrer">skills/perf-profiler/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/perf-profiler/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#triage" class="btn btn-cyan">🎛️ 交互瓶颈取证路线图</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#triage">交互式瓶颈取证路线</a>
+      <a href="#evidence">三级证据等级与红线</a>
+      <a href="#install">4 种安装方式</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="triage">
+      <h2>🎛️ 交互式排查路线：遇到哪类慢问题，该采什么证据？</h2>
+      <p class="section-intro">点击对应性能症状，查看 <code>perf-profiler</code> 要求的基线口径、必采证据与最小改动护栏：</p>
+      <div class="triage-tabs" role="tablist" aria-label="性能瓶颈类型">
+        <button type="button" class="tr-btn is-active" data-kind="api">🐢 慢接口 / CPU 飙高</button>
+        <button type="button" class="tr-btn" data-kind="sql">🗄️ 慢 SQL / N+1 查询</button>
+        <button type="button" class="tr-btn" data-kind="mem">🧠 内存泄漏 / GC 抖动</button>
+        <button type="button" class="tr-btn" data-kind="net">🌐 网络瀑布 / 包体积过大</button>
+      </div>
+      <div class="tr-box" aria-live="polite">
+        <h3 id="tr-title" style="margin:0;color:#f8fafc;">慢接口 / CPU 热点排查</h3>
+        <div class="tr-row">
+          <div class="tr-cell">
+            <strong>1. 基线口径</strong>
+            <p id="tr-base">固定并发度、预热轮次、数据规模与代码提交 SHA，记录 P50/P95/P99 与波动范围。</p>
+          </div>
+          <div class="tr-cell">
+            <strong>2. 必采证据</strong>
+            <p id="tr-ev">CPU Profiler / 火焰图（pprof / py-spy / clinic / async-profiler）定位真实热点栈，排查同步阻塞与重复计算。</p>
+          </div>
+          <div class="tr-cell">
+            <strong>3. 复测与回滚</strong>
+            <p id="tr-fix">单点改动最重热点后按同条件复测，并先跑通正确性单测；严禁删校验换速度。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="evidence">
+      <h2>⚖️ 三级证据等级与生产安全红线</h2>
+      <div class="grid-2">
+        <div class="info-box is-good">
+          <h3>报告强制标注三级证据等级</h3>
+          <ul class="clean-list">
+            <li><strong>已测量</strong>：具备可复现基线、真实 profiling 产物与同条件前后对比数据；</li>
+            <li><strong>静态推断</strong>：由复杂度、循环嵌套或配置推导的候选点，尚未实测；</li>
+            <li><strong>待验证</strong>：缺环境、数据或权限，诚实说明当前无法定量判断影响。</li>
+          </ul>
+        </div>
+        <div class="info-box is-bad">
+          <h3>绝对不越界的安全与诚实原则</h3>
+          <ul class="clean-list">
+            <li>生产环境 <code>EXPLAIN ANALYZE</code>、压测、加索引或改连接池前<strong>必须明确授权</strong>；</li>
+            <li>不在报告中暴露生产数据、凭据或含敏感信息的 profile 原始产物；</li>
+            <li>绝不为了漂亮数字缩小测试数据规模、改变统计口径或删除校验逻辑。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种安装方式</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 perf-profiler</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill perf-profiler</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\perf-profiler" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\perf-profiler\*" "$HOME\.claude\skills\perf-profiler\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/perf-profiler
+cp -r claude-code-skills-zh/skills/perf-profiler/* ~/.claude/skills/perf-profiler/</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>支持哪些后端和前端技术栈？</h3>
+          <p>语言无关，流程优先复用目标项目已安装的基准与分析工具（Go <code>pprof</code>、Node <code>--cpu-prof</code>、Python <code>cProfile/py-spy</code>、SQL <code>EXPLAIN</code>、Lighthouse/Bundle Analyzer）。</p>
+        </div>
+        <div class="faq-item">
+          <h3>输出报告包含哪些关键字段？</h3>
+          <p>固定交付：目标指标与场景、基线测量方法、带证据等级的发现表、改动与权衡说明、同条件复测结果、未控制变量以及回滚方式。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/api-tester/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 契约接口测试</span>
+            <h3>api-tester</h3>
+            <p>优化完慢接口后，顺手用契约回归用例验证响应结构与错误码零破坏。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/zh-code-reviewer/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 代码审查</span>
+            <h3>zh-code-reviewer</h3>
+            <p>对性能优化改动做只读 diff 审查，核验并发锁、缓存一致性与边界条件。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/p/archify/">
+          <div>
+            <span class="related-tag">💻 交互架构图 · 99.7K+ ⭐</span>
+            <h3>tt-a1i/archify</h3>
+            <p>先用交互架构图梳理跨服务依赖与耦合热点，再精准定位系统级瓶颈。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>perf-profiler</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/perf-profiler/SKILL.md" target="_blank" rel="noopener noreferrer">skills/perf-profiler/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var kinds = {
+    api: {
+      title: '慢接口 / CPU 热点排查',
+      base: '固定并发度、预热轮次、数据规模与代码提交 SHA，记录 P50/P95/P99 与波动范围。',
+      ev: 'CPU Profiler / 火焰图（pprof / py-spy / clinic / async-profiler）定位真实热点栈，排查同步阻塞与重复计算。',
+      fix: '单点改动最重热点后按同条件复测，并先跑通正确性单测；严禁删校验换速度。'
+    },
+    sql: {
+      title: '慢 SQL / N+1 查询与锁等待排查',
+      base: '固定表数据量级与过滤条件，记录总查询次数、扫描行数与执行耗时。',
+      ev: '在测试库采集查询日志与 EXPLAIN 执行计划，定位 N+1 循环查库、全表扫描、索引失效与连接池排队。',
+      fix: '优先批量查询或补充精准联合索引，评估写入放大与存储权衡；生产加索引必须显式授权。'
+    },
+    mem: {
+      title: '内存持续上涨 / GC 抖动排查',
+      base: '固定请求样本量与运行时长，记录 RSS、堆分配峰值与 GC 停顿频率。',
+      ev: '对比前后两次 Heap Snapshot / 内存分配 profile，定位无界缓存、闭包持有、未关闭句柄或大对象频繁分配。',
+      fix: '加上限淘汰策略或流式分片处理，复测长时运行曲线确认内存回落稳定。'
+    },
+    net: {
+      title: '请求瀑布慢 / 前端包体积过大排查',
+      base: '固定网络节流档位与冷/热缓存条件，记录 TTFB、FCP/LCP 与传输总字节数。',
+      ev: '分析网络瀑布与 Bundle Analyzer 构成，排查串行请求链、未压缩载荷、未命中缓存与巨型依赖包。',
+      fix: '合并/并行关键请求、按需拆包或补缓存头，复测同档位指标并核验功能兼容。'
+    }
+  };
+  var btns = document.querySelectorAll('.tr-btn[data-kind]');
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var k = kinds[btn.getAttribute('data-kind')];
+      if (!k) return;
+      btns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+      document.getElementById('tr-title').textContent = k.title;
+      document.getElementById('tr-base').textContent = k.base;
+      document.getElementById('tr-ev').textContent = k.ev;
+      document.getElementById('tr-fix').textContent = k.fix;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text; area.setAttribute('readonly', ''); area.style.position = 'fixed'; area.style.opacity = '0';
+      document.body.appendChild(area); area.select();
+      try { var ok = document.execCommand('copy'); document.body.removeChild(area); if (ok) resolve(); else reject(new Error('copy failed')); }
+      catch (err) { document.body.removeChild(area); reject(err); }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied'); btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () { btn.classList.remove('copied'); btn.textContent = defaultLabel; }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

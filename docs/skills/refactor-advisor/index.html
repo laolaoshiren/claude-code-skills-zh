@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>refactor-advisor：默认只读的存量代码坏味道诊断与重构顾问 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：默认只读扫描存量代码库的坏味道、模块耦合热点与测试护栏缺口，按高/中/低风险输出 Before/After 示例与 P1-P3 分阶段重构路线图，不拍脑袋估工时、未经确认不改源码。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="refactor-advisor">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/refactor-advisor/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="refactor-advisor：默认只读的存量代码坏味道诊断与重构顾问">
+<meta property="og:description" content="只读盘点长方法、上帝类、全局可变状态与深层嵌套，先核查测试护栏与调用面，输出 P1-P3 小步可验证中文重构方案。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/refactor-advisor/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="refactor-advisor 存量代码重构顾问技能">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="refactor-advisor：默认只读的存量代码坏味道诊断与重构顾问">
+<meta name="twitter:description" content="识别 8 类常见坏味道、评估测试护栏与引用面，输出红黄绿分级与 P1-P3 分阶段重构路线图，MIT 开源即装。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：架构演进（紫罗兰 + 玫瑰洋红重构剖析主题） */
+  :root {
+    --accent: #8b5cf6;
+    --accent2: #f472b6;
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.2) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(244, 114, 182, 0.12) 0%, transparent 50%);
+  }
+  .rf-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+  .rf-btn {
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(18, 16, 30, 0.8);
+    color: #e2e8f0;
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .rf-btn:hover { border-color: rgba(244, 114, 182, 0.7); transform: translateY(-1px); }
+  .rf-btn.is-active {
+    background: rgba(139, 92, 246, 0.22);
+    border-color: #f472b6;
+    color: #fbcfe8;
+  }
+  .rf-panel {
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 14px;
+    background: rgba(11, 10, 22, 0.9);
+    padding: 18px 20px;
+  }
+  .rf-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+    align-items: center;
+  }
+  .rf-badge {
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    background: rgba(255, 255, 255, 0.04);
+    color: #e2e8f0;
+  }
+  .rf-badge.is-high { background: rgba(255, 118, 117, 0.15); border-color: rgba(255, 118, 117, 0.45); color: #fca5a5; }
+  .rf-badge.is-mid { background: rgba(253, 203, 110, 0.14); border-color: rgba(253, 203, 110, 0.42); color: #fde68a; }
+  .rf-badge.is-low { background: rgba(0, 184, 148, 0.14); border-color: rgba(0, 184, 148, 0.42); color: #6ee7b7; }
+  .rf-loc {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: #c4b5fd;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(139, 92, 246, 0.16);
+  }
+  .rf-title { font-size: 1.06rem; font-weight: 800; color: #f8fafc; margin-bottom: 6px; }
+  .rf-evidence { font-size: 0.92rem; color: #cbd5e1; line-height: 1.68; margin-bottom: 12px; }
+  .rf-diff-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .rf-code-card {
+    background: #070710;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .rf-code-card.is-after { border-color: rgba(0, 184, 148, 0.4); }
+  .rf-code-head {
+    padding: 6px 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    color: #94a3b8;
+  }
+  .rf-code-card.is-after .rf-code-head { color: #6ee7b7; background: rgba(0, 184, 148, 0.09); }
+  .rf-code-body {
+    font-family: var(--mono);
+    font-size: 0.81rem;
+    line-height: 1.65;
+    padding: 11px 13px;
+    color: #e2e8f0;
+    white-space: pre-wrap;
+    margin: 0;
+  }
+  .rf-guardrail {
+    border-radius: 10px;
+    padding: 10px 14px;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.32);
+    font-size: 0.88rem;
+    color: #ddd6fe;
+    line-height: 1.62;
+  }
+  @media (max-width: 820px) {
+    .rf-diff-grid { grid-template-columns: 1fr; }
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "refactor-advisor",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/refactor-advisor/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/refactor-advisor",
+  "description": "面向中文开发者的存量代码重构顾问：默认只读扫描目标模块坏味道、耦合热点与测试护栏缺口，按高/中/低风险与复杂度输出 Before/After 重构示意与 P1-P3 分阶段验证路线图，未经授权不直接改写源码。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "refactor-advisor", "item": "https://claude-skills.bt199.com/skills/refactor-advisor/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "调用 refactor-advisor 时，它会直接帮我把大文件拆掉并修改源码吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。refactor-advisor 默认严格只读出方案：扫描可观测指标、核查测试覆盖与上下游调用面，并输出分阶段重构报告。只有在你明确选定某一阶段并授权执行后，才会按小步实施重构并在每步后实际运行测试、类型检查与 lint。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "为什么重构报告里不写「预计需要 3 天工时」或「代码重复度 42%」？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "未经工具实测的工时和百分比属于臆造数据，容易误导排期。refactor-advisor 只汇报真实可观测指标（文件行数、超长函数、嵌套层数、参数数量、引用位置与近期提交热度），并基于引用面与行为风险给出低/中/高复杂度与风险分级。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "重构过程中如果顺带发现了真正的业务逻辑 Bug 怎么处理？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "重构必须严格保持外部可观察行为不变（Behavior-preserving）。若扫描或实施中发现产品逻辑 Bug，技能规则要求单独报告给开发者决策，绝不悄悄把 Bug 修复混进重构改动里。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "它和 zh-code-reviewer、perf-profiler、eslint-fix 如何分工？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "refactor-advisor 专职存量代码库的坏味道诊断与技术债路线图；单次 PR / git diff 缺陷审查用 zh-code-reviewer；慢接口与内存热点剖析用 perf-profiler；自动修复 ESLint 报错则用 eslint-fix。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">refactor-advisor</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-purple">♻️ 本仓原创 · 技术债治理</span>
+        <span class="pill pill-cyan">🔒 默认只读出方案</span>
+        <span class="pill pill-green">🧪 先补测试护栏再动手</span>
+      </div>
+      <h1><span class="accent-text">refactor-advisor</span>：存量代码坏味道诊断与分阶段重构顾问</h1>
+      <p class="hero-lead">老项目动一处牵全身，最怕 AI 一上来就“帮你全部重写”。<code>refactor-advisor</code> 默认严格只读：扫描真实行数、嵌套层数、引用面与高频变更热点，先查测试护栏缺口，按红/黄/绿严重度输出 <strong>Before / After 示意</strong> 与 <strong>P1–P3 小步可验证路线图</strong>，绝不拍脑袋估工时，也绝不私改源码。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">存量坏味道与架构演进</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">适用工具</div>
+          <div class="metric-value">Claude Code / Codex / Cursor / Gemini CLI</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/refactor-advisor/SKILL.md" target="_blank" rel="noopener noreferrer">skills/refactor-advisor/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/refactor-advisor/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#demo" class="btn btn-cyan">🎛️ 交互切换坏味道与只读方案</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#demo">坏味道与只读重构切换器</a>
+      <a href="#workflow">3 步只读诊断与 P1-P3 路线图</a>
+      <a href="#catalog">8 类坏味道速查矩阵</a>
+      <a href="#boundaries">与其他技能分工边界</a>
+      <a href="#install">4 种安装方式</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="demo">
+      <h2>🎛️ 交互式坏味道严重度与只读重构方案切换器</h2>
+      <p class="section-intro">点击下方 5 类典型坏味道，查看 <code>refactor-advisor</code> 如何基于真实可观测证据判定严重度、给出行为等价的 Before/After 方案，并在动手前强制要求补齐测试护栏：</p>
+
+      <div class="rf-tabs" role="tablist" aria-label="坏味道类型切换">
+        <button type="button" class="rf-btn is-active" data-rf="longMethod" role="tab" aria-selected="true">🔴 长方法 / 上帝类</button>
+        <button type="button" class="rf-btn" data-rf="globalState" role="tab" aria-selected="false">🔴 全局可变状态</button>
+        <button type="button" class="rf-btn" data-rf="deepNest" role="tab" aria-selected="false">🟡 深层嵌套与长参数</button>
+        <button type="button" class="rf-btn" data-rf="coupling" role="tab" aria-selected="false">🟡 过度耦合基础设施</button>
+        <button type="button" class="rf-btn" data-rf="magic" role="tab" aria-selected="false">🟢 魔法数字与隐晦条件</button>
+      </div>
+
+      <div class="rf-panel" aria-live="polite">
+        <div class="rf-meta-row">
+          <span class="rf-badge is-high" id="rf-severity">🔴 高优先 · 高风险/高收益</span>
+          <span class="rf-badge" id="rf-complexity">复杂度：中 · 阶段：P2 拆分热点</span>
+          <span class="rf-loc" id="rf-loc">src/services/user.ts:45-120</span>
+        </div>
+        <div class="rf-title" id="rf-title">单函数混杂入参校验、权限判断与数据库持久化（76 行，7 处调用）</div>
+        <div class="rf-evidence" id="rf-evidence">可观测证据：函数长度 76 行、承担 3 段独立职责，近 30 次 Git 提交中被修改 6 次，属于高变动热点；当前仅主路径有集成测试，边界错误分支无单测。</div>
+
+        <div class="rf-diff-grid">
+          <div class="rf-code-card">
+            <div class="rf-code-head">Before（现状示意 · 只读分析未改动）</div>
+            <pre class="rf-code-body" id="rf-before">function processUser(data) {
+  if (data) {
+    if (data.email && data.role) {
+      // 混杂校验、默认值补齐与写库逻辑
+      return db.users.save(data);
+    }
+  }
+  throw new Error('invalid');
+}</pre>
+          </div>
+          <div class="rf-code-card is-after">
+            <div class="rf-code-head">After（推荐手法：Extract Function）</div>
+            <pre class="rf-code-body" id="rf-after">function processUser(data) {
+  const validated = validateUserData(data);
+  return saveToDatabase(validated);
+}</pre>
+          </div>
+        </div>
+
+        <div class="rf-guardrail" id="rf-guardrail">🧪 前置护栏要求（P1 先行）：在拆分前先为 validateUserData 的空字段与非法角色分支补齐最小回归单测（可配合 test-generator）；重构全程保持抛错类型与返回值行为等价。</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="workflow">
+      <h2>🧭 3 步只读诊断流程与 P1–P3 执行路线图</h2>
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>只读扫描真实可观测指标</h3>
+            <p>优先使用当前 Agent 原生搜索与读取工具（或 <code>rg</code>），不硬编码仅限 Unix 的命令；统计文件行数、超长函数、参数数量、深层嵌套与重复业务分支，并借助 <code>git -c core.quotepath=false log --name-only -n 30 --pretty=format:</code> 识别高变动热点文件。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>核查测试护栏、调用面与工作树保护</h3>
+            <p>盘点目标模块的上下游引用位置与自动化测试覆盖情况，识别用户工作树中已有的未提交修改（严禁在后续授权重构中覆盖或混入无关改动）。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>按「变更频率 × 影响面」排定 P1 / P2 / P3 路线图</h3>
+            <p>先补齐核心模块回归测试（<strong>P1，低风险不改业务行为</strong>），再拆分 🔴 高优先核心热点（<strong>P2，全量单测 + 类型检查</strong>），最后清理 🟡 / 🟢 结构债务（<strong>P3，lint + 单测</strong>）；每步小步验证，未实跑测试绝不宣称无回归。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="catalog">
+      <h2>📋 8 类常见坏味道与推荐重构手法</h2>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>坏味道</th>
+              <th>典型特征</th>
+              <th>推荐重构手法</th>
+              <th>严重度</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>长方法</strong></td>
+              <td>单函数承担多段独立职责且过长</td>
+              <td>提取函数 (Extract Function)</td>
+              <td class="risk-high">🔴 高</td>
+            </tr>
+            <tr>
+              <td><strong>上帝类 / 大文件</strong></td>
+              <td>单个类或模块聚合过多无关联职责</td>
+              <td>按内聚边界拆分模块 / 提取类</td>
+              <td class="risk-high">🔴 高</td>
+            </tr>
+            <tr>
+              <td><strong>重复业务逻辑</strong></td>
+              <td>同一业务校验或转换逻辑散落多处</td>
+              <td>提取共享纯函数或领域服务</td>
+              <td class="risk-high">🔴 高</td>
+            </tr>
+            <tr>
+              <td><strong>全局可变状态</strong></td>
+              <td>模块级可变单例被多处隐式读写</td>
+              <td>显式传参或依赖注入</td>
+              <td class="risk-high">🔴 高</td>
+            </tr>
+            <tr>
+              <td><strong>过长参数列表</strong></td>
+              <td>多个强关联参数反复透传</td>
+              <td>引入具名配置 / 参数对象</td>
+              <td class="risk-med">🟡 中</td>
+            </tr>
+            <tr>
+              <td><strong>嵌套过深</strong></td>
+              <td>条件或循环嵌套达到 3+ 层</td>
+              <td>卫语句 (Guard Clause) 提前返回</td>
+              <td class="risk-med">🟡 中</td>
+            </tr>
+            <tr>
+              <td><strong>过度耦合</strong></td>
+              <td>业务层直接绑定具体基础设施实现</td>
+              <td>抽象接口边界 / 依赖反转</td>
+              <td class="risk-med">🟡 中</td>
+            </tr>
+            <tr>
+              <td><strong>魔法数字与隐晦条件</strong></td>
+              <td>无语义字面量或复杂布尔表达式</td>
+              <td>提取命名常量与谓词函数</td>
+              <td>🟢 轻微</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-amber">
+        <div class="callout-title">⚠️ 行为等价与安全执行边界</div>
+        <p>重构严格遵循 <strong>Behavior-preserving</strong>（外部可观察行为不变）：若在分析中顺带发现产品逻辑 Bug，先单独报告而不悄悄混入重构；未经用户选定阶段并授权，严禁改写任何源码；经授权实施后每步必须实际运行项目测试、类型检查与 lint。</p>
+      </div>
+    </section>
+
+    <section class="section-card" id="boundaries">
+      <h2>🧩 与其他研发技能的分工边界</h2>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>你的需求场景</th>
+              <th>推荐使用的技能</th>
+              <th>分工原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>梳理存量模块技术债、拆分大文件/长函数、制定重构路线图</td>
+              <td><strong><code>refactor-advisor</code></strong></td>
+              <td>面向存量代码结构演进，先只读诊断并补测试护栏</td>
+            </tr>
+            <tr>
+              <td>审查单次 PR / <code>git diff</code> 的逻辑缺陷与并发安全风险</td>
+              <td><a href="/skills/zh-code-reviewer/"><code>zh-code-reviewer</code></a></td>
+              <td>聚焦增量变更的高信号分级审查，不发散到全仓债务</td>
+            </tr>
+            <tr>
+              <td>定位线上慢接口、N+1 查询与内存泄漏瓶颈</td>
+              <td><a href="/skills/perf-profiler/"><code>perf-profiler</code></a></td>
+              <td>基于真实 profiler 证据与可复现性能基线优化运行时性能</td>
+            </tr>
+            <tr>
+              <td>先快速理清陌生仓库的目录层级与核心入口</td>
+              <td><a href="/skills/ds-mapper/"><code>ds-mapper</code></a></td>
+              <td>生成带中文注释的 3 层目录结构地图，适合重构前摸底</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种安装方式（零外部依赖，复制即装）</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装插件包</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 refactor-advisor</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill refactor-advisor</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\refactor-advisor" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\refactor-advisor\*" "$HOME\.claude\skills\refactor-advisor\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/refactor-advisor
+cp -r claude-code-skills-zh/skills/refactor-advisor/* ~/.claude/skills/refactor-advisor/</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>刚装上让它“分析 src/order 模块的技术债”，它会直接改代码吗？</h3>
+          <p>不会。默认严格只读出方案，只有在你看完报告并明确指定“按 P2 方案实施第 1 项重构”后，才会小步修改并运行验证。</p>
+        </div>
+        <div class="faq-item">
+          <h3>项目目前完全没有单元测试，它还敢拆核心模块吗？</h3>
+          <p>不会盲目拆分。工作流第 2 步就会检查测试护栏，缺失测试的高风险模块会在路线图 P1 阶段优先列出「补齐最小回归测试」作为前置步骤（可配合 <code>test-generator</code>）。</p>
+        </div>
+        <div class="faq-item">
+          <h3>工作区里我有还没提交的业务代码，授权重构时会覆盖掉吗？</h3>
+          <p>不会。第 2 步专门要求识别工作树中用户已有的未提交修改，严禁覆盖或混入无关改动。</p>
+        </div>
+        <div class="faq-item">
+          <h3>适合前端 React / Vue、Python、Go、Java 等不同技术栈吗？</h3>
+          <p>适合。技能不绑定单一语言，优先使用当前 Agent 原生文件检索和跨平台 Git 命令，按目标仓库真实测试、类型检查与 lint 工具链制定验证方案。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 同类原创技能站内互链</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/zh-code-reviewer/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 代码审查</span>
+            <h3>zh-code-reviewer</h3>
+            <p>基于 git diff 的只读分级中文代码审查，配合重构后提交前把关。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/perf-profiler/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 性能剖析</span>
+            <h3>perf-profiler</h3>
+            <p>用可复现基线和真实 profiler 证据定位慢接口、N+1 查询与内存热点。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/ds-mapper/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 目录结构地图</span>
+            <h3>ds-mapper</h3>
+            <p>重构陌生老项目前先用只读结构地图快速摸清目录边界与入口文件。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>refactor-advisor</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/refactor-advisor/SKILL.md" target="_blank" rel="noopener noreferrer">skills/refactor-advisor/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var smells = {
+    longMethod: {
+      sevClass: 'is-high',
+      severity: '🔴 高优先 · 高风险/高收益',
+      complexity: '复杂度：中 · 阶段：P2 拆分热点',
+      loc: 'src/services/user.ts:45-120',
+      title: '单函数混杂入参校验、权限判断与数据库持久化（76 行，7 处调用）',
+      evidence: '可观测证据：函数长度 76 行、承担 3 段独立职责，近 30 次 Git 提交中被修改 6 次，属于高变动热点；当前仅主路径有集成测试，边界错误分支无单测。',
+      before: 'function processUser(data) {\n  if (data) {\n    if (data.email && data.role) {\n      // 混杂校验、默认值补齐与写库逻辑\n      return db.users.save(data);\n    }\n  }\n  throw new Error(\'invalid\');\n}',
+      after: 'function processUser(data) {\n  const validated = validateUserData(data);\n  return saveToDatabase(validated);\n}',
+      guardrail: '🧪 前置护栏要求（P1 先行）：在拆分前先为 validateUserData 的空字段与非法角色分支补齐最小回归单测（可配合 test-generator）；重构全程保持抛错类型与返回值行为等价。'
+    },
+    globalState: {
+      sevClass: 'is-high',
+      severity: '🔴 高优先 · 隐式状态污染风险',
+      complexity: '复杂度：高 · 阶段：P2 依赖显式化',
+      loc: 'src/runtime/sessionStore.ts:12-68',
+      title: '模块级可变单例 currentTenant 被 11 个业务模块隐式读写',
+      evidence: '可观测证据：全局 export let currentTenant 在多处异步调用间直接覆盖，单元测试彼此串联污染，并发请求下存在跨租户串数据风险。',
+      before: 'export let currentTenant = null;\nexport async function createInvoice(items) {\n  return db.invoices.insert({ tenant: currentTenant, items });\n}',
+      after: 'export async function createInvoice(ctx, items) {\n  return db.invoices.insert({ tenant: ctx.tenantId, items });\n}',
+      guardrail: '🧪 前置护栏要求：列出全部 11 处调用方位置，采用“新增显式参数 + 保留过渡签名”分两步迁移，全部调用方切完后再移除全局可变导出，并用并行单测验证无状态串扰。'
+    },
+    deepNest: {
+      sevClass: 'is-mid',
+      severity: '🟡 中优先 · 可读性与扩展性受损',
+      complexity: '复杂度：低 · 阶段：P3 结构清理',
+      loc: 'src/billing/discount.ts:18-63',
+      title: '条件分支嵌套 4 层且反复透传 6 个关联计费参数',
+      evidence: '可观测证据：if 嵌套达 4 层，calcPrice(uid, level, region, coupon, subtotal, isVip) 在 4 个文件重复透传，新加促销规则极易漏判分支。',
+      before: 'function calcPrice(uid, level, region, coupon, subtotal, isVip) {\n  if (subtotal > 0) {\n    if (isVip) {\n      if (coupon) { /* ... */ }\n    }\n  }\n}',
+      after: 'function calcPrice(orderCtx) {\n  if (orderCtx.subtotal <= 0) return 0;\n  if (!orderCtx.isVip) return applyBaseRule(orderCtx);\n  return applyVipCoupon(orderCtx);\n}',
+      guardrail: '🧪 验证要求：使用卫语句提前返回与具名参数对象属于局部纯逻辑重构，执行计费模块全量单测与 TypeScript 类型检查确认所有边界金额分毫不差。'
+    },
+    coupling: {
+      sevClass: 'is-mid',
+      severity: '🟡 中优先 · 业务绑定基础设施',
+      complexity: '复杂度：中 · 阶段：P2/P3 边界解耦',
+      loc: 'src/order/notify.ts:10-54',
+      title: '订单领域服务直接实例化阿里云短信 SDK，无法离线单测',
+      evidence: '可观测证据：notifyOrderPaid 内部直接 new DysmsapiClient()，导致跑订单单测必须连接外网或打脆弱的模块级 mock。',
+      before: 'export async function notifyOrderPaid(order) {\n  const sms = new DysmsapiClient(process.env.SMS_KEY);\n  await sms.send(order.phone, order.id);\n}',
+      after: 'export async function notifyOrderPaid(order, notifier) {\n  await notifier.sendPaidNotice(order.phone, order.id);\n}',
+      guardrail: '🧪 验证要求：抽象最小 Notifier 接口并在应用入口注入默认实现，先确保既有集成行为不变，再补充内存 FakeNotifier 离线回归单测。'
+    },
+    magic: {
+      sevClass: 'is-low',
+      severity: '🟢 轻微 · 局部可读性清理',
+      complexity: '复杂度：低 · 阶段：P3 择机顺带处理',
+      loc: 'src/auth/token.ts:31-42',
+      title: '散落魔法数字 86400000 与多段内联布尔状态判断',
+      evidence: '可观测证据：权限校验条件连续出现 status === 2 && retry < 3 && now - ts < 86400000，无语义常量注释，新人阅读需回查数据库枚举表。',
+      before: 'if (user.status === 2 && user.retry < 3 && Date.now() - user.ts < 86400000) {\n  return issueToken(user);\n}',
+      after: 'const ONE_DAY_MS = 24 * 60 * 60 * 1000;\nif (canRefreshSession(user, Date.now(), ONE_DAY_MS)) {\n  return issueToken(user);\n}',
+      guardrail: '🧪 验证要求：不改变任何数值与判断顺序，运行 lint 与 auth 模块单测即可；不与高风险架构拆包混在同一次提交里。'
+    }
+  };
+
+  var btns = document.querySelectorAll('.rf-btn[data-rf]');
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-rf');
+      var item = smells[key];
+      if (!item) return;
+      btns.forEach(function (b) {
+        var active = b === btn;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      var sevEl = document.getElementById('rf-severity');
+      sevEl.className = 'rf-badge ' + item.sevClass;
+      sevEl.textContent = item.severity;
+      document.getElementById('rf-complexity').textContent = item.complexity;
+      document.getElementById('rf-loc').textContent = item.loc;
+      document.getElementById('rf-title').textContent = item.title;
+      document.getElementById('rf-evidence').textContent = item.evidence;
+      document.getElementById('rf-before').textContent = item.before;
+      document.getElementById('rf-after').textContent = item.after;
+      document.getElementById('rf-guardrail').textContent = item.guardrail;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve(); else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

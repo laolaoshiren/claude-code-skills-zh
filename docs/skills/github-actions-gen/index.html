@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>github-actions-gen：最小权限与 40 位 SHA 固定的安全 CI/CD 生成技能 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：先盘点真实项目依赖与脚本再生成安全、可验证的 GitHub Actions workflow。强制最小 permissions、完整 40 位 commit SHA 固定、checkout 禁留凭据、超时控制与不可信 PR 隔离。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="github-actions-gen">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/github-actions-gen/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="github-actions-gen：最小权限与 40 位 SHA 固定的安全 CI/CD 生成技能">
+<meta property="og:description" content="拒绝凭项目名猜配置与高危 @v4 漂移标签：默认生成只读 CI，固定 40 位 Action SHA、隔离 fork PR Secrets，并执行 actionlint 与本地命令复验。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/github-actions-gen/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="github-actions-gen 安全 CI/CD 生成技能">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="github-actions-gen：最小权限与 40 位 SHA 固定的安全 CI/CD 生成技能">
+<meta name="twitter:description" content="盘点真实 lockfile 与脚本，生成最小 permissions、完整 40 位 SHA、timeout-minutes 与 OIDC 保护的 GitHub Actions，MIT 开源一键安装。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制配色：CI/CD 流水线蓝 + 冰青主题 */
+  :root {
+    --accent: #2563eb;
+    --accent2: #60a5fa;
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(37, 99, 235, 0.22) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(56, 189, 248, 0.11) 0%, transparent 50%);
+  }
+  .detail-hero h1 .accent-text {
+    background: linear-gradient(135deg, #60a5fa, #22d3ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .nav-star, .btn-primary, .step-num {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    box-shadow: 0 4px 18px rgba(37, 99, 235, 0.34);
+  }
+  .ci-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+  .ci-btn {
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(15, 23, 42, 0.72);
+    color: #e2e8f0;
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .ci-btn:hover { border-color: rgba(96, 165, 250, 0.7); color: #fff; }
+  .ci-btn.is-active {
+    border-color: #3b82f6;
+    background: rgba(37, 99, 235, 0.2);
+    color: #bfdbfe;
+  }
+  .ci-panel {
+    border: 1px solid rgba(96, 165, 250, 0.34);
+    border-radius: 14px;
+    background: rgba(10, 15, 28, 0.9);
+    padding: 18px 20px;
+  }
+  .ci-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .ci-head h3 { margin: 0; font-size: 1.08rem; color: #f8fafc; }
+  .ci-meta {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 11px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    border: 1px solid rgba(96, 165, 250, 0.42);
+    background: rgba(37, 99, 235, 0.15);
+    color: #93c5fd;
+  }
+  .ci-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 780px) { .ci-grid { grid-template-columns: 1fr; } }
+  .ci-cell {
+    background: rgba(17, 24, 39, 0.85);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .ci-cell strong {
+    display: block;
+    font-size: 0.83rem;
+    color: #93c5fd;
+    margin-bottom: 6px;
+  }
+  .ci-cell p { margin: 0; font-size: 0.89rem; color: #cbd5e1; line-height: 1.6; }
+  .ci-yaml-box {
+    background: #070b14;
+    border: 1px solid rgba(96, 165, 250, 0.24);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .ci-yaml-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 13px;
+    background: rgba(37, 99, 235, 0.12);
+    border-bottom: 1px solid rgba(96, 165, 250, 0.2);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #bfdbfe;
+  }
+  .ci-yaml-pre {
+    margin: 0;
+    padding: 13px 15px;
+    font-family: var(--mono);
+    font-size: 0.81rem;
+    line-height: 1.62;
+    color: #dbeafe;
+    overflow-x: auto;
+    white-space: pre;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "github-actions-gen",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/github-actions-gen/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/github-actions-gen",
+  "description": "基于真实项目依赖与脚本生成或修订安全、可验证 GitHub Actions workflow 的原创中文技能：强制最小 permissions、完整 40 位 Action SHA、超时控制与不可信 PR 隔离。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "github-actions-gen", "item": "https://claude-skills.bt199.com/skills/github-actions-gen/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "为什么所有第三方 Action 必须固定为完整 40 位 commit SHA，而不能写 @v4 或 @main？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "分支名（@main/@master）和语义化 tag（@v4/@latest）都可能被上游移动或遭供应链劫持。采用 uses: owner/action@<40位SHA> # vX.Y.Z 格式后，SHA 成为不可变执行边界，注释保留版本可读性，能直接防住上游 tag 篡改攻击。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "为什么不能为了给 fork PR 跑测试或拿 Secrets 而改用 pull_request_target？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "pull_request_target 会在目标仓库高权限上下文中执行并可访问 Secrets。若在其中 checkout PR head 或执行 PR 脚本/安装依赖，攻击者可直接通过 PR 窃取凭据或写入仓库。技能严格禁止在 pull_request_target 中运行不可信 PR 内容。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "默认生成的 workflow 会顺带配置自动发版或生产部署吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。默认只生成只读 CI（lint/test/build）。Release、推送镜像、部署生产、写回仓库或调用外部 webhook 必须先确认部署目标、GitHub Environment、OIDC/Secrets 权限与回滚方式，并拆入独立 job 或独立文件。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "如果本机没有安装 actionlint，技能会怎么验证生成的 workflow？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "工具不可用时会明确报告未完成 actionlint 门禁，绝不伪称通过；同时仍会执行 YAML 语法解析、核对所有表达式与 env 隔离、扫描全部 uses: 是否为 40 位 SHA 以及检查 checkout 的 persist-credentials: false，并在本地复验项目 lint/test/build 命令。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">github-actions-gen</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-purple">⚙️ 供应链安全 CI/CD</span>
+        <span class="pill pill-cyan">🔒 最小 permissions + 40 位 SHA</span>
+        <span class="pill pill-green">⏱️ 超时与并发取消</span>
+      </div>
+      <h1><span class="accent-text">github-actions-gen</span>：最小权限与可验证的 GitHub Actions 生成器</h1>
+      <p class="hero-lead">告别 AI 随手吐出的「过时 <code>@v3</code>、缺权限限制、硬塞 <code>pull_request_target</code> 漏密钥、凭空编造 <code>npm run test:ci</code>」式 CI 配置。先盘点真实 lockfile 与项目脚本，再按供应链安全标准生成只读 CI 或独立授权的 Release / OIDC 部署流水线。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">CI / 矩阵 / Release / OIDC</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">供应链护栏</div>
+          <div class="metric-value">40 位 SHA · 禁留凭据</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/github-actions-gen/SKILL.md" target="_blank" rel="noopener noreferrer">skills/github-actions-gen/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/github-actions-gen/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#picker" class="btn btn-cyan">🎛️ 交互 CI/CD 模板选型器</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#picker">交互式模板选型器</a>
+      <a href="#workflow">威胁模型与生成流程</a>
+      <a href="#boundaries">供应链红线与核对清单</a>
+      <a href="#install">4 种安装方式</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="picker">
+      <h2>🎛️ 交互式 CI/CD 模板选型器（安全基线预览）</h2>
+      <p class="section-intro">按技术栈切换查看 <code>github-actions-gen</code> 盘点的真实项目证据、最小 <code>permissions</code> 策略、Action 40 位 SHA 固定规则与超时控制骨架：</p>
+      <div class="ci-tabs" role="tablist" aria-label="CI/CD 技术栈选型">
+        <button type="button" class="ci-btn is-active" role="tab" aria-selected="true" data-stack="node">🟢 Node.js</button>
+        <button type="button" class="ci-btn" role="tab" aria-selected="false" data-stack="python">🐍 Python</button>
+        <button type="button" class="ci-btn" role="tab" aria-selected="false" data-stack="go">🐹 Go</button>
+        <button type="button" class="ci-btn" role="tab" aria-selected="false" data-stack="docker">🐳 Docker</button>
+      </div>
+      <div class="ci-panel" aria-live="polite">
+        <div class="ci-head">
+          <h3 id="ci-title">Node.js / TypeScript 只读 CI 模板</h3>
+          <span id="ci-meta" class="ci-meta">证据源：package.json · .nvmrc · package-lock.json</span>
+        </div>
+        <div class="ci-grid">
+          <div class="ci-cell">
+            <strong>1. 最小 permissions 边界</strong>
+            <p id="ci-perm">顶层锁定 contents: read；fork PR 不接触 Secrets 与写权限，checkout 默认 persist-credentials: false。</p>
+          </div>
+          <div class="ci-cell">
+            <strong>2. Action 固定与缓存策略</strong>
+            <p id="ci-pin">全部 Action 必须从官方 release 核验完整 40 位 SHA 并附版本注释；缓存 key 绑定真实 lockfile（npm / pnpm / yarn），绝不缓存凭据。</p>
+          </div>
+          <div class="ci-cell">
+            <strong>3. 超时与并发控制</strong>
+            <p id="ci-timeout">每个 job 显式设置 timeout-minutes: 15 与 concurrency.cancel-in-progress: true，避免挂死任务耗尽配额。</p>
+          </div>
+        </div>
+        <div class="ci-yaml-box">
+          <div class="ci-yaml-bar">
+            <span id="ci-file">.github/workflows/ci.yml（安全结构示例 · 生成时实时核验官方 40 位 SHA）</span>
+            <button type="button" class="copy-btn" data-copy-target="ci-yaml">📋 复制骨架</button>
+          </div>
+          <pre class="ci-yaml-pre"><code id="ci-yaml">name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@&lt;40位官方核验SHA&gt; # vX.Y.Z
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@&lt;40位官方核验SHA&gt; # vX.Y.Z
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="workflow">
+      <h2>🧭 威胁模型优先的 7 步 CI/CD 生成流程</h2>
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>盘点真实项目证据</h3>
+            <p>先读 <code>package.json</code>、<code>.nvmrc</code>、<code>pyproject.toml</code>、<code>go.mod</code>、<code>Cargo.toml</code>、<code>Dockerfile</code> 与既有 <code>.github/workflows/</code>，确认真实脚本、monorepo 边界与矩阵维度；脚本缺失先指出缺口，不靠猜测编命令。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>建立触发器威胁模型</h3>
+            <p>把 <code>pull_request</code> 视作不可信代码（只读 Token、零 Secrets、不跑高权限自托管 Runner）；绝不在 <code>pull_request_target</code> 中 checkout 或运行 PR 代码；所有 <code>${{ github.event.* }}</code> 不可信输入必须经 <code>env:</code> 传递，防 shell 注入。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>按职责拆分流水线</h3>
+            <p>默认只落盘只读 <code>ci.yml</code>（lint / test / build）；仅在用户明确授权并确认环境、OIDC、required reviewers 与回滚方案后，再单独拆分 <code>release.yml</code> 或 <code>deploy.yml</code>，且只给发布 job 所需写权限。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>核验官方 Release 并固定 40 位 SHA</h3>
+            <p>从 Action 官方仓库解析完整 40 位 commit SHA，写成 <code>uses: owner/action@&lt;40位SHA&gt; # vX.Y.Z</code>；对 <code>actions/checkout</code> 默认设置 <code>persist-credentials: false</code>，并在交付说明里标注 SHA 来源与核验时间。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <h3>实测语法与本地命令验证</h3>
+            <p>依次运行 <code>actionlint</code>（若未安装如实说明缺口）、YAML 解析检查、<code>uses:</code> 全量 SHA 扫描、本地 lint/test/build 复验及最终 <code>git diff</code> 审查，确认无 Token、真实 webhook 或 <code>.env</code> 泄露。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="boundaries">
+      <h2>🛡️ 供应链安全红线与交付核对清单</h2>
+      <div class="grid-2">
+        <div class="info-box is-good">
+          <h3>每份生成 Workflow 的强制标配</h3>
+          <ul class="prose-list">
+            <li>命令、运行时版本与 lockfile 均来自真实仓库文件，不凭项目名瞎猜；</li>
+            <li>所有第三方 Action 固定 40 位完整 SHA 并附版本注释；</li>
+            <li>顶层及各 job 均配置最小 <code>permissions</code>、<code>timeout-minutes</code> 与并发取消；</li>
+            <li>发布部署优先采用短期 OIDC、受保护 GitHub Environment 与可验证回滚方案。</li>
+          </ul>
+        </div>
+        <div class="info-box is-bad">
+          <h3>明确禁止的高危反模式</h3>
+          <ul class="prose-list">
+            <li>禁止在 <code>uses:</code> 中使用 <code>@main</code>、<code>@master</code>、<code>@latest</code> 或可移动的 <code>@vN</code> tag；</li>
+            <li>禁止在 <code>pull_request_target</code> 中 checkout PR head 或运行 PR 脚本/依赖；</li>
+            <li>禁止把 <code>${{ github.event.pull_request.title }}</code> 等表达式直接拼进 <code>run:</code> shell；</li>
+            <li>禁止在未获要求时擅自新增 <code>README-CICD.md</code> 等冗余文档或把 Secrets 写入日志/缓存。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种安装方式</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 github-actions-gen</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill github-actions-gen</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\github-actions-gen" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\github-actions-gen\*" "$HOME\.claude\skills\github-actions-gen\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/github-actions-gen
+cp -r claude-code-skills-zh/skills/github-actions-gen/* ~/.claude/skills/github-actions-gen/</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>为什么所有第三方 Action 必须固定为完整 40 位 commit SHA，而不能写 @v4 或 @main？</h3>
+          <p>分支引用与语义化 tag 都属于可变指针，上游一旦被劫持或误覆盖，仓库 CI 会静默执行恶意代码。使用 <code>uses: owner/action@&lt;40位SHA&gt; # vX.Y.Z</code> 后，SHA 锁定不可变源码，注释保留可读版本。</p>
+        </div>
+        <div class="faq-item">
+          <h3>为什么不能为了给 fork PR 跑测试或拿 Secrets 而改用 pull_request_target？</h3>
+          <p><code>pull_request_target</code> 运行在基准仓库高权限上下文中，若 checkout 或执行 PR 代码，外部贡献者即可窃取 Secrets 或篡改仓库。fork PR 无法读取 Secrets 是正常且必要的安全边界。</p>
+        </div>
+        <div class="faq-item">
+          <h3>默认生成的 workflow 会顺带配置自动发版或生产部署吗？</h3>
+          <p>不会。默认只生成只读 CI；Release、推送镜像与生产部署必须先确认目标、GitHub Environment、OIDC 权限、required reviewers 与回滚方案，再拆分为独立 job 或独立 workflow。</p>
+        </div>
+        <div class="faq-item">
+          <h3>如果本机没有安装 actionlint，技能会怎么验证生成的 workflow？</h3>
+          <p>会明确标注 <code>actionlint</code> 未执行，绝不谎称通过；同时继续完成 YAML 解析、表达式注入排查、全量 <code>uses:</code> SHA 审计、<code>persist-credentials: false</code> 核对及本地测试命令复验。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/git-workflow/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · Git 安全工作流</span>
+            <h3>git-workflow</h3>
+            <p>生成并复验完 workflow 后，按原子提交与分级授权规范安全提交和推送到远端。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/api-tester/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 契约接口测试</span>
+            <h3>api-tester</h3>
+            <p>为 CI 流水线补齐可复现的 API 契约与回归用例，自动守住接口结构与状态码。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/db-migrator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 数据库迁移助手</span>
+            <h3>db-migrator</h3>
+            <p>把上线前的 Schema 迁移审查、回滚脚本和大表锁表检查纳入可控发布流程。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>github-actions-gen</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/github-actions-gen/SKILL.md" target="_blank" rel="noopener noreferrer">skills/github-actions-gen/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var stacks = {
+    node: {
+      title: 'Node.js / TypeScript 只读 CI 模板',
+      meta: '证据源：package.json · .nvmrc · package-lock.json',
+      perm: '顶层锁定 contents: read；fork PR 不接触 Secrets 与写权限，checkout 默认 persist-credentials: false。',
+      pin: '全部 Action 必须从官方 release 核验完整 40 位 SHA 并附版本注释；缓存 key 绑定真实 lockfile（npm / pnpm / yarn），绝不缓存凭据。',
+      timeout: '每个 job 显式设置 timeout-minutes: 15 与 concurrency.cancel-in-progress: true，避免挂死任务耗尽配额。',
+      file: '.github/workflows/ci.yml（Node.js 安全骨架 · 生成时实时核验官方 SHA）',
+      yaml: [
+        'name: CI',
+        'on:',
+        '  push:',
+        '    branches: [main]',
+        '  pull_request:',
+        '    branches: [main]',
+        '',
+        'permissions:',
+        '  contents: read',
+        '',
+        'concurrency:',
+        '  group: ci-${{ github.workflow }}-${{ github.ref }}',
+        '  cancel-in-progress: true',
+        '',
+        'jobs:',
+        '  test:',
+        '    runs-on: ubuntu-latest',
+        '    timeout-minutes: 15',
+        '    steps:',
+        '      - uses: actions/checkout@<40位官方核验SHA> # vX.Y.Z',
+        '        with:',
+        '          persist-credentials: false',
+        '      - uses: actions/setup-node@<40位官方核验SHA> # vX.Y.Z',
+        '        with:',
+        '          node-version-file: .nvmrc',
+        '          cache: npm',
+        '          cache-dependency-path: package-lock.json',
+        '      - run: npm ci',
+        '      - run: npm run lint',
+        '      - run: npm test',
+        '      - run: npm run build'
+      ].join('\n')
+    },
+    python: {
+      title: 'Python（uv / Poetry / pip）只读 CI 模板',
+      meta: '证据源：pyproject.toml · .python-version · uv.lock / poetry.lock',
+      perm: '顶层仅声明 contents: read；测试阶段不注入 PyPI Token 或私有仓库凭据，checkout 禁用 persist-credentials。',
+      pin: '固定 actions/checkout 与 actions/setup-python 的完整 40 位 SHA；严格按项目实际锁文件选择 uv / poetry / pip，不强换包管理器。',
+      timeout: '设置 timeout-minutes: 15；矩阵仅覆盖 pyproject.toml 声明支持的 Python 版本，拒绝无意义全版本矩阵浪费资源。',
+      file: '.github/workflows/ci.yml（Python 安全骨架 · 生成时实时核验官方 SHA）',
+      yaml: [
+        'name: Python CI',
+        'on:',
+        '  push:',
+        '    branches: [main]',
+        '  pull_request:',
+        '    branches: [main]',
+        '',
+        'permissions:',
+        '  contents: read',
+        '',
+        'concurrency:',
+        '  group: py-ci-${{ github.ref }}',
+        '  cancel-in-progress: true',
+        '',
+        'jobs:',
+        '  check:',
+        '    runs-on: ubuntu-latest',
+        '    timeout-minutes: 15',
+        '    steps:',
+        '      - uses: actions/checkout@<40位官方核验SHA> # vX.Y.Z',
+        '        with:',
+        '          persist-credentials: false',
+        '      - uses: actions/setup-python@<40位官方核验SHA> # vX.Y.Z',
+        '        with:',
+        '          python-version-file: .python-version',
+        '          cache: pip',
+        '      - run: python -m pip install -e ".[dev]"',
+        '      - run: ruff check .',
+        '      - run: pytest'
+      ].join('\n')
+    },
+    go: {
+      title: 'Go 模块只读测试与静态检查 CI 模板',
+      meta: '证据源：go.mod · go.sum · .golangci.yml',
+      perm: '顶层锁定 contents: read；不暴露发布签密密钥，fork PR 只跑只读单测、竞态检测与静态检查。',
+      pin: '固定 actions/checkout 与 actions/setup-go 的 40 位官方 SHA；通过 go-version-file: go.mod 与内置 module 缓存自动对齐版本。',
+      timeout: '单测与 race 检测设置 timeout-minutes: 15，配合 go test -timeout 5m 避免死锁测试拖死 Runner。',
+      file: '.github/workflows/ci.yml（Go 安全骨架 · 生成时实时核验官方 SHA）',
+      yaml: [
+        'name: Go CI',
+        'on:',
+        '  push:',
+        '    branches: [main]',
+        '  pull_request:',
+        '    branches: [main]',
+        '',
+        'permissions:',
+        '  contents: read',
+        '',
+        'concurrency:',
+        '  group: go-ci-${{ github.ref }}',
+        '  cancel-in-progress: true',
+        '',
+        'jobs:',
+        '  test:',
+        '    runs-on: ubuntu-latest',
+        '    timeout-minutes: 15',
+        '    steps:',
+        '      - uses: actions/checkout@<40位官方核验SHA> # vX.Y.Z',
+        '        with:',
+        '          persist-credentials: false',
+        '      - uses: actions/setup-go@<40位官方核验SHA> # vX.Y.Z',
+        '        with:',
+        '          go-version-file: go.mod',
+        '          cache: true',
+        '      - run: go vet ./...',
+        '      - run: go test -race -timeout 5m ./...'
+      ].join('\n')
+    },
+    docker: {
+      title: 'Docker 构建校验（PR 只读构建 vs 授权发布隔离）',
+      meta: '证据源：Dockerfile · .dockerignore · docker-compose.yml',
+      perm: 'PR 阶段仅 contents: read 且 push: false，绝不接触镜像仓库凭据；推送 GHCR/云镜像须拆独立 job 并显式授权 packages: write 或短期 OIDC。',
+      pin: '固定 docker/setup-buildx-action 与 docker/build-push-action 的 40 位官方 SHA；敏感构建参数不写入镜像层与构建缓存。',
+      timeout: '构建 job 设定 timeout-minutes: 20，生产发布绑定受保护 GitHub Environment、required reviewers 与并发锁。',
+      file: '.github/workflows/docker-ci.yml（PR 只读构建骨架 · 不自动推送镜像）',
+      yaml: [
+        'name: Docker Build Check',
+        'on:',
+        '  pull_request:',
+        '    branches: [main]',
+        '',
+        'permissions:',
+        '  contents: read',
+        '',
+        'concurrency:',
+        '  group: docker-ci-${{ github.ref }}',
+        '  cancel-in-progress: true',
+        '',
+        'jobs:',
+        '  build-check:',
+        '    runs-on: ubuntu-latest',
+        '    timeout-minutes: 20',
+        '    steps:',
+        '      - uses: actions/checkout@<40位官方核验SHA> # vX.Y.Z',
+        '        with:',
+        '          persist-credentials: false',
+        '      - uses: docker/setup-buildx-action@<40位官方核验SHA> # vX.Y.Z',
+        '      - uses: docker/build-push-action@<40位官方核验SHA> # vX.Y.Z',
+        '        with:',
+        '          context: .',
+        '          push: false'
+      ].join('\n')
+    }
+  };
+
+  var btns = document.querySelectorAll('.ci-btn[data-stack]');
+  var titleEl = document.getElementById('ci-title');
+  var metaEl = document.getElementById('ci-meta');
+  var permEl = document.getElementById('ci-perm');
+  var pinEl = document.getElementById('ci-pin');
+  var timeoutEl = document.getElementById('ci-timeout');
+  var fileEl = document.getElementById('ci-file');
+  var yamlEl = document.getElementById('ci-yaml');
+
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var item = stacks[btn.getAttribute('data-stack')];
+      if (!item) return;
+      btns.forEach(function (b) {
+        var active = b === btn;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      titleEl.textContent = item.title;
+      metaEl.textContent = item.meta;
+      permEl.textContent = item.perm;
+      pinEl.textContent = item.pin;
+      timeoutEl.textContent = item.timeout;
+      fileEl.textContent = item.file;
+      yamlEl.textContent = item.yaml;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve(); else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

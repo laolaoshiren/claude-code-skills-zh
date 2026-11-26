@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ds-mapper：跨平台只读项目目录结构地图生成器 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：只读扫描任意代码库并输出带中文注释的 3 层 ASCII 目录树、模块职责对照表与启动入口建议。支持 Agent 原生遍历、git ls-files 与 Windows PowerShell 防踩坑（规避 Windows find.exe 报错）。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="ds-mapper">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/ds-mapper/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="ds-mapper：跨平台只读项目目录结构地图生成器">
+<meta property="og:description" content="30 秒摸清陌生代码库：跨平台只读扫描、自动跳过产物与依赖目录、生成带中文注释的目录树、模块职责表与入口建议。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/ds-mapper/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="ds-mapper 项目目录结构地图生成器">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ds-mapper：跨平台只读项目目录结构地图生成器">
+<meta name="twitter:description" content="只读生成中文项目结构地图：兼容 Git ls-files / PowerShell / 原生遍历，支持 3 层深度与 Monorepo 分区。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：代码制图（湖蓝青 + 翡翠目录树主题） */
+  :root {
+    --accent: #06b6d4;
+    --accent2: #22c55e;
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(6, 182, 212, 0.2) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(34, 197, 94, 0.12) 0%, transparent 50%);
+  }
+  .ds-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .ds-tab-group { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ds-btn {
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(12, 20, 28, 0.78);
+    color: #e2e8f0;
+    border-radius: 10px;
+    padding: 8px 13px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+  .ds-btn:hover { border-color: rgba(6, 182, 212, 0.7); transform: translateY(-1px); }
+  .ds-btn.is-active {
+    background: rgba(6, 182, 212, 0.2);
+    border-color: #22c55e;
+    color: #a7f3d0;
+  }
+  .ds-stage {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 14px;
+  }
+  .ds-card {
+    border: 1px solid rgba(6, 182, 212, 0.26);
+    border-radius: 14px;
+    background: rgba(8, 15, 24, 0.88);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .ds-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .ds-card-title { font-size: 0.9rem; font-weight: 700; color: #67e8f9; }
+  .ds-chip {
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: rgba(34, 197, 94, 0.14);
+    border: 1px solid rgba(34, 197, 94, 0.36);
+    color: #86efac;
+  }
+  .ds-cmd-box {
+    font-family: var(--mono);
+    font-size: 0.83rem;
+    line-height: 1.65;
+    background: #050a11;
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    border-radius: 10px;
+    padding: 11px 13px;
+    color: #cffafe;
+    white-space: pre-wrap;
+    margin: 0;
+  }
+  .ds-note {
+    font-size: 0.88rem;
+    color: #cbd5e1;
+    line-height: 1.66;
+  }
+  .ds-pitfall {
+    border-radius: 10px;
+    padding: 10px 13px;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    background: rgba(253, 203, 110, 0.08);
+    border: 1px solid rgba(253, 203, 110, 0.38);
+    color: #fde68a;
+  }
+  .ds-tree {
+    font-family: var(--mono);
+    font-size: 0.81rem;
+    line-height: 1.66;
+    background: #050a11;
+    border: 1px solid rgba(34, 197, 94, 0.28);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: #dcfce7;
+    white-space: pre;
+    overflow-x: auto;
+    margin: 0;
+    flex: 1;
+  }
+  @media (max-width: 860px) {
+    .ds-stage { grid-template-columns: 1fr; }
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "ds-mapper",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/ds-mapper/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/ds-mapper",
+  "description": "面向中文开发者的项目目录结构地图生成器：跨平台只读扫描代码库，自动过滤依赖与产物目录，输出带中文注释的 3 层 ASCII 目录树、模块职责对照表与启动入口建议。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "ds-mapper", "item": "https://claude-skills.bt199.com/skills/ds-mapper/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "为什么 ds-mapper 特别强调不要在 Windows 下运行 find . -maxdepth 3？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Windows 自带的 find.exe 是文本内容搜索命令，而非 Unix 的目录查找工具，直接运行 find . -maxdepth 3 会立刻报错。ds-mapper 优先采用当前 Agent 原生文件列举工具或 git -c core.quotepath=false ls-files；无 Git 的 Windows 环境改用 PowerShell 的 Get-ChildItem -Depth 3。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "扫描大型 Monorepo 仓库时，目录树会不会刷屏几千行？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。ds-mapper 自动跳过 node_modules、.git、vendor、__pycache__、dist、build、.next、target 等依赖与构建产物目录，默认最多展示 3 层深度；遇到 Monorepo 会按 packages/ 或 apps/ 分区列出核心子包，兼顾可读性与上下文占用。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "它会看着文件夹名字瞎编模块职责，或者顺手改动仓库里的文件吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "都不会。ds-mapper 默认严格只读，不修改仓库中任何文件；并且要求先读真实清单文件（package.json、pyproject.toml、go.mod 等）并抽样阅读入口文件后再写中文注释，未实际读取到的目录或文件严禁编造用途，必要时标明「待进一步查看」。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "它和 zh-docgen、zh-readme 什么时候该各自出场？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "刚接手陌生仓库想 30 秒看懂目录布局和入口文件时用 ds-mapper；要生成详细架构设计、API 手册或运维文档用 zh-docgen；要撰写开源仓库首页 README.md 则用 zh-readme。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">ds-mapper</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-cyan">🗺️ 本仓原创 · 项目导航</span>
+        <span class="pill pill-green">🔒 默认只读 · 最多 3 层</span>
+        <span class="pill pill-amber">🪟 Windows / macOS / Linux 防踩坑</span>
+      </div>
+      <h1><span class="accent-text">ds-mapper</span>：跨平台项目目录结构地图生成器</h1>
+      <p class="hero-lead">接手陌生仓库的第一步不是盲目翻文件，而是先拿一张真实的中文地图。<code>ds-mapper</code> 严格只读扫描代码库，自动绕开 Windows <code>find.exe</code> 报错与 <code>node_modules</code> 噪声，读取真实清单与入口文件后，输出带中文注释的 <strong>3 层 ASCII 目录树</strong>、<strong>模块职责对照表</strong> 与 <strong>启动入口建议</strong>。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">陌生仓库快速导览</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">适用工具</div>
+          <div class="metric-value">Claude Code / Codex / Cursor / Gemini CLI</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/ds-mapper/SKILL.md" target="_blank" rel="noopener noreferrer">skills/ds-mapper/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/ds-mapper/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#demo" class="btn btn-cyan">🎛️ 对比跨平台遍历与目录层级</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#demo">跨平台遍历与层级对比器</a>
+      <a href="#workflow">4 步只读制图流程</a>
+      <a href="#rules">忽略规则与防编造底线</a>
+      <a href="#boundaries">与其他技能分工边界</a>
+      <a href="#install">4 种安装方式</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="demo">
+      <h2>🎛️ 交互式对比器：跨平台遍历策略 × 项目目录层级视图</h2>
+      <p class="section-intro">左侧切换不同环境下的只读遍历方式，右侧切换单仓库 3 层视图或 Monorepo 分区视图，直观查看 <code>ds-mapper</code> 如何避免跨平台命令报错并控制输出长度：</p>
+
+      <div class="ds-controls">
+        <div class="ds-tab-group" role="tablist" aria-label="跨平台遍历方式">
+          <button type="button" class="ds-btn is-active" data-scan="native" role="tab" aria-selected="true">🤖 Agent 原生遍历（首选）</button>
+          <button type="button" class="ds-btn" data-scan="git" role="tab" aria-selected="false">🌿 Git ls-files</button>
+          <button type="button" class="ds-btn" data-scan="ps" role="tab" aria-selected="false">🪟 Windows PowerShell</button>
+          <button type="button" class="ds-btn" data-scan="unix" role="tab" aria-selected="false">🐧 macOS / Linux</button>
+        </div>
+        <div class="ds-tab-group" role="tablist" aria-label="目录层级视图">
+          <button type="button" class="ds-btn is-active" data-layout="standard" role="tab" aria-selected="true">🌳 标准 3 层仓库</button>
+          <button type="button" class="ds-btn" data-layout="monorepo" role="tab" aria-selected="false">📦 Monorepo 分区</button>
+        </div>
+      </div>
+
+      <div class="ds-stage" aria-live="polite">
+        <div class="ds-card">
+          <div class="ds-card-head">
+            <span class="ds-card-title" id="ds-scan-title">方式 1：Agent 原生文件列举工具（跨平台零 Shell 依赖）</span>
+            <span class="ds-chip" id="ds-scan-badge">优先级 #1</span>
+          </div>
+          <pre class="ds-cmd-box" id="ds-scan-cmd"># 不直接依赖操作系统 Shell 差异
+使用当前 Agent 原生目录列举 / 文件检索能力
+-> 自动尊重 .gitignore 并跳过构建产物目录</pre>
+          <div class="ds-note" id="ds-scan-desc">适用范围：Claude Code、Codex、Cursor、Gemini CLI 均内置文件列表能力，无需担心 PowerShell / Bash 语法差异或中文路径编码转义，是 ds-mapper 规定的第一优先策略。</div>
+          <div class="ds-pitfall" id="ds-scan-pitfall">⚠️ 关键避坑：若退回 Shell 执行，绝不在 Windows 下运行 Unix 的 `find . -maxdepth 3`——Windows 自带 `find.exe` 是文本搜索工具，会直接报错。</div>
+        </div>
+
+        <div class="ds-card">
+          <div class="ds-card-head">
+            <span class="ds-card-title" id="ds-layout-title">标准单仓 3 层目录树（已自动过滤依赖与产物）</span>
+            <span class="ds-chip" id="ds-layout-badge">Max Depth = 3</span>
+          </div>
+          <pre class="ds-tree" id="ds-layout-tree">project-root/
+├── src/                    # 📦 核心源码
+│   ├── components/         # 🧩 UI 组件
+│   ├── services/           # 🔌 业务逻辑层
+│   ├── utils/              # 🔧 工具函数
+│   └── index.ts            # 🚀 入口文件
+├── tests/                  # 🧪 测试文件
+├── docs/                   # 📖 文档
+├── .github/                # 🔄 CI/CD 配置
+├── package.json            # 📋 依赖管理
+└── README.md               # 📝 项目说明</pre>
+          <div class="ds-note" id="ds-layout-entry">💡 入口建议：启动入口 `src/index.ts` · 入门文档 `README.md` · 配置文件 `package.json`（均经真实读取核实，未读取到的目录标为「待进一步查看」）。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="workflow">
+      <h2>🧭 4 步只读项目制图流程</h2>
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>跨平台只读扫描根目录</h3>
+            <p>按优先级选用扫描方式：Agent 原生文件列举 → Git 仓库 <code>git -c core.quotepath=false ls-files</code> → 无 Git 的 Windows 用 PowerShell <code>Get-ChildItem -Depth 3</code> → 无 Git 的 macOS/Linux 用 <code>ls -la</code> 或 <code>find . -maxdepth 3</code>。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>读取真实清单文件，拒绝凭目录名瞎猜</h3>
+            <p>读取实际存在的 <code>package.json</code>、<code>pyproject.toml</code>、<code>Cargo.toml</code>、<code>go.mod</code>、<code>pom.xml</code> 与 <code>README.md</code>，核实真实编程语言、Web 框架、包管理器和 Monorepo 工作区边界。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>抽样阅读核心目录入口文件</h3>
+            <p>进入核心业务目录抽样查看入口文件与典型模块，用一句自然简体中文概括该目录职责；没实际读到的目录绝不编造用途，明确标出「待进一步查看」。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>交付 4 段式结构地图</h3>
+            <p>固定输出「🔧 项目信息」「🌳 带中文注释的 ASCII 目录树」「🗺️ 模块职责对照表」「💡 启动/文档/配置入口建议」，让你 30 秒找到该从哪个文件开始读。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="rules">
+      <h2>🛡️ 自动过滤清单与只读安全底线</h2>
+      <div class="grid-2">
+        <div class="callout callout-green">
+          <div class="callout-title">🧹 自动跳过的噪声目录</div>
+          <p>扫描阶段自动过滤 <code>node_modules</code>、<code>.git</code>、<code>vendor</code>、<code>__pycache__</code>、<code>dist</code>、<code>build</code>、<code>.next</code>、<code>target</code> 等依赖与编译产物目录，防止目录树被数万个缓存文件撑爆上下文。</p>
+        </div>
+        <div class="callout callout-cyan">
+          <div class="callout-title">🔒 只读与实事求是原则</div>
+          <p>默认严格只读，绝不修改、创建或删除仓库里的任何文件；默认最多展开 3 层深度，Monorepo 按 <code>packages/</code> 或 <code>apps/</code> 分区展示；未实际读取的目录绝不脑补功能。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="boundaries">
+      <h2>🧩 与其他文档/探索技能的分工边界</h2>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>你的需求场景</th>
+              <th>推荐使用的技能</th>
+              <th>分工原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>“带我看看项目结构 / 这个仓库怎么组织的 / 画目录树”</td>
+              <td><strong><code>ds-mapper</code></strong></td>
+              <td>轻量只读结构导览，30 秒看清目录树、模块职责与启动入口</td>
+            </tr>
+            <tr>
+              <td>需要深入生成 <code>docs/</code> 架构设计、API 手册或运维配置文档</td>
+              <td><a href="/skills/zh-docgen/"><code>zh-docgen</code></a></td>
+              <td>面向长期维护的技术文档编写与增量更新，附 Mermaid 图与参数表</td>
+            </tr>
+            <tr>
+              <td>需要撰写或重写开源仓库展示首页 <code>README.md</code></td>
+              <td><a href="/skills/zh-readme/"><code>zh-readme</code></a></td>
+              <td>面向外部开发者的项目门面、安装命令与卖点说明</td>
+            </tr>
+            <tr>
+              <td>摸清结构后想盘点老模块坏味道与拆分路线图</td>
+              <td><a href="/skills/refactor-advisor/"><code>refactor-advisor</code></a></td>
+              <td>基于真实复杂度与测试护栏制定 P1–P3 分阶段重构方案</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种安装方式（零外部依赖，复制即装）</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装插件包</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 ds-mapper</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill ds-mapper</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\ds-mapper" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\ds-mapper\*" "$HOME\.claude\skills\ds-mapper\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/ds-mapper
+cp -r claude-code-skills-zh/skills/ds-mapper/* ~/.claude/skills/ds-mapper/</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>为什么 Windows 下不能用常见的 find . -maxdepth 3？</h3>
+          <p>Windows 系统自带的 <code>find.exe</code> 是查找文本字符串的命令行工具，不支持 <code>-maxdepth</code> 参数，直接运行会立刻报错。<code>ds-mapper</code> 内置跨平台策略，在无 Git 的 Windows 环境下改用 PowerShell <code>Get-ChildItem -Depth 3</code>。</p>
+        </div>
+        <div class="faq-item">
+          <h3>仓库包含大量中文文件名或中文子目录时，Git 输出会乱码吗？</h3>
+          <p>不会。使用 Git 遍历时显式加上 <code>-c core.quotepath=false</code>，直接展示清晰中文路径而非八进制转义字符。</p>
+        </div>
+        <div class="faq-item">
+          <h3>支持非 Git 的普通本地源码压缩包目录吗？</h3>
+          <p>支持。无 Git 仓库时会自动回退到 Agent 原生文件列举，或按操作系统分别采用 PowerShell <code>Get-ChildItem -Depth 3</code>（Windows）与 <code>ls -la</code> / <code>find . -maxdepth 3</code>（macOS/Linux）。</p>
+        </div>
+        <div class="faq-item">
+          <h3>可以把生成的结构地图进一步扩展成正式的 docs/ 文档吗？</h3>
+          <p>非常适合串联使用：先用 <code>ds-mapper</code> 30 秒摸清全局目录边界与入口文件，再用 <a href="/skills/zh-docgen/"><code>zh-docgen</code></a> 针对重点模块生成详细的架构设计与 API 手册。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 同类原创技能站内互链</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/zh-docgen/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 技术文档</span>
+            <h3>zh-docgen</h3>
+            <p>看懂目录后，进一步从源码与配置提取证据生成 docs/ 架构与 API 手册。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/zh-readme/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 开源首页</span>
+            <h3>zh-readme</h3>
+            <p>把项目结构与真实安装步骤整理成面向开源用户的中文 README.md。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/refactor-advisor/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 重构顾问</span>
+            <h3>refactor-advisor</h3>
+            <p>理清模块分布后，只读盘点存量坏味道并制定 P1–P3 小步重构路线图。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>ds-mapper</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/ds-mapper/SKILL.md" target="_blank" rel="noopener noreferrer">skills/ds-mapper/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var scans = {
+    native: {
+      title: '方式 1：Agent 原生文件列举工具（跨平台零 Shell 依赖）',
+      badge: '优先级 #1',
+      cmd: '# 不直接依赖操作系统 Shell 差异\n使用当前 Agent 原生目录列举 / 文件检索能力\n-> 自动尊重 .gitignore 并跳过构建产物目录',
+      desc: '适用范围：Claude Code、Codex、Cursor、Gemini CLI 均内置文件列表能力，无需担心 PowerShell / Bash 语法差异或中文路径编码转义，是 ds-mapper 规定的第一优先策略。',
+      pitfall: '⚠️ 关键避坑：若退回 Shell 执行，绝不在 Windows 下运行 Unix 的 `find . -maxdepth 3`——Windows 自带 `find.exe` 是文本搜索工具，会直接报错。'
+    },
+    git: {
+      title: '方式 2：Git 仓库受控文件遍历（防中文路径八进制转义）',
+      badge: 'Git 仓库推荐',
+      cmd: 'git -c core.quotepath=false ls-files',
+      desc: '适用范围：标准 Git 仓库，直接拿到受版本控制的干净文件清单，天然排除未跟踪的 node_modules、dist、.next、target 与本地临时产物。',
+      pitfall: '✅ Windows 中文路径必加 `-c core.quotepath=false`：否则中文目录名会被转义成 `\\346\\226\\207\\346\\241\\243`，导致模型和开发者都难以直接阅读。'
+    },
+    ps: {
+      title: '方式 3：无 Git 的 Windows 环境（PowerShell 原生深度遍历）',
+      badge: 'Windows 专用',
+      cmd: 'Get-ChildItem -Depth 3',
+      desc: '适用范围：解压自压缩包、没有 .git 目录的 Windows 本地项目；使用 PowerShell 原生命令限制 3 层深度，并手动排除 node_modules / __pycache__ / build 等目录。',
+      pitfall: '🚫 为什么不用 `find . -maxdepth 3`：Windows 下的 `find.exe` 用于在文件里搜索文本行，传入 `-maxdepth` 会直接返回参数格式无效错误。'
+    },
+    unix: {
+      title: '方式 4：无 Git 的 macOS / Linux 环境（POSIX 标准遍历）',
+      badge: 'macOS / Linux',
+      cmd: 'ls -la\n# 或限制 3 层深度并排除产物目录\nfind . -maxdepth 3',
+      desc: '适用范围：无 Git 初始化的 macOS / Linux 目录；结合 3 层深度限制与常见产物目录跳过规则，快速摸清顶层模块与核心子目录。',
+      pitfall: '💡 提示：输出前仍需过滤 `.git`、`node_modules`、`vendor`、`__pycache__`、`dist`、`build`、`target`，避免输出过长浪费上下文。'
+    }
+  };
+
+  var layouts = {
+    standard: {
+      title: '标准单仓 3 层目录树（已自动过滤依赖与产物）',
+      badge: 'Max Depth = 3',
+      tree: 'project-root/\n├── src/                    # 📦 核心源码\n│   ├── components/         # 🧩 UI 组件\n│   ├── services/           # 🔌 业务逻辑层\n│   ├── utils/              # 🔧 工具函数\n│   └── index.ts            # 🚀 入口文件\n├── tests/                  # 🧪 测试文件\n├── docs/                   # 📖 文档\n├── .github/                # 🔄 CI/CD 配置\n├── package.json            # 📋 依赖管理\n└── README.md               # 📝 项目说明',
+      entry: '💡 入口建议：启动入口 `src/index.ts` · 入门文档 `README.md` · 配置文件 `package.json`（均经真实读取核实，未读取到的目录标为「待进一步查看」）。'
+    },
+    monorepo: {
+      title: 'Monorepo 多包分区视图（按 apps/ 与 packages/ 收敛）',
+      badge: 'Monorepo 分区',
+      tree: 'workspace-root/\n├── apps/                   # 🖥️ 可部署应用区\n│   ├── web/                # 🌐 前端站点（Next.js）\n│   └── api/                # 🔌 后端服务（Fastify）\n├── packages/               # 📦 共享子包区\n│   ├── shared-types/       # 🧩 公共类型与 Schema\n│   └── ui-kit/             # 🎨 基础组件库\n├── pnpm-workspace.yaml     # ⚙️ Workspace 分区清单\n└── package.json            # 📋 根脚本与工具链',
+      entry: '💡 入口建议：先读 `pnpm-workspace.yaml` 确认子包边界，再分别进入 `apps/web/src` 与 `apps/api/src` 查看入口，避免单次展开全部子包导致刷屏。'
+    }
+  };
+
+  var scanBtns = document.querySelectorAll('.ds-btn[data-scan]');
+  scanBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-scan');
+      var item = scans[key];
+      if (!item) return;
+      scanBtns.forEach(function (b) {
+        var active = b === btn;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      document.getElementById('ds-scan-title').textContent = item.title;
+      document.getElementById('ds-scan-badge').textContent = item.badge;
+      document.getElementById('ds-scan-cmd').textContent = item.cmd;
+      document.getElementById('ds-scan-desc').textContent = item.desc;
+      document.getElementById('ds-scan-pitfall').textContent = item.pitfall;
+    });
+  });
+
+  var layoutBtns = document.querySelectorAll('.ds-btn[data-layout]');
+  layoutBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-layout');
+      var item = layouts[key];
+      if (!item) return;
+      layoutBtns.forEach(function (b) {
+        var active = b === btn;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      document.getElementById('ds-layout-title').textContent = item.title;
+      document.getElementById('ds-layout-badge').textContent = item.badge;
+      document.getElementById('ds-layout-tree').textContent = item.tree;
+      document.getElementById('ds-layout-entry').textContent = item.entry;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve(); else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

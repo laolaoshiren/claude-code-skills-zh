@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>security-audit：源码级只读安全审计与威胁面排查技能 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：按威胁面只读排查注入、越权、硬编码密钥、XSS、SSRF 与敏感信息泄露，区分已确认与疑似置信度、严守凭据脱敏零回显，并与 dep-auditor 清晰分工。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="security-audit">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/security-audit/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="security-audit：源码级只读安全审计与威胁面排查技能">
+<meta property="og:description" content="默认严格只读不发攻击载荷、按 Source → Sink 数据流区分可达性置信度、凭据仅报文件行号绝不回显明文。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/security-audit/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="security-audit 源码级只读安全审计技能">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="security-audit：源码级只读安全审计与威胁面排查技能">
+<meta name="twitter:description" content="按高/中/低危分层排查源码安全漏洞，区分已确认与疑似置信度，不猜依赖 CVE、不改源码、不回显真实密钥。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：威胁面红线审计（警示绯红 + 琥珀护栏） */
+  :root {
+    --accent: #ef4444;
+    --accent2: #fb923c;
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(239, 68, 68, 0.17) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(251, 146, 60, 0.11) 0%, transparent 50%);
+  }
+  .detail-hero h1 .accent-text {
+    background: linear-gradient(135deg, #f87171, #fb923c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .audit-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin: 16px 0;
+  }
+  @media (max-width: 820px) {
+    .audit-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 520px) {
+    .audit-tabs { grid-template-columns: 1fr; }
+  }
+  .audit-tab {
+    text-align: left;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(15, 23, 42, 0.72);
+    border-radius: 12px;
+    padding: 13px 15px;
+    color: #e2e8f0;
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+  }
+  .audit-tab:hover {
+    border-color: rgba(248, 113, 113, 0.65);
+    transform: translateY(-1px);
+  }
+  .audit-tab.is-active {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.14);
+  }
+  .audit-tab strong {
+    display: block;
+    font-size: 0.94rem;
+    color: #f8fafc;
+    margin-bottom: 4px;
+  }
+  .audit-tab span {
+    display: block;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    line-height: 1.45;
+  }
+  .audit-panel {
+    border: 1px solid rgba(239, 68, 68, 0.36);
+    border-radius: 14px;
+    background: rgba(12, 16, 28, 0.92);
+    padding: 20px 22px;
+  }
+  .audit-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .audit-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 11px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .audit-chip.is-sev {
+    background: rgba(239, 68, 68, 0.18);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.42);
+  }
+  .audit-chip.is-conf {
+    background: rgba(251, 146, 60, 0.16);
+    color: #fdba74;
+    border: 1px solid rgba(251, 146, 60, 0.4);
+  }
+  .audit-chip.is-ro {
+    background: rgba(0, 206, 201, 0.13);
+    color: #5eead4;
+    border: 1px solid rgba(0, 206, 201, 0.35);
+  }
+  .audit-panel h3 {
+    margin: 0 0 8px;
+    font-size: 1.08rem;
+    color: #f8fafc;
+  }
+  .audit-flow {
+    font-family: var(--mono);
+    font-size: 0.84rem;
+    color: #fecaca;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px dashed rgba(248, 113, 113, 0.38);
+    border-radius: 10px;
+    padding: 10px 13px;
+    margin: 10px 0 14px;
+    line-height: 1.6;
+  }
+  .audit-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+  }
+  @media (max-width: 720px) {
+    .audit-cols { grid-template-columns: 1fr; }
+  }
+  .audit-sub {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .audit-sub h4 {
+    font-size: 0.86rem;
+    color: #fdba74;
+    margin-bottom: 6px;
+  }
+  .audit-sub ul {
+    margin: 0;
+    padding-left: 18px;
+    color: #cbd5e1;
+    font-size: 0.87rem;
+    line-height: 1.72;
+  }
+  .audit-fix-box {
+    margin-top: 12px;
+    background: #090b12;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: #dbe4ff;
+    white-space: pre-wrap;
+    line-height: 1.65;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "security-audit",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/security-audit/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/security-audit",
+  "description": "源码级代码安全审计助手，按威胁面只读排查注入、越权、硬编码密钥、XSS、SSRF 与敏感信息泄露，按 Source 到 Sink 数据流区分已确认与疑似置信度，不改源码、不回显真实密钥。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "security-audit", "item": "https://claude-skills.bt199.com/skills/security-audit/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "security-audit 和 dep-auditor 的职责分工是什么？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "security-audit 专注业务源码与配置的静态安全审计（注入、越权、硬编码密钥、XSS、SSRF、反序列化等），严禁凭版本号猜测第三方包 CVE；package.json、lockfile、requirements.txt、go.mod、Cargo.lock 等第三方依赖漏洞与许可证事实核验应交给 dep-auditor。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "执行 security-audit 时会自动修改业务代码或向服务发测试攻击包吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。security-audit 默认严格只读，只分析源码与配置，绝不擅自改写文件，也不向本地或线上服务发送攻击载荷、端口扫描或验证性越权请求；仅在用户明确要求修复并确认范围后才修改源码并复验测试。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "如果扫描出代码里写死了 API Key 或数据库密码，报告会怎么处理？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "报告严禁回显任何真实密钥、Token、密码或私钥明文，只记录脱敏后的「文件:行号」与变量名，并在修复优先级中提醒用户立即撤销并轮换已泄露的凭据，而不是仅删除代码行了事。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "为什么报告要区分「已确认（高置信）」和「疑似（待复核）」？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "静态正则搜索很容易把已参数化或由上游网关拦截的代码误报为高危漏洞。security-audit 要求沿着输入源（Source）到校验过滤再到危险汇聚点（Sink）追踪数据流：路径完整且无有效拦截才标「已确认」，上游中间件或运行时配置不在本次读取范围内时诚实标「疑似（待复核）」。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">security-audit</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-purple">🔒 源码级静态安全审计</span>
+        <span class="pill pill-amber">🎯 数据流可达性分级</span>
+        <span class="pill pill-cyan">👁️ 默认只读 · 凭据零回显</span>
+      </div>
+      <h1><span class="accent-text">security-audit</span>：按威胁面只读排查源码安全漏洞</h1>
+      <p class="hero-lead">面向代码上线前加固、敏感模块体检与接口权限复核的原创中文安全审计技能。围绕 <strong>Source → 校验/过滤 → Sink</strong> 追踪数据流，区分「已确认」与「疑似」置信度，<strong>严守默认只读、不回显真实密钥原文、不提供武器化 exploit、不跨界猜测依赖 CVE</strong> 四条底线。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">源码静态审计与加固方案</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">安全护栏</div>
+          <div class="metric-value">严格只读 + 凭据脱敏 + 零 Exploit</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/security-audit/SKILL.md" target="_blank" rel="noopener noreferrer">skills/security-audit/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/security-audit/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#vuln-explorer" class="btn btn-cyan">🛡️ 体验高危维度排查器</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#vuln-explorer">交互式高危漏洞排查器</a>
+      <a href="#boundaries">触发边界与技能分工</a>
+      <a href="#layers">高/中/低危分层清单</a>
+      <a href="#install">4 种零报错安装命令</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="vuln-explorer">
+      <h2>🛡️ 交互式高危漏洞维度排查器</h2>
+      <p class="section-intro">切换 4 类高频安全维度，查看 <code>security-audit</code> 如何基于真实数据流判定可达性置信度、守住只读边界并输出脱敏修复建议：</p>
+
+      <div class="audit-tabs" role="tablist" aria-label="高危漏洞排查维度">
+        <button type="button" class="audit-tab is-active" data-dim="injection" aria-pressed="true">
+          <strong>💉 注入类漏洞</strong>
+          <span>SQL / NoSQL / 命令注入与路径遍历</span>
+        </button>
+        <button type="button" class="audit-tab" data-dim="auth" aria-pressed="false">
+          <strong>🪪 认证与越权</strong>
+          <span>JWT 签名校验缺失、IDOR 水平/垂直越权</span>
+        </button>
+        <button type="button" class="audit-tab" data-dim="secret" aria-pressed="false">
+          <strong>🔑 硬编码密钥泄露</strong>
+          <span>API Key / 私钥 / 口令与轮换提醒</span>
+        </button>
+        <button type="button" class="audit-tab" data-dim="xss" aria-pressed="false">
+          <strong>🌐 XSS 与 SSRF</strong>
+          <span>DOM 未转义输出、内网 IP 与重定向校验</span>
+        </button>
+      </div>
+
+      <div class="audit-panel" aria-live="polite">
+        <div class="audit-meta-row">
+          <span class="audit-chip is-sev" id="aud-sev">🔴 高危 · 优先核实数据流</span>
+          <span class="audit-chip is-conf" id="aud-conf">置信度规则：区分已确认与疑似</span>
+          <span class="audit-chip is-ro" id="aud-ro">只读边界：绝不发送注入载荷</span>
+        </div>
+        <h3 id="aud-title">SQL / NoSQL / 命令注入与路径遍历核验</h3>
+        <div class="audit-flow" id="aud-flow">数据流核验链：外部输入（req.query / body / 文件名） → 是否经过参数化或白名单规范化 → SQL 拼接 / shell=true / 任意路径读写</div>
+        <div class="audit-cols">
+          <div class="audit-sub">
+            <h4>🎯 可达性置信度判定</h4>
+            <ul id="aud-conf-list">
+              <li>已确认（高置信）：不可信输入未经参数化直接拼入 SQL 或传入 shell=true 命令执行点</li>
+              <li>疑似（待复核）：存在拼接写法，但上游参数来源或网关校验逻辑未纳入当前审计目录</li>
+              <li>排除误报：已采用预编译占位符或严格白名单映射的语句，不虚报高危</li>
+            </ul>
+          </div>
+          <div class="audit-sub">
+            <h4>🚧 只读边界与跨技能分工</h4>
+            <ul id="aud-bound-list">
+              <li>只读分析源码，绝不构造真实 SQL/Shell 攻击载荷打本地或线上接口</li>
+              <li>不提供武器化利用脚本（exploit），仅给出最小可验证修复代码</li>
+              <li>若疑点来自第三方 ORM 或驱动版本已知 CVE，移交 dep-auditor 查 lockfile</li>
+            </ul>
+          </div>
+        </div>
+        <div class="audit-fix-box" id="aud-fix">// 修复前（脱敏示意）：直接拼接用户输入
+db.query("SELECT id, name FROM users WHERE email = '" + email + "'");
+
+// 修复后：统一改用参数化查询
+db.query("SELECT id, name FROM users WHERE email = ?", [email]);</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="boundaries">
+      <h2>🧭 触发边界与安全技能分工</h2>
+      <p class="section-intro">避免一个 Skill 乱揽活导致“凭记忆编造 CVE”或“把代码风格当高危漏洞”，<code>security-audit</code> 与同仓其他技能职责切分明确：</p>
+      <div class="grid-2">
+        <div class="info-box is-good">
+          <h3>✅ 交给 security-audit</h3>
+          <ul class="prose-list">
+            <li>指定目录、业务模块、HTTP API / Webhook / 文件上传接口的<strong>源码级静态安全审计</strong>；</li>
+            <li>排查硬编码密钥、SQL/命令注入、JWT/IDOR 越权、不安全反序列化、XSS/CSRF/SSRF 与敏感日志泄露；</li>
+            <li>生成含 <code>文件:行号</code>、置信度评级、潜在影响和脱敏最小修复方案的中文报告。</li>
+          </ul>
+        </div>
+        <div class="info-box is-bad">
+          <h3>🚫 不适用场景（交由对应技能处理）</h3>
+          <ul class="prose-list">
+            <li><code>package.json</code> / <code>lockfile</code> / <code>requirements.txt</code> / <code>go.mod</code> / <code>Cargo.lock</code> 等第三方依赖 CVE 与许可证核验 → 请转 <a href="/skills/dep-auditor/">dep-auditor</a>（本技能严禁凭版本号猜测 CVE）；</li>
+            <li>梳理 <code>.env*</code> 变量清单与 <code>.gitignore</code> / 客户端前缀泄露 → 请转 <a href="/skills/env-manager/">env-manager</a>；</li>
+            <li>常规功能 Bug 与代码可读性审查 → 请转 <a href="/skills/zh-code-reviewer/">zh-code-reviewer</a>；</li>
+            <li>针对线上或外部目标的主动渗透测试、端口扫描或漏洞利用 → 严禁执行。</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout callout-red">
+        <div class="callout-title">⚠️ 凭据零回显与密钥轮换红线</div>
+        <p>当静态扫描检出硬编码 API Key、数据库密码或私钥时，报告中<strong>只输出脱敏后的 <code>文件:行号</code> 与变量名</strong>，绝不把真实凭据原文回显到报告或聊天窗口；同时明确提醒立即撤销并轮换凭据，而非仅删除代码行。</p>
+      </div>
+    </section>
+
+    <section class="section-card" id="layers">
+      <h2>📋 三层威胁面排查清单与报告结构</h2>
+      <div class="grid-3">
+        <div class="info-box">
+          <h3>🔴 高危（优先核实可达性）</h3>
+          <ul class="prose-list">
+            <li>硬编码密钥 / API Key / 私钥 / 数据库密码</li>
+            <li>SQL / NoSQL / LDAP 注入与命令注入（<code>shell: true</code> / <code>os.system</code>）</li>
+            <li>路径遍历与任意文件读写（未校验基目录前缀）</li>
+            <li>不安全反序列化（<code>pickle.loads</code>、不安全 YAML <code>load</code>）</li>
+            <li>认证授权缺失（JWT 签名/<code>alg: none</code>、IDOR 越权）与 SSRF</li>
+          </ul>
+        </div>
+        <div class="info-box">
+          <h3>🟡 中危（重点防滥用）</h3>
+          <ul class="prose-list">
+            <li>XSS（未转义用户输入直出 DOM 原始 HTML / React 危险原始 HTML 注入属性 / 模板原样输出）</li>
+            <li>CSRF 防护缺失或 Cookie 漏配 <code>HttpOnly</code> / <code>Secure</code> / <code>SameSite</code></li>
+            <li>密码学缺陷（弱哈希存口令、可预测随机数作验证码/令牌）</li>
+            <li>敏感信息写入日志、异常响应或前端 Bundle</li>
+            <li>过宽 CORS（<code>*</code> 配 <code>Credentials</code>）或缺失限流</li>
+          </ul>
+        </div>
+        <div class="info-box">
+          <h3>🟢 低危与加固建议</h3>
+          <ul class="prose-list">
+            <li>缺少安全响应头（CSP、HSTS、<code>X-Content-Type-Options</code>）</li>
+            <li>报错堆栈暴露内部物理路径或框架版本</li>
+            <li>临时文件权限过宽或未强制 HTTPS</li>
+            <li>显式列出「未覆盖范围」（如运行时网关配置、第三方依赖建议交 <code>dep-auditor</code>）</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种零报错安装方式</h2>
+      <p class="section-intro">支持 Claude Code 2.1+ 插件市场一键安装、单技能 CLI 安装，以及 Windows PowerShell 5.1+ / macOS / Linux 手动安装：</p>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装全部原创技能</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 security-audit</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill security-audit</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\security-audit" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\security-audit\*" "$HOME\.claude\skills\security-audit\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/security-audit
+cp -r claude-code-skills-zh/skills/security-audit/* ~/.claude/skills/security-audit/</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-cyan">
+        <div class="callout-title">💡 推荐触发指令示例</div>
+        <p>安装后可直接在 Claude Code 中输入：“请对 <code>src/api/</code> 做一次只读安全审计，重点查 SQL 注入、IDOR 越权和日志脱敏，先出中文审计报告，不要改文件。”</p>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>security-audit 和 dep-auditor 的职责分工是什么？</h3>
+          <p><code>security-audit</code> 专注业务源码与配置的静态安全审计（注入、越权、硬编码密钥、XSS、SSRF、反序列化等），严禁凭版本号猜测第三方包 CVE；<code>package.json</code>、<code>lockfile</code>、<code>requirements.txt</code>、<code>go.mod</code>、<code>Cargo.lock</code> 等第三方依赖漏洞与许可证事实核验应交给 <a href="/skills/dep-auditor/">dep-auditor</a>。</p>
+        </div>
+        <div class="faq-item">
+          <h3>执行 security-audit 时会自动修改业务代码或向服务发测试攻击包吗？</h3>
+          <p>不会。<code>security-audit</code> 默认严格只读，只分析源码与配置，绝不擅自改写文件，也不向本地或线上服务发送攻击载荷、端口扫描或验证性越权请求；仅在用户明确要求修复并确认范围后才修改源码并复验测试。</p>
+        </div>
+        <div class="faq-item">
+          <h3>如果扫描出代码里写死了 API Key 或数据库密码，报告会怎么处理？</h3>
+          <p>报告严禁回显任何真实密钥、Token、密码或私钥明文，只记录脱敏后的「文件:行号」与变量名，并在修复优先级中提醒用户立即撤销并轮换已泄露的凭据，而不是仅删除代码行了事。</p>
+        </div>
+        <div class="faq-item">
+          <h3>为什么报告要区分「已确认（高置信）」和「疑似（待复核）」？</h3>
+          <p>静态正则搜索很容易把已参数化或由上游网关拦截的代码误报为高危漏洞。<code>security-audit</code> 要求沿着输入源（Source）到校验过滤再到危险汇聚点（Sink）追踪数据流：路径完整且无有效拦截才标「已确认」，上游中间件或运行时配置不在本次读取范围内时诚实标「疑似（待复核）」。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关安全与审查原创技能</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/dep-auditor/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 依赖审计</span>
+            <h3>dep-auditor</h3>
+            <p>基于真实 lockfile 与官方 advisory 只读审计 7 大生态依赖漏洞、版本健康度与许可证事实。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/env-manager/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 环境变量</span>
+            <h3>env-manager</h3>
+            <p>只读扫描 .env* 与源码引用、拦截客户端公开前缀泄露，生成脱敏 .env.example 与校验模板。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/zh-code-reviewer/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 代码审查</span>
+            <h3>zh-code-reviewer</h3>
+            <p>基于 git diff 与调用链的分级中文只读代码审查，合入 PR 前先查逻辑与回归缺陷。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>security-audit</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/security-audit/SKILL.md" target="_blank" rel="noopener noreferrer">skills/security-audit/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var dims = {
+    injection: {
+      sev: '🔴 高危 · 优先核实数据流',
+      conf: '置信度规则：区分已确认与疑似',
+      ro: '只读边界：绝不发送注入载荷',
+      title: 'SQL / NoSQL / 命令注入与路径遍历核验',
+      flow: '数据流核验链：外部输入（req.query / body / 文件名） → 是否经过参数化或白名单规范化 → SQL 拼接 / shell=true / 任意路径读写',
+      confItems: [
+        '已确认（高置信）：不可信输入未经参数化直接拼入 SQL 或传入 shell=true 命令执行点',
+        '疑似（待复核）：存在拼接写法，但上游参数来源或网关校验逻辑未纳入当前审计目录',
+        '排除误报：已采用预编译占位符或严格白名单映射的语句，不虚报高危'
+      ],
+      boundItems: [
+        '只读分析源码，绝不构造真实 SQL/Shell 攻击载荷打本地或线上接口',
+        '不提供武器化利用脚本（exploit），仅给出最小可验证修复代码',
+        '若疑点来自第三方 ORM 或驱动版本已知 CVE，移交 dep-auditor 查 lockfile'
+      ],
+      fix: '// 修复前（脱敏示意）：直接拼接用户输入\ndb.query("SELECT id, name FROM users WHERE email = \'" + email + "\'");\n\n// 修复后：统一改用参数化查询\ndb.query("SELECT id, name FROM users WHERE email = ?", [email]);'
+    },
+    auth: {
+      sev: '🔴 高危 · 身份与资源归属校验',
+      conf: '置信度规则：追踪鉴权中间件与归属过滤',
+      ro: '只读边界：不发越权探测请求',
+      title: '认证缺失、JWT 签名缺陷与 IDOR 水平/垂直越权',
+      flow: '数据流核验链：路由入口 → 鉴权中间件（JWT 签名/过期/alg） → 业务查询是否绑定当前登录主体 ownerId',
+      confItems: [
+        '已确认（高置信）：受保护接口缺失鉴权中间件，或仅凭客户端传入 orderId 直接查改他人记录',
+        '疑似（待复核）：Handler 内未见权限判断，但可能依赖外部 API 网关或独立鉴权切面拦截',
+        '重点核查：JWT 是否允许 alg: none、是否只 decode 未 verify 签名与过期时间'
+      ],
+      boundItems: [
+        '不向测试或生产环境重放伪造 Token 或他人资源 ID 做主动越权验证',
+        '修复方案聚焦在查询条件强制绑定 req.user.id 与角色策略白名单',
+        '若涉及认证库版本漏洞（如 jsonwebtoken 旧版 CVE），提示切换 dep-auditor'
+      ],
+      fix: '// 修复前（脱敏示意）：仅按路径参数查询，存在 IDOR 越权\nconst order = await Order.findById(req.params.orderId);\n\n// 修复后：强制叠加当前用户归属约束\nconst order = await Order.findOne({ _id: req.params.orderId, userId: req.user.id });'
+    },
+    secret: {
+      sev: '🔴 高危 · 凭据暴露与轮换止损',
+      conf: '置信度规则：区分真实凭据与示例占位符',
+      ro: '脱敏底线：严禁回显真实密钥原文',
+      title: '硬编码 API Key / 私钥 / 数据库口令与敏感日志泄露',
+      flow: '数据流核验链：源码/配置字面量 → 是否属于真实密钥格式（非占位符） → Git 历史 / 日志 / 客户端 Bundle 暴露面',
+      confItems: [
+        '已确认（高置信）：源码或提交配置中出现高熵密钥、私钥块或带口令的连接串字面量',
+        '疑似（待复核）：形似凭据的测试常量，需团队确认是否对应真实外部账号或仅本地假数据',
+        '联动检查：同步排查异常日志、响应体与前端打包产物是否透出 Token / 口令'
+      ],
+      boundItems: [
+        '报告中仅记录「文件:行号」与变量名，绝不打印真实密钥明文（零回显）',
+        '修复优先级第一项必须提醒立即撤销并轮换已泄露凭据，不能只删源码行',
+        '后续 .env* 梳理与 .gitignore 核查建议配合 env-manager 完成'
+      ],
+      fix: '// 报告记录格式（严格脱敏）\n// [src/config/pay.ts:18] 硬编码第三方密钥（变量名：PAY_API_KEY）\n\n// 修复后：改由环境变量注入，并立即在控制台轮换旧密钥\nconst payKey = process.env.PAY_API_KEY;'
+    },
+    xss: {
+      sev: '🔴/🟡 高中危 · 前端注入与内网探测',
+      conf: '置信度规则：核查转义链路与出口地址校验',
+      ro: '只读边界：不发起内网 SSRF 探测',
+      title: 'XSS 未转义输出与 SSRF 服务端请求伪造排查',
+      flow: '数据流核验链：用户可控字符串/URL → 是否转义或校验协议+解析后内网 IP+重定向 → DOM 原始 HTML 注入点 / 服务端 HTTP 客户端',
+      confItems: [
+        '已确认（高置信）：用户输入未经净化直接写入原始 HTML DOM 注入点或服务端直接请求任意外链 URL',
+        '疑似（待复核）：存在富文本渲染或 Webhook 回调，但净化库配置或出网防火墙策略在仓库外',
+        'SSRF 必查项：不仅校验域名字符串，还需校验 DNS 解析后的内网/环回 IP 与 30x 重定向目标'
+      ],
+      boundItems: [
+        '默认只读分析源码与模板，不向云元数据地址（169.254.169.254）发起验证请求',
+        '前端修复优先改用纯文本节点渲染（textContent）或可信白名单净化器',
+        '若需核查模板引擎或 HTTP 客户端库历史 CVE，转交 dep-auditor 依据 lockfile 核验'
+      ],
+      fix: '// 修复前（脱敏示意）：直接请求用户传入回调 URL\nconst resp = await fetch(req.body.webhookUrl);\n\n// 修复后：校验协议为 https、域名命中白名单，并禁用未校验的自动重定向\nassertSafePublicHttpsUrl(req.body.webhookUrl);\nconst resp = await fetch(req.body.webhookUrl, { redirect: "error" });'
+    }
+  };
+
+  function replaceList(id, items) {
+    var ul = document.getElementById(id);
+    if (!ul) return;
+    while (ul.firstChild) ul.removeChild(ul.firstChild);
+    items.forEach(function (txt) {
+      var li = document.createElement('li');
+      li.textContent = txt;
+      ul.appendChild(li);
+    });
+  }
+
+  var tabs = document.querySelectorAll('.audit-tab[data-dim]');
+  tabs.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var data = dims[btn.getAttribute('data-dim')];
+      if (!data) return;
+      tabs.forEach(function (b) {
+        var active = b === btn;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      document.getElementById('aud-sev').textContent = data.sev;
+      document.getElementById('aud-conf').textContent = data.conf;
+      document.getElementById('aud-ro').textContent = data.ro;
+      document.getElementById('aud-title').textContent = data.title;
+      document.getElementById('aud-flow').textContent = data.flow;
+      replaceList('aud-conf-list', data.confItems);
+      replaceList('aud-bound-list', data.boundItems);
+      document.getElementById('aud-fix').textContent = data.fix;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve(); else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

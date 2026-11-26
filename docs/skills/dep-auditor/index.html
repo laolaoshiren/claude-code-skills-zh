@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dep-auditor：多生态 Lockfile 依赖漏洞、版本健康度与许可证事实审计 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：只读审计 Node.js、Python、Go、Rust、JVM、Ruby 项目依赖漏洞、版本健康度与许可证事实。以真实 lockfile 与 advisory 为据，禁裸 npx，只陈述许可证事实不作法律结论。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="dep-auditor">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/dep-auditor/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="dep-auditor：多生态 Lockfile 依赖漏洞与许可证事实审计技能">
+<meta property="og:description" content="默认只读不改锁文件、绝不裸跑 npx 或擅自装包、区分依赖树存在与程序可达、许可证部分仅陈述事实不作法律结论。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/dep-auditor/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="dep-auditor 多生态依赖安全审计技能">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="dep-auditor：多生态 Lockfile 依赖漏洞与许可证事实审计技能">
+<meta name="twitter:description" content="覆盖 npm/pnpm/Yarn/Python/Go/Rust/JVM/Ruby，以真实 lockfile 和官方 advisory 输出中文审计报告，禁裸 npx、不猜 CVE。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：供应链体检与合规证据（翡翠绿 + 清澈青） */
+  :root {
+    --accent: #10b981;
+    --accent2: #06b6d4;
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(16, 185, 129, 0.17) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(6, 182, 212, 0.12) 0%, transparent 50%);
+  }
+  .detail-hero h1 .accent-text {
+    background: linear-gradient(135deg, #34d399, #22d3ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .dep-switcher {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  @media (max-width: 740px) {
+    .dep-switcher { grid-template-columns: 1fr; }
+  }
+  .dep-tab {
+    text-align: left;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(15, 23, 42, 0.72);
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: #e2e8f0;
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+  }
+  .dep-tab:hover {
+    border-color: rgba(52, 211, 153, 0.65);
+    transform: translateY(-1px);
+  }
+  .dep-tab.is-active {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.15);
+  }
+  .dep-tab strong {
+    display: block;
+    font-size: 0.96rem;
+    color: #f8fafc;
+    margin-bottom: 4px;
+  }
+  .dep-tab span {
+    display: block;
+    font-size: 0.82rem;
+    color: #94a3b8;
+  }
+  .dep-panel {
+    border: 1px solid rgba(16, 185, 129, 0.36);
+    border-radius: 14px;
+    background: rgba(10, 18, 26, 0.92);
+    padding: 20px 22px;
+  }
+  .dep-badge {
+    display: inline-block;
+    padding: 4px 11px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: rgba(16, 185, 129, 0.18);
+    color: #6ee7b7;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    margin-bottom: 10px;
+  }
+  .dep-panel h3 {
+    margin: 0 0 8px;
+    font-size: 1.08rem;
+    color: #f8fafc;
+  }
+  .dep-panel p {
+    margin: 0 0 12px;
+    color: #cbd5e1;
+    font-size: 0.92rem;
+    line-height: 1.7;
+  }
+  .dep-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  @media (max-width: 720px) {
+    .dep-grid { grid-template-columns: 1fr; }
+  }
+  .dep-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .dep-box h4 {
+    font-size: 0.86rem;
+    color: #67e8f9;
+    margin-bottom: 6px;
+  }
+  .dep-box ul {
+    margin: 0;
+    padding-left: 18px;
+    color: #cbd5e1;
+    font-size: 0.86rem;
+    line-height: 1.72;
+  }
+  .dep-sample {
+    margin-top: 12px;
+    background: #080d14;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 0.81rem;
+    color: #cffafe;
+    white-space: pre-wrap;
+    line-height: 1.65;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "dep-auditor",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/dep-auditor/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/dep-auditor",
+  "description": "审计 Node.js、Python、Go、Rust、JVM、Ruby 项目的依赖漏洞、版本健康度与许可证事实。默认只读、禁裸 npx 与擅自安装工具、以真实 lockfile 与 advisory 为据，许可证部分仅陈述事实不作法律结论。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "dep-auditor", "item": "https://claude-skills.bt199.com/skills/dep-auditor/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "本地没装 pip-audit 或 cargo-audit 时，dep-auditor 会帮我自动下载安装吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "绝对不会。dep-auditor 严禁为了完成审计而裸跑 npx，也禁止擅自执行 pip install、go install、cargo install 或向构建文件临时注入插件。工具缺失时会在报告「执行覆盖」里如实记录「未执行及原因」，再单独提供可选安装方案等待用户授权，绝不把工具缺失写成「未发现漏洞」。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "dep-auditor 对 GPL / AGPL 许可证会直接判成高危吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。dep-auditor 明确坚持「只陈述许可证事实、不作法律结论」：不把 GPL、AGPL 或其他 copyleft 许可证统称为「传染性许可证」，也不固定映射到高/中/低风险，而是列出包元数据、SPDX 标识、LICENSE 与例外条款，并结合分发方式、SaaS 场景与双重许可整理待确认事项，建议由合规或法律人员作最终判断。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "为什么一定要看 lockfile，只读 package.json 或 requirements.txt 不行吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "manifest 中的版本范围（如 ^1.4.0）无法证明当前实际安装的精确版本，也看不到完整的传递依赖树。dep-auditor 优先从 package-lock.json、pnpm-lock.yaml、yarn.lock、poetry.lock、uv.lock、go.sum、Cargo.lock 等锁文件核实解析版本；缺失 lockfile 时会把覆盖缺口明确写入报告。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "授权修复漏洞时，dep-auditor 会直接跑 npm audit fix --force 吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。dep-auditor 把「发现问题」「建议修复」「执行修改」严格分开，禁止默认运行 npm audit fix、pip-audit --fix、--force 或批量大版本升级。获得明确授权后，按直接/传递与补丁/次版本/大版本分批精准升级，并复验 diff、测试、构建与 lint。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">dep-auditor</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-green">📦 多生态 Lockfile 审计</span>
+        <span class="pill pill-cyan">🧾 可追溯 Advisory 证据</span>
+        <span class="pill pill-amber">⚖️ 许可证只述事实 · 禁裸 npx</span>
+      </div>
+      <h1><span class="accent-text">dep-auditor</span>：证据驱动的依赖漏洞、版本与许可证审计</h1>
+      <p class="hero-lead">覆盖 Node.js（npm / pnpm / Yarn）、Python、Go、Rust、JVM 与 Ruby 生态。基于真实 lockfile 解析版本与本地已有审计命令输出中文报告，<strong>默认只读、绝不裸跑 <code>npx</code> 或擅自装工具、绝不凭包名猜 CVE、许可证部分只陈述事实不作法律结论</strong>。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">覆盖生态</div>
+          <div class="metric-value is-cyan">Node / Python / Go / Rust / JVM / Ruby</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">核心护栏</div>
+          <div class="metric-value">默认只读 + 禁裸 npx + 不作法律结论</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/dep-auditor/SKILL.md" target="_blank" rel="noopener noreferrer">skills/dep-auditor/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/dep-auditor/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#lockfile-check" class="btn btn-cyan">🧪 切换 Lockfile 体检维度</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#lockfile-check">Lockfile 体检维度切换</a>
+      <a href="#ecosystems">7 大生态只读命令基线</a>
+      <a href="#fix-boundary">授权修复与安全边界</a>
+      <a href="#install">4 种零报错安装命令</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="lockfile-check">
+      <h2>🧪 交互式 Lockfile 体检维度切换</h2>
+      <p class="section-intro">点击切换 3 大审计维度，查看 <code>dep-auditor</code> 在每个维度的证据基线、防幻觉约束与中文报告输出格式：</p>
+
+      <div class="dep-switcher" role="tablist" aria-label="Lockfile 体检维度">
+        <button type="button" class="dep-tab is-active" data-dim="vuln" aria-pressed="true">
+          <strong>🚨 漏洞公告核验</strong>
+          <span>真实 Advisory + 可达性区分 + 禁裸 npx</span>
+        </button>
+        <button type="button" class="dep-tab" data-dim="health" aria-pressed="false">
+          <strong>📈 版本健康度</strong>
+          <span>解析版本 vs 稳定版 + 弃用声明与跨度</span>
+        </button>
+        <button type="button" class="dep-tab" data-dim="license" aria-pressed="false">
+          <strong>⚖️ 许可证事实梳理</strong>
+          <span>只陈述 SPDX/LICENSE 事实，不作法律结论</span>
+        </button>
+      </div>
+
+      <div class="dep-panel" aria-live="polite">
+        <span class="dep-badge" id="dep-badge">维度 1 · 漏洞证据与零猜测原则</span>
+        <h3 id="dep-title">以 Lockfile 解析版本 + 官方 Advisory 为唯一依据</h3>
+        <p id="dep-desc">只调用项目锁定且当前环境已安装的只读审计命令，严禁裸跑 npx 或擅自下载工具；区分「依赖树中存在受影响版本」与「漏洞在当前程序中可达」，多工具结论冲突时并列呈现。</p>
+        <div class="dep-grid">
+          <div class="dep-box">
+            <h4>✅ 必查证据字段</h4>
+            <ul id="dep-evidence">
+              <li>Advisory ID、来源链接与含时区的查询时间</li>
+              <li>实际解析版本、受影响范围与已知修复版本</li>
+              <li>直接 / 传递依赖、生产 / 开发范围及 workspace 归属</li>
+              <li>严重度来源、CVSS 版本与分数，及工具/代码路径可达性证据</li>
+            </ul>
+          </div>
+          <div class="dep-box">
+            <h4>🛡️ 硬性边界与防误报</h4>
+            <ul id="dep-guard">
+              <li>严禁裸跑 npx 或擅自执行 pip/go/cargo install 拉取审计工具</li>
+              <li>工具缺失时如实记「未执行及原因」，绝不写成「未发现漏洞」</li>
+              <li>不向未授权公共漏洞服务上传私有包名、Token 或私有 registry 凭据</li>
+              <li>无发现时写「在本次工具与范围覆盖内未发现」并保留覆盖缺口</li>
+            </ul>
+          </div>
+        </div>
+        <div class="dep-sample" id="dep-sample">| 严重度 | 包与解析版本 | Advisory / 来源 | 受影响范围 | 修复版本 | 范围 | 可达性 | 置信度 |
+| High (CVSS 3.1: 7.5) | example-pkg@2.1.4 | GHSA-xxxx-xxxx | &lt;2.1.6 | 2.1.6 | 传递 / 生产 | 未验证（需代码路径确认） | 高（来自 pnpm audit） |</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="ecosystems">
+      <h2>🧰 多生态首选证据与只读命令基线</h2>
+      <p class="section-intro">存在多个互相冲突的 lockfile（例如仓库同时提交了 <code>package-lock.json</code> 与 <code>pnpm-lock.yaml</code>）时，先报告歧义再执行检查：</p>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>生态</th>
+              <th>首选证据基线</th>
+              <th>只读命令示例（仅当环境已安装时运行）</th>
+              <th>禁令与缺口处理</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>npm</strong></td>
+              <td><code>package-lock.json</code>、项目 npm 版本</td>
+              <td><code>npm audit --json</code>、<code>npm outdated --json</code></td>
+              <td>不裸跑 <code>npx</code>，不默认跑 <code>npm audit fix</code></td>
+            </tr>
+            <tr>
+              <td><strong>pnpm</strong></td>
+              <td><code>pnpm-lock.yaml</code>、<code>packageManager</code></td>
+              <td><code>pnpm audit --json</code>、<code>pnpm outdated --format json</code></td>
+              <td>区分 workspace 子包与生产/开发依赖</td>
+            </tr>
+            <tr>
+              <td><strong>Yarn</strong></td>
+              <td><code>yarn.lock</code>、项目 Yarn 版本</td>
+              <td>使用对应 Yarn 版本文档支持的只读 audit / outdated 命令</td>
+              <td>先确认 Classic v1 还是 Berry v2+ 语法</td>
+            </tr>
+            <tr>
+              <td><strong>Python</strong></td>
+              <td>虚拟环境、<code>poetry.lock</code> / <code>uv.lock</code> / <code>Pipfile.lock</code></td>
+              <td><code>pip-audit --format json</code>；<code>python -m pip list --outdated --format=json</code></td>
+              <td>未装 <code>pip-audit</code> 时记录未执行，不擅自 <code>pip install</code></td>
+            </tr>
+            <tr>
+              <td><strong>Go</strong></td>
+              <td><code>go.mod</code> / <code>go.sum</code></td>
+              <td><code>govulncheck -json ./...</code>；<code>go list -m -json all</code></td>
+              <td>未装 <code>govulncheck</code> 时不擅自 <code>go install</code></td>
+            </tr>
+            <tr>
+              <td><strong>Rust</strong></td>
+              <td><code>Cargo.toml</code> / <code>Cargo.lock</code></td>
+              <td><code>cargo audit --json</code></td>
+              <td>未装子命令时不擅自 <code>cargo install</code></td>
+            </tr>
+            <tr>
+              <td><strong>JVM / Ruby</strong></td>
+              <td>wrapper、<code>pom.xml</code>、Gradle、<code>Gemfile.lock</code></td>
+              <td>优先运行仓库已有审计任务</td>
+              <td>严禁向构建文件临时注入第三方插件</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section-card" id="fix-boundary">
+      <h2>🔒 发现、建议、执行三步分离</h2>
+      <div class="grid-2">
+        <div class="info-box is-good">
+          <h3>✅ 授权后安全升级流程</h3>
+          <ul class="prose-list">
+            <li>确认允许修改的目录、包名、版本范围、包管理器与目标分支；工作树不干净时不覆盖用户原有改动；</li>
+            <li>使用原生包管理器与精确版本执行最小升级，将直接/传递依赖与补丁/次版本/大版本分批处理；</li>
+            <li>先读 changelog、迁移指南和运行时要求，每批修改后复验 lockfile diff、审计、测试、构建和 lint。</li>
+          </ul>
+        </div>
+        <div class="info-box is-bad">
+          <h3>🚫 明确禁止的高风险捷径</h3>
+          <ul class="prose-list">
+            <li>未经明确授权直接修改 manifest、lockfile、源码或 CI 配置；</li>
+            <li>默认执行 <code>npm audit fix</code>、<code>pip-audit --fix</code>、<code>--force</code> 或一把梭大版本升级；</li>
+            <li>凭“两年未更新”就推断有漏洞，或把 copyleft 许可证粗暴贴上“高危/传染”法律定性标签。</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout callout-amber">
+        <div class="callout-title">⚖️ 许可证审计合规声明</div>
+        <p><code>dep-auditor</code> 仅整理包元数据、SPDX 标识、<code>LICENSE</code> 原文及例外条款，并结合你的分发方式、静态/动态链接、SaaS 使用、二次修改与双重许可列出待确认事项；需要正式法律意见时，必须交由公司法务或开源合规人员确认。</p>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种零报错安装方式</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装全部原创技能</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 dep-auditor</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill dep-auditor</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\dep-auditor" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\dep-auditor\*" "$HOME\.claude\skills\dep-auditor\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/dep-auditor
+cp -r claude-code-skills-zh/skills/dep-auditor/* ~/.claude/skills/dep-auditor/</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-cyan">
+        <div class="callout-title">💡 推荐触发指令示例</div>
+        <p>安装后可直接输入：“只读审计当前仓库的 <code>pnpm-lock.yaml</code> 生产依赖，列出真实 advisory、版本健康度与 SPDX 许可证事实，先不要改任何依赖文件。”</p>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>本地没装 pip-audit 或 cargo-audit 时，dep-auditor 会帮我自动下载安装吗？</h3>
+          <p>绝对不会。<code>dep-auditor</code> 严禁为了完成审计而裸跑 <code>npx</code>，也禁止擅自执行 <code>pip install</code>、<code>go install</code>、<code>cargo install</code> 或向构建文件临时注入插件。工具缺失时会在报告「执行覆盖」里如实记录「未执行及原因」，再单独提供可选安装方案等待用户授权，绝不把工具缺失写成「未发现漏洞」。</p>
+        </div>
+        <div class="faq-item">
+          <h3>dep-auditor 对 GPL / AGPL 许可证会直接判成高危吗？</h3>
+          <p>不会。<code>dep-auditor</code> 明确坚持「只陈述许可证事实、不作法律结论」：不把 GPL、AGPL 或其他 copyleft 许可证统称为「传染性许可证」，也不固定映射到高/中/低风险，而是列出包元数据、SPDX 标识、<code>LICENSE</code> 与例外条款，并结合分发方式、SaaS 场景与双重许可整理待确认事项，建议由合规或法律人员作最终判断。</p>
+        </div>
+        <div class="faq-item">
+          <h3>为什么一定要看 lockfile，只读 package.json 或 requirements.txt 不行吗？</h3>
+          <p>manifest 中的版本范围（如 <code>^1.4.0</code>）无法证明当前实际安装的精确版本，也看不到完整的传递依赖树。<code>dep-auditor</code> 优先从 <code>package-lock.json</code>、<code>pnpm-lock.yaml</code>、<code>yarn.lock</code>、<code>poetry.lock</code>、<code>uv.lock</code>、<code>go.sum</code>、<code>Cargo.lock</code> 等锁文件核实解析版本；缺失 lockfile 时会把覆盖缺口明确写入报告。</p>
+        </div>
+        <div class="faq-item">
+          <h3>授权修复漏洞时，dep-auditor 会直接跑 npm audit fix --force 吗？</h3>
+          <p>不会。<code>dep-auditor</code> 把「发现问题」「建议修复」「执行修改」严格分开，禁止默认运行 <code>npm audit fix</code>、<code>pip-audit --fix</code>、<code>--force</code> 或批量大版本升级。获得明确授权后，按直接/传递与补丁/次版本/大版本分批精准升级，并复验 diff、测试、构建与 lint。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关安全与工程质量技能</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/security-audit/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 源码安全</span>
+            <h3>security-audit</h3>
+            <p>专注业务源码注入、越权、硬编码密钥与 XSS/SSRF 只读排查，与 dep-auditor 互补闭环。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/env-manager/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 环境变量</span>
+            <h3>env-manager</h3>
+            <p>扫描 .env* 与源码引用、排查客户端前缀暴露与 .gitignore 漏洞，生成脱敏模板。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/zh-code-reviewer/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 代码审查</span>
+            <h3>zh-code-reviewer</h3>
+            <p>升级依赖前后的 diff 与调用链中文只读审查，提前发现破坏性变更与回归风险。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>dep-auditor</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/dep-auditor/SKILL.md" target="_blank" rel="noopener noreferrer">skills/dep-auditor/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var dims = {
+    vuln: {
+      badge: '维度 1 · 漏洞证据与零猜测原则',
+      title: '以 Lockfile 解析版本 + 官方 Advisory 为唯一依据',
+      desc: '只调用项目锁定且当前环境已安装的只读审计命令，严禁裸跑 npx 或擅自下载工具；区分「依赖树中存在受影响版本」与「漏洞在当前程序中可达」，多工具结论冲突时并列呈现。',
+      evidence: [
+        'Advisory ID、来源链接与含时区的查询时间',
+        '实际解析版本、受影响范围与已知修复版本',
+        '直接 / 传递依赖、生产 / 开发范围及 workspace 归属',
+        '严重度来源、CVSS 版本与分数，及工具/代码路径可达性证据'
+      ],
+      guard: [
+        '严禁裸跑 npx 或擅自执行 pip/go/cargo install 拉取审计工具',
+        '工具缺失时如实记「未执行及原因」，绝不写成「未发现漏洞」',
+        '不向未授权公共漏洞服务上传私有包名、Token 或私有 registry 凭据',
+        '无发现时写「在本次工具与范围覆盖内未发现」并保留覆盖缺口'
+      ],
+      sample: '| 严重度 | 包与解析版本 | Advisory / 来源 | 受影响范围 | 修复版本 | 范围 | 可达性 | 置信度 |\n| High (CVSS 3.1: 7.5) | example-pkg@2.1.4 | GHSA-xxxx-xxxx | <2.1.6 | 2.1.6 | 传递 / 生产 | 未验证（需代码路径确认） | 高（来自 pnpm audit） |'
+    },
+    health: {
+      badge: '维度 2 · 版本健康度与理性升级跨度',
+      title: '核验最新稳定版、弃用声明与发布日期，不盲目追新',
+      desc: '汇总当前解析版本与最新稳定版的升级跨度（补丁 / 次版本 / 大版本）及官方弃用证据，绝不因为某个稳定工具库「超过两年未更新」就武断判定存在安全漏洞。',
+      evidence: [
+        '当前 lockfile 解析版本与最新稳定版对照',
+        '官方 deprecated 弃用声明、仓库归档状态与维护证据',
+        '清晰区分 Patch / Minor / Major 升级跨度与运行时版本要求',
+        '结合 changelog 与破坏性变更评估升级成本'
+      ],
+      guard: [
+        '不将「长期稳定未发新版」自动等同于存在安全漏洞',
+        '只读阶段不改写 package.json / pyproject.toml / go.mod',
+        '授权升级时按直接/传递依赖与版本跨度分批验证，拒绝一把梭',
+        '未连接 registry 或离线环境时标明覆盖缺口，不靠记忆填最新版本号'
+      ],
+      sample: '| 包与解析版本 | 最新稳定版 | 弃用 / 维护证据 | 升级跨度 | 建议 |\n| legacy-http@1.4.2 | 1.4.2 | 官方标记 deprecated（迁移至新包） | 已停止维护 | 规划替代迁移，先读迁移指南 |\n| core-lib@3.2.0 | 3.8.1 | 正常维护 | Minor（次版本） | 授权后先在测试分支小步升级复验 |'
+    },
+    license: {
+      badge: '维度 3 · 许可证事实梳理（不作法律结论）',
+      title: '只陈述 SPDX 与 LICENSE 事实，把合规裁定留给专业法务',
+      desc: '从包元数据、SPDX 标识、仓库 LICENSE 文件与 SPDX exception 多源交叉核验，来源不一致时保留冲突；绝不把 GPL/AGPL 统称为「传染性许可证」或机械贴上高/中/低风险标签。',
+      evidence: [
+        '包名与实际解析版本对应的 SPDX 标识与 LICENSE 文本来源',
+        '元数据与仓库 LICENSE 不一致时如实并列冲突证据',
+        '核对是否存在双重许可（OR）或 SPDX exception（如 Classpath-exception）',
+        '结合分发形态、链接方式、SaaS 部署与源码修改列出待确认清单'
+      ],
+      guard: [
+        '严禁输出「某许可证非法/不可商用/必传染」等绝对法律结论',
+        '不把 copyleft 许可证固定映射成统一的高/中/低风险等级',
+        '对缺少许可证字段（UNLICENSED / 未知）的包明确标出证据缺失',
+        '明确建议将涉及分发、修改或 SaaS 边界的条目提交合规或法律人员复核'
+      ],
+      sample: '| 包与版本 | SPDX / 许可证 | 证据来源 | 使用场景 | 待确认事项 |\n| media-codec@4.0.1 | LGPL-2.1-or-later | package.json + LICENSE | 生产服务端动态链接 | 确认是否向外部客户分发二进制及替换链接要求，建议法务复核 |\n| dual-tool@1.2.0 | MIT OR Apache-2.0 | Cargo.toml | 内部工具 | 明确团队选用的许可路径并保留对应版权声明 |'
+    }
+  };
+
+  function replaceList(id, items) {
+    var ul = document.getElementById(id);
+    if (!ul) return;
+    while (ul.firstChild) ul.removeChild(ul.firstChild);
+    items.forEach(function (txt) {
+      var li = document.createElement('li');
+      li.textContent = txt;
+      ul.appendChild(li);
+    });
+  }
+
+  var tabs = document.querySelectorAll('.dep-tab[data-dim]');
+  tabs.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var data = dims[btn.getAttribute('data-dim')];
+      if (!data) return;
+      tabs.forEach(function (b) {
+        var active = b === btn;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      document.getElementById('dep-badge').textContent = data.badge;
+      document.getElementById('dep-title').textContent = data.title;
+      document.getElementById('dep-desc').textContent = data.desc;
+      replaceList('dep-evidence', data.evidence);
+      replaceList('dep-guard', data.guard);
+      document.getElementById('dep-sample').textContent = data.sample;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve(); else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

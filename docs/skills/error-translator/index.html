@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>error-translator：保留原报错与标识符的中文报错翻译排障技能 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：将单条或短段英文报错、编译失败、运行时堆栈及 Windows 终端编码错误翻译为自然中文，解释触发根因并给出最小修复方案。默认只读不改源码、术语保真且自动脱敏；明确区分 eslint-fix、log-analyzer 与 skill-translator。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="error-translator">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/error-translator/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="error-translator：保留原报错与标识符的中文报错翻译排障技能">
+<meta property="og:description" content="原报错原文保真 + 自然中文翻译 + 堆栈业务帧根因 + 修改前后最小修复对比。覆盖 Python、TS/JS、Java、Go、Rust 与 Windows 终端坑。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/error-translator/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="error-translator 编程报错翻译与排障技能">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="error-translator：保留原报错与标识符的中文报错翻译排障技能">
+<meta name="twitter:description" content="默认只读解释不擅自改代码、敏感凭据自动脱敏、缺上下文不硬猜，清晰分工 eslint-fix 与 log-analyzer。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：报错解码与精准排障（玫瑰红错误栈 + 天青解法） */
+  :root {
+    --accent: #f43f5e;
+    --accent2: #38bdf8;
+  }
+  .et-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+  .et-btn {
+    border: 1px solid rgba(148,163,184,0.28); background: rgba(15,23,42,0.75);
+    color: #e2e8f0; border-radius: 10px; padding: 9px 14px; font-size: 0.88rem;
+    font-weight: 600; cursor: pointer; transition: all .18s ease;
+  }
+  .et-btn:hover { border-color: rgba(244,63,94,0.62); }
+  .et-btn.is-active { border-color: #f43f5e; background: rgba(244,63,94,0.16); color: #fecdd3; }
+  .et-stage {
+    border: 1px solid rgba(56,189,248,0.34); border-radius: 14px;
+    background: rgba(10,15,28,0.9); padding: 18px 20px;
+  }
+  .et-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .et-env {
+    display: inline-block; padding: 4px 11px; border-radius: 999px;
+    font-size: 0.79rem; font-weight: 700; background: rgba(56,189,248,0.16); color: #7dd3fc;
+  }
+  .et-readonly { font-size: 0.79rem; color: #94a3b8; font-weight: 600; }
+  .et-raw {
+    font-family: var(--mono); font-size: 0.83rem; color: #fecdd3;
+    background: rgba(244,63,94,0.09); border: 1px solid rgba(244,63,94,0.38);
+    border-radius: 10px; padding: 11px 13px; margin-bottom: 12px;
+    white-space: pre-wrap; word-break: break-word;
+  }
+  .et-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  @media (max-width: 740px) { .et-pair { grid-template-columns: 1fr; } }
+  .et-box {
+    background: rgba(17,24,39,0.85); border: 1px solid rgba(148,163,184,0.18);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .et-box strong { display: block; font-size: 0.82rem; color: #7dd3fc; margin-bottom: 6px; }
+  .et-box span { display: block; font-size: 0.89rem; color: #e2e8f0; line-height: 1.65; }
+  .et-diff { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  @media (max-width: 740px) { .et-diff { grid-template-columns: 1fr; } }
+  .et-code-card {
+    background: #0b0b12; border: 1px solid rgba(148,163,184,0.22);
+    border-radius: 10px; padding: 11px 13px;
+  }
+  .et-code-card.is-bad { border-color: rgba(244,63,94,0.38); }
+  .et-code-card.is-good { border-color: rgba(16,185,129,0.42); }
+  .et-code-card strong { display: block; font-size: 0.78rem; margin-bottom: 6px; }
+  .et-code-card.is-bad strong { color: #fda4af; }
+  .et-code-card.is-good strong { color: #6ee7b7; }
+  .et-code-card pre {
+    margin: 0; font-family: var(--mono); font-size: 0.81rem; line-height: 1.6;
+    color: #dbe4ff; white-space: pre-wrap; word-break: break-word;
+  }
+  .et-scope {
+    font-size: 0.85rem; color: #cbd5e1; background: rgba(56,189,248,0.08);
+    border: 1px solid rgba(56,189,248,0.26); border-radius: 9px; padding: 9px 12px;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "error-translator",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/error-translator/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/error-translator",
+  "description": "编程报错翻译与排障助手：将单条或短段英文报错与异常堆栈翻译为自然中文，保留原报错文本与关键标识符，定位业务代码帧根因并给出最小修复方案；默认只读并脱敏凭据。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "error-translator", "item": "https://claude-skills.bt199.com/skills/error-translator/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "我只是把报错贴给 error-translator 看，它会顺手改我的源码吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。error-translator 默认只读解释，只输出中文翻译、根因分析与修改前后对比方案；除非你明确要求直接修改文件，否则不会改动项目源码或擅自安装依赖。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "为什么它坚持保留英文原报错、类名、错误码和文件路径？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "把错误码或函数名过度意译成中文会让你无法在源码、官方文档或 Issue 里继续检索。术语保真原则确保你既能一眼看懂中文含义，又能随时拿原文精确搜索定位。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "粘贴的报错堆栈里不小心带了数据库连接串或 Token 怎么办？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "技能内置敏感信息脱敏规则，回复中会对 Token、Cookie、数据库连接串和密码自动打码，不会原样重复输出凭据。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "error-translator 与 eslint-fix、log-analyzer、skill-translator 如何区分？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "单条或短段报错与异常堆栈翻译排障用 error-translator；ESLint 规则诊断与限定范围修复用 eslint-fix；大体积 .log 或容器日志聚合分析用 log-analyzer；汉化英文 SKILL.md 文档请用 skill-translator。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">error-translator</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-purple">🌐 报错术语保真翻译</span>
+        <span class="pill pill-cyan">🔍 堆栈业务帧定位根因</span>
+        <span class="pill pill-green">🛡️ 默认只读 + 凭据脱敏</span>
+      </div>
+      <h1><span class="accent-text">error-translator</span>：保留原报错文本、讲清根因与最小修复的排障技能</h1>
+      <p class="hero-lead">把让人头疼的英文编译错误、运行时堆栈、框架报错和 Windows 终端编码坑翻译成自然中文。坚持「原报错保真、默认只读不改文件、凭据自动脱敏、缺上下文不硬猜」，并结合仓库真实文件行号给出可直接落地的分层最小修复。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">单条/短段报错翻译与排障</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">核心原则</div>
+          <div class="metric-value">术语保真 / 默认只读 / 脱敏</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/error-translator/SKILL.md" target="_blank" rel="noopener noreferrer">skills/error-translator/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/error-translator/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#translator" class="btn btn-cyan">🧪 体验报错分类翻译示例</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#translator">报错分类翻译示例</a>
+      <a href="#workflow">4 步只读排障流程</a>
+      <a href="#boundaries">与相邻技能分工</a>
+      <a href="#install">4 种安装方式</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="translator">
+      <h2>🧪 交互式报错分类翻译示例</h2>
+      <p class="section-intro">切换 3 类高频报错，预览 <code>error-translator</code> 如何同时做到「保留原报错文本 + 根因解释 + 最小修复」，并清晰标注技能分工：</p>
+
+      <div class="et-tabs" role="tablist" aria-label="报错分类选择">
+        <button type="button" class="et-btn is-active" data-err="compile">1. 编译与类型错（TypeScript / Rust）</button>
+        <button type="button" class="et-btn" data-err="env">2. 依赖与环境错（Node ESM / Python）</button>
+        <button type="button" class="et-btn" data-err="win">3. Windows 终端与编码错（GBK / PS 5.1）</button>
+      </div>
+
+      <div class="et-stage" aria-live="polite">
+        <div class="et-meta">
+          <span class="et-env" id="et-env">TypeScript 5.x · 编译与类型错误</span>
+          <span class="et-readonly">🔒 默认只读输出 · 保留原报错与标识符</span>
+        </div>
+        <div class="et-raw" id="et-raw">TS2322: Type 'string | undefined' is not assignable to type 'string'. (src/order.ts:42:5)</div>
+        <div class="et-pair">
+          <div class="et-box">
+            <strong>🌐 自然中文翻译（术语保真）</strong>
+            <span id="et-zh">TS2322：不能将类型 string | undefined 赋值给期望为 string 的目标（位置：src/order.ts 第 42 行）。</span>
+          </div>
+          <div class="et-box">
+            <strong>🔍 触发根因</strong>
+            <span id="et-cause">开启 strictNullChecks 后，调用方或字典取值返回了可能为 undefined 的可选值，直接传给只接收 string 的参数导致编译阶段拦截。</span>
+          </div>
+        </div>
+        <div class="et-diff">
+          <div class="et-code-card is-bad">
+            <strong>❌ 修改前（有问题的写法）</strong>
+            <pre id="et-before">const token: string = headers.get('x-trace-id');</pre>
+          </div>
+          <div class="et-code-card is-good">
+            <strong>✅ 修改后（最小安全修复）</strong>
+            <pre id="et-after">const traceId = headers.get('x-trace-id');
+if (!traceId) {
+  throw new Error('缺少 x-trace-id 请求头');
+}</pre>
+          </div>
+        </div>
+        <div class="et-scope" id="et-scope">分工提示：此类单条编译类型错由 error-translator 直接解读；如果是 ESLint 规则批量告警与自动修复，请交给 eslint-fix。</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="workflow">
+      <h2>🧭 4 步只读翻译与排障流程</h2>
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>识别语言、框架与运行平台</h3>
+            <p>精准判定 Python、Node.js、TypeScript、Java、Go、Rust、C++、SQL 或 Windows PowerShell/GBK 平台差异，避免把平台命令问题误判为代码 Bug。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>保留原文与标识符的自然翻译</h3>
+            <p>按「原始消息 → 中文翻译」输出，完整保留错误码、类名、函数名、配置键与文件路径，不胡乱意译，方便你继续检索源码或上游 Issue。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>结合堆栈业务帧定位根因</h3>
+            <p>优先定位最内层业务代码帧并结合当前仓库真实行号分析直接诱因；遇到截断报错时列出最可能的 2–3 种原因，并说明还需补充哪几行代码，绝不硬猜。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>提供分层最小修复与预防建议</h3>
+            <p>输出 1–3 个具体安全的修改方案（标注推荐方案及适用前提）与修改前后代码对比；若涉及装依赖或改环境配置，先说明影响并交由用户决定是否执行。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="boundaries">
+      <h2>🛡️ 安全原则与 4 个相邻技能分工</h2>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>实际场景</th>
+              <th>对应技能</th>
+              <th>职责界定</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>单条/短段英文报错、编译失败、Traceback、终端坑</strong></td>
+              <td><code>error-translator</code></td>
+              <td>只读翻译、术语保真、堆栈根因定位与最小修复代码对比。</td>
+            </tr>
+            <tr>
+              <td><strong>ESLint 规则报错诊断与限定范围修复</strong></td>
+              <td><a href="/skills/eslint-fix/"><code>eslint-fix</code></a></td>
+              <td>锁定项目本地 ESLint 版本，先只读基线与 dry-run 预览，再限定范围修复并复验。</td>
+            </tr>
+            <tr>
+              <td><strong>多行或大体积 .log / Docker / K8s 日志聚类排查</strong></td>
+              <td><a href="/skills/log-analyzer/"><code>log-analyzer</code></a></td>
+              <td>大文件流式采样、UTF-16LE/GBK 识别、高频异常聚类与 <code>traceId</code> 因果链定位。</td>
+            </tr>
+            <tr>
+              <td><strong>汉化海外英文 SKILL.md 或 AGENTS.md 规则</strong></td>
+              <td><a href="/skills/skill-translator/"><code>skill-translator</code></a></td>
+              <td>保留代码与前置命令无损本地化技能定义并做安全预检。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-cyan">
+        <div class="callout-title">🔒 四项默认安全承诺</div>
+        <ul class="prose-list">
+          <li><strong>默认只读不改文件：</strong>未得到你明确修改指令前，只做解释与方案对比。</li>
+          <li><strong>敏感凭据脱敏：</strong>对粘贴报错里的 Token、Cookie、数据库连接串和密码自动遮蔽。</li>
+          <li><strong>缺上下文不硬猜：</strong>堆栈被截断时明确列出待补充的代码片段，不编造不存在的根因。</li>
+          <li><strong>高影响命令先告知：</strong>涉及安装依赖、升级运行时或改环境配置时先说明影响由你决策。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种安装方式</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 error-translator</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill error-translator</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\error-translator" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\error-translator\*" "$HOME\.claude\skills\error-translator\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/error-translator
+cp -r claude-code-skills-zh/skills/error-translator/* ~/.claude/skills/error-translator/</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>它支持哪些编程语言和常见框架报错？</h3>
+          <p>覆盖 Python（<code>TypeError</code>、<code>ModuleNotFoundError</code>、<code>UnicodeDecodeError</code>、<code>asyncio</code>）、JS/TS（ESM/CJS 混用、React Hooks、类型收窄）、Java、Go、Rust（borrow checker / lifetime）、SQL 以及 Windows PowerShell 常见终端坑。</p>
+        </div>
+        <div class="faq-item">
+          <h3>和直接把报错扔给大模型问“这是啥意思”有什么不同？</h3>
+          <p>普通问答经常过度意译丢掉关键报错原文、脱离你仓库里的真实代码瞎猜，或者一上来就擅自修改文件和装包。<code>error-translator</code> 强制术语保真、默认只读、脱敏凭据，并优先结合仓库真实文件行号给出修改前后最小对比。</p>
+        </div>
+        <div class="faq-item">
+          <h3>如果报错信息只有半截，它会不会瞎编一个答案？</h3>
+          <p>不会。规则明确要求「缺上下文不硬猜」：会列出最可能的 2–3 种原因，并清楚告诉你还需要补充哪几行源码或完整 traceback。</p>
+        </div>
+        <div class="faq-item">
+          <h3>我要排查整个 50MB 的日志文件里为什么 502，应该用它吗？</h3>
+          <p>大体积或多行日志聚合请交给 <a href="/skills/log-analyzer/"><code>log-analyzer</code></a>；等它把源头异常行抽出来后，如果需要深入解释具体语言堆栈与代码改法，再衔接 <code>error-translator</code>。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/eslint-fix/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · Lint 安全修复</span>
+            <h3>eslint-fix</h3>
+            <p>面对 ESLint 规则红线时，锁定本地版本先预览再限定范围自动修复。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/log-analyzer/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 大体积日志剖析</span>
+            <h3>log-analyzer</h3>
+            <p>流式采样多行日志、识别 Windows UTF-16LE/GBK 编码并按 traceId 追踪根因。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/skill-translator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 技能本地化</span>
+            <h3>skill-translator</h3>
+            <p>需要把海外英文 SKILL.md 或 AGENTS.md 规则无损汉化时请用它。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>error-translator</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/error-translator/SKILL.md" target="_blank" rel="noopener noreferrer">skills/error-translator/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var examples = {
+    compile: {
+      env: 'TypeScript 5.x · 编译与类型错误',
+      raw: "TS2322: Type 'string | undefined' is not assignable to type 'string'. (src/order.ts:42:5)",
+      zh: 'TS2322：不能将类型 string | undefined 赋值给期望为 string 的目标（位置：src/order.ts 第 42 行）。',
+      cause: '开启 strictNullChecks 后，调用方或字典取值返回了可能为 undefined 的可选值，直接传给只接收 string 的参数导致编译阶段拦截。',
+      before: "const token: string = headers.get('x-trace-id');",
+      after: "const traceId = headers.get('x-trace-id');\nif (!traceId) {\n  throw new Error('缺少 x-trace-id 请求头');\n}",
+      scope: '分工提示：此类单条编译类型错由 error-translator 直接解读；如果是 ESLint 规则批量告警与自动修复，请交给 eslint-fix。'
+    },
+    env: {
+      env: 'Node.js 20+ · 依赖与模块环境错误',
+      raw: 'Error [ERR_REQUIRE_ESM]: require() of ES Module .../node_modules/chalk/source/index.js not supported.',
+      zh: 'ERR_REQUIRE_ESM：当前 CommonJS 模块无法使用 require() 同步加载仅支持 ESM 的依赖包 chalk。',
+      cause: '目标依赖新版已改为纯 ESM（package.json 声明 "type": "module"），而当前脚本仍按 CommonJS 的 require() 方式导入。',
+      before: "const chalk = require('chalk');\nconsole.log(chalk.green('ok'));",
+      after: "const { default: chalk } = await import('chalk');\nconsole.log(chalk.green('ok'));\n// 或先确认影响后在 package.json 统一迁移 ESM",
+      scope: '分工提示：涉及升级或降级依赖版本、修改 package.json 模块类型时，error-translator 会先说明影响由你决策，不会擅自装包改配置。'
+    },
+    win: {
+      env: 'Windows PowerShell 5.1 / Python · 终端与编码错误',
+      raw: "UnicodeDecodeError: 'gbk' codec can't decode byte 0x80 in position 12: illegal multibyte sequence\n# 或 PowerShell 5.1：标记“&&”不是有效语句分隔符",
+      zh: 'Windows 默认 CP936（GBK）代码页无法解码 UTF-8 文本字节；或 PowerShell 5.1 不支持 bash 风格的 && 串联命令。',
+      cause: '中文 Windows 上 Python open() 不传 encoding 时默认按系统本地编码（GBK）读取 UTF-8 文件；PowerShell 5.1 需用分号或换行拆开命令，且 curl 默认别名指向 Invoke-WebRequest。',
+      before: '# Python\ntext = open("README.md").read()\n# PowerShell 5.1\ngit pull && npm test',
+      after: '# Python\nwith open("README.md", encoding="utf-8") as f:\n    text = f.read()\n# PowerShell 5.1\ngit pull; if ($?) { npm test }',
+      scope: '分工提示：单条编码/终端报错由 error-translator 给出最小修法；若是几百 MB 的 Windows UTF-16LE/GBK 日志文件排查，请使用 log-analyzer。'
+    }
+  };
+
+  var btns = document.querySelectorAll('.et-btn[data-err]');
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var e = examples[btn.getAttribute('data-err')];
+      if (!e) return;
+      btns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+      document.getElementById('et-env').textContent = e.env;
+      document.getElementById('et-raw').textContent = e.raw;
+      document.getElementById('et-zh').textContent = e.zh;
+      document.getElementById('et-cause').textContent = e.cause;
+      document.getElementById('et-before').textContent = e.before;
+      document.getElementById('et-after').textContent = e.after;
+      document.getElementById('et-scope').textContent = e.scope;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text; area.setAttribute('readonly', ''); area.style.position = 'fixed'; area.style.opacity = '0';
+      document.body.appendChild(area); area.select();
+      try { var ok = document.execCommand('copy'); document.body.removeChild(area); if (ok) resolve(); else reject(new Error('copy failed')); }
+      catch (err) { document.body.removeChild(area); reject(err); }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied'); btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () { btn.classList.remove('copied'); btn.textContent = defaultLabel; }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

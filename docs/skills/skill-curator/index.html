@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>skill-curator：证据驱动的中文 Skill 收录核验与评分技能 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：证据驱动核验 GitHub 上的 Claude Code、Codex、Agent Skills、Plugin、MCP 与 CLI 候选仓库。核查真实资产、识别营销空壳、路由至 8 大分类并支持单次 GraphQL 批量取数。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="skill-curator">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/skill-curator/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="skill-curator：证据驱动的中文 Skill 收录核验与评分技能">
+<meta property="og:description" content="不凭 Star 或简介下结论：100 分制核查真实资产与安装路径、识破商业引流空壳、精准路由至 8 大分类并提示批量 GraphQL 省流。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/skill-curator/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="skill-curator 中文 Skill 收录评估器">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="skill-curator：证据驱动的中文 Skill 收录核验与评分技能">
+<meta name="twitter:description" content="逐项核验 SKILL.md / plugin.json / MCP / CLI 真实资产与中文价值，输出可追溯核验报告与规范收录文案。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：策展核验与分类路由（星云紫 + 核验洋红） */
+  :root {
+    --accent: #8b5cf6;
+    --accent2: #ec4899;
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.19) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(236, 72, 153, 0.12) 0%, transparent 50%);
+  }
+  .detail-hero h1 .accent-text {
+    background: linear-gradient(135deg, #a78bfa, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .cur-cases {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin: 16px 0;
+  }
+  @media (max-width: 840px) {
+    .cur-cases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 520px) {
+    .cur-cases { grid-template-columns: 1fr; }
+  }
+  .cur-btn {
+    text-align: left;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(15, 23, 42, 0.72);
+    border-radius: 12px;
+    padding: 13px 14px;
+    color: #e2e8f0;
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+  }
+  .cur-btn:hover {
+    border-color: rgba(167, 139, 250, 0.7);
+    transform: translateY(-1px);
+  }
+  .cur-btn.is-active {
+    border-color: #ec4899;
+    background: rgba(139, 92, 246, 0.17);
+  }
+  .cur-btn strong {
+    display: block;
+    font-size: 0.92rem;
+    color: #f8fafc;
+    margin-bottom: 4px;
+  }
+  .cur-btn span {
+    display: block;
+    font-size: 0.79rem;
+    color: #94a3b8;
+    line-height: 1.45;
+  }
+  .cur-panel {
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    border-radius: 14px;
+    background: rgba(13, 12, 26, 0.92);
+    padding: 20px 22px;
+  }
+  .cur-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .cur-verdict {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    background: rgba(16, 185, 129, 0.16);
+    color: #6ee7b7;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+  }
+  .cur-verdict.is-warn {
+    background: rgba(245, 158, 11, 0.16);
+    color: #fcd34d;
+    border-color: rgba(245, 158, 11, 0.42);
+  }
+  .cur-verdict.is-reject {
+    background: rgba(239, 68, 68, 0.16);
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.42);
+  }
+  .cur-route {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #f9a8d4;
+    background: rgba(236, 72, 153, 0.14);
+    border: 1px solid rgba(236, 72, 153, 0.36);
+    padding: 4px 11px;
+    border-radius: 999px;
+  }
+  .cur-panel h3 {
+    margin: 0 0 8px;
+    font-size: 1.06rem;
+    color: #f8fafc;
+  }
+  .cur-score-bar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 12px 0;
+  }
+  @media (max-width: 720px) {
+    .cur-score-bar { grid-template-columns: 1fr; }
+  }
+  .cur-stat {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .cur-stat-k {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-bottom: 3px;
+  }
+  .cur-stat-v {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #f8fafc;
+  }
+  .cur-checks {
+    margin: 10px 0 12px;
+    padding-left: 18px;
+    color: #cbd5e1;
+    font-size: 0.88rem;
+    line-height: 1.75;
+  }
+  .cur-md {
+    background: #080812;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 0.81rem;
+    color: #ede9fe;
+    white-space: pre-wrap;
+    line-height: 1.65;
+  }
+  .cat-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .cat-chip {
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(139, 92, 246, 0.14);
+    border: 1px solid rgba(167, 139, 250, 0.36);
+    color: #ddd6fe;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "skill-curator",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/skill-curator/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/skill-curator",
+  "description": "中文 Skill 收录评估器，证据驱动核验 GitHub 候选仓库的真实可复用资产、安装路径、活跃度、重复项与安全边界，基于 100 分制评分并路由至 8 大分类，支持单次 GraphQL 批量取数避免限流风控。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "skill-curator", "item": "https://claude-skills.bt199.com/skills/skill-curator/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "一个高星仓库（比如几千 Star）可以直接跳过资产核验直接收录吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "绝对不行。skill-curator 明确规定「不要因 Star 低而自动拒绝，也不要因 Star 高而跳过资产核验」。很多高星仓库只有营销落地页、概念文案或商业引流说明，必须确认真实存在 SKILL.md、plugin.json、agents/、MCP Server、CLI 或明确可复现的安装命令。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "为什么批量核验候选仓时强调合并为一次 gh api graphql 查询？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "逐仓库、逐文件高频调用 REST API 很容易触发 GitHub 限流甚至账号风控。skill-curator 优先将多个候选仓库的元数据与根目录结构合并进单次 gh api graphql 只读请求，既高效又合规。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "只是让 skill-curator 评估候选链接，它会自动改 README 或合并 PR 吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。用户只要求评估时，skill-curator 仅输出结构化核验报告、评分、推荐分类与规范中文文案，不修改仓库或 GitHub 状态；仅当用户明确要求加入精选列表且候选通过核验后，才先更新 README 再运行官网同步与项目检查。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "涉及自动发帖、浏览器自动化或强商业 API 依赖的仓库会被直接淘汰吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不一定直接淘汰（除非涉及盗号、恶意攻击、绕过付费、违法采集或明显侵权），但会按风险扣 0–30 分，并在核验报告与收录文案中显式写明前置条件、账号风控、订阅依赖或许可证限制，严禁暗示无风险全自动运行。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">skill-curator</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-purple">🎯 100 分制证据驱动评估</span>
+        <span class="pill pill-cyan">🗂️ 8 大分类精准路由</span>
+        <span class="pill pill-amber">⚡ 批量 GraphQL 防限流</span>
+      </div>
+      <h1><span class="accent-text">skill-curator</span>：中文 Skill 候选仓库收录核验与评估器</h1>
+      <p class="hero-lead">专为精选目录维护者、团队内部 Skill 资产库与 PR 审核打造的原创技能。<strong>不凭仓库简介或 Star 下结论</strong>：逐项核验真实资产、安装可复现性、重复项与商业引流风险，按 100 分制量化评分并输出可直接合入的中文收录文案。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">候选仓核验、评分与分类路由</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">核心护栏</div>
+          <div class="metric-value">证据优先 + 只读评估 + 批量 GraphQL</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/skill-curator/SKILL.md" target="_blank" rel="noopener noreferrer">skills/skill-curator/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/skill-curator/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#curator-sim" class="btn btn-cyan">🧪 试跑候选仓核验模拟器</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#curator-sim">候选仓核验模拟器</a>
+      <a href="#rubric">100 分制权重与 8 大分类</a>
+      <a href="#graphql">单次 GraphQL 批量取数</a>
+      <a href="#install">4 种零报错安装命令</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="curator-sim">
+      <h2>🧪 交互式 GitHub 候选仓收录核验模拟器</h2>
+      <p class="section-intro">点击 4 类真实运维中高频遇到的候选仓场景，查看 <code>skill-curator</code> 如何核验真实资产、识破营销空壳与商业引流、扣减风险分并路由到 8 大分类：</p>
+
+      <div class="cur-cases" role="tablist" aria-label="候选仓库场景选择">
+        <button type="button" class="cur-btn is-active" data-case="solid" aria-pressed="true">
+          <strong>✅ 真实资产开发 Skill</strong>
+          <span>含 SKILL.md + plugin.json + 清晰安装命令</span>
+        </button>
+        <button type="button" class="cur-btn" data-case="hype" aria-pressed="false">
+          <strong>🚫 高星商业引流空壳</strong>
+          <span>仅营销 README，无可复用资产</span>
+        </button>
+        <button type="button" class="cur-btn" data-case="risk" aria-pressed="false">
+          <strong>⚠️ 自动发布/登录态工具</strong>
+          <span>有真实 MCP，但涉平台风控与商业 API</span>
+        </button>
+        <button type="button" class="cur-btn" data-case="subdir" aria-pressed="false">
+          <strong>🔀 子目录 Skill 与去重</strong>
+          <span>tree/ 子路径规范化与仓库级收录判断</span>
+        </button>
+      </div>
+
+      <div class="cur-panel" aria-live="polite">
+        <div class="cur-top">
+          <span class="cur-verdict" id="cur-verdict">建议收录 · 88 / 100 分</span>
+          <span class="cur-route" id="cur-route">推荐分类：开发效率</span>
+        </div>
+        <h3 id="cur-title">场景 1：真实可复用的工程 Skill / Plugin 仓库</h3>
+        <div class="cur-score-bar">
+          <div class="cur-stat">
+            <div class="cur-stat-k">真实资产核验</div>
+            <div class="cur-stat-v" id="cur-asset">SKILL.md + .claude-plugin/plugin.json</div>
+          </div>
+          <div class="cur-stat">
+            <div class="cur-stat-k">风险扣分（0–30）</div>
+            <div class="cur-stat-v" id="cur-penalty">-0 分（MIT 许可，无越权操作）</div>
+          </div>
+          <div class="cur-stat">
+            <div class="cur-stat-k">去重与规范化</div>
+            <div class="cur-stat-v" id="cur-dedup">rg 检索 README 无重复，非重定向 URL</div>
+          </div>
+        </div>
+        <ul class="cur-checks" id="cur-checks">
+          <li>生态直接相关（23/25）：明确支持 Claude Code 与 Codex 工作流</li>
+          <li>可安装性（18/20）：提供真实包名与可复现命令，写清前置条件</li>
+          <li>真实资产（19/20）：根目录存在 skills/、SKILL.md 与 plugin.json</li>
+          <li>文档与中文价值（28/35）：解决高频开发需求，中文用户无需二次摸索即可上手</li>
+        </ul>
+        <div class="cur-md" id="cur-md">### 推荐中文收录文案（示例）
+| [example-dev-skill](https://github.com/owner/example-dev-skill) | 面向接口联调与日志排查的 Claude Code / Codex 技能包，含 SKILL.md 与 plugin.json，按步骤引导只读定位常见构建报错（真实 Star 核验后填入）|</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="rubric">
+      <h2>📊 100 分制评分维度与 8 大分类路由</h2>
+      <p class="section-intro">证据与硬性淘汰条件永远优先于总分：<code>75–100</code> 建议收录、<code>60–74</code> 谨慎收录（需补边界）、<code>&lt;60</code> 暂不收录。</p>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>评估维度</th>
+              <th>权重</th>
+              <th>核验重点</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>与 Agent 生态直接相关</strong></td>
+              <td>25 分</td>
+              <td>明确支持 Claude Code / Codex / Cursor / Gemini CLI / OpenClaw 等工作流</td>
+            </tr>
+            <tr>
+              <td><strong>可安装性</strong></td>
+              <td>20 分</td>
+              <td>真实安装命令、前置条件、可复现性；子目录不能独立安装时优先收录仓库级地址</td>
+            </tr>
+            <tr>
+              <td><strong>真实资产</strong></td>
+              <td>20 分</td>
+              <td>存在 <code>SKILL.md</code>、<code>.claude-plugin/plugin.json</code>、<code>agents/</code>、<code>commands/</code>、<code>AGENTS.md</code>、MCP Server 或 CLI</td>
+            </tr>
+            <tr>
+              <td><strong>文档完整度</strong></td>
+              <td>15 分</td>
+              <td>README 说明安装、配置、示例和边界，不凭概念文案充数</td>
+            </tr>
+            <tr>
+              <td><strong>中文用户价值</strong></td>
+              <td>10 分</td>
+              <td>解决高频工程/内容/办公需求，或适配中文、国内平台与 Windows 环境</td>
+            </tr>
+            <tr>
+              <td><strong>活跃度与可信度</strong></td>
+              <td>10 分</td>
+              <td>更新记录、维护者可信度、许可证清晰度与回归测试</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>🗂️ 仅从仓库现有 8 大分类中路由</h3>
+      <div class="cat-chips">
+        <span class="cat-chip">热门与高潜</span>
+        <span class="cat-chip">平台运营 / 自媒体 / 办公流量</span>
+        <span class="cat-chip">开发效率</span>
+        <span class="cat-chip">内容创作</span>
+        <span class="cat-chip">学术科研</span>
+        <span class="cat-chip">AI Agent</span>
+        <span class="cat-chip">金融 / 商业</span>
+        <span class="cat-chip">中文专属</span>
+      </div>
+    </section>
+
+    <section class="section-card" id="graphql">
+      <h2>⚡ 批量核验防限流：单次 GraphQL 批量取数</h2>
+      <div class="grid-2">
+        <div class="info-box is-good">
+          <h3>✅ 推荐做法：批量 GraphQL 一次查清</h3>
+          <ul class="prose-list">
+            <li>单个候选仓可用 <code>gh repo view</code> 与只读 contents 接口核验元数据与根目录资产；</li>
+            <li>批量核验多个候选仓时，优先合并为<strong>单次 <code>gh api graphql</code></strong> 批量获取 Star、归档状态、许可证与根目录结构，避免逐仓轮询触发限流或账号风控；</li>
+            <li><code>gh</code> 不可用时改用公开网页只读核验，并在「核验说明」中如实标注未确认项，严禁猜测 Star。</li>
+          </ul>
+        </div>
+        <div class="info-box is-bad">
+          <h3>🚫 硬性淘汰 vs 必须显式提示</h3>
+          <ul class="prose-list">
+            <li><strong>直接淘汰</strong>：404/私有/空仓/已归档无替代、与 Agent 生态无关、看不到实际资产、涉及盗号/恶意攻击/绕过付费/违法采集/明显侵权、名实不符；</li>
+            <li><strong>显式提示（按风险扣 0–30 分）</strong>：强依赖商业 API 或云端浏览器、会自动发帖/操作交易、涉及爬虫/Cookie/账号风控、许可证受限或长期失修；</li>
+            <li>“官方”“生产级”“最大”“首个”等定性词必须有可核验证据。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种零报错安装方式</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装全部原创技能</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 skill-curator</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill skill-curator</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\skill-curator" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\skill-curator\*" "$HOME\.claude\skills\skill-curator\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/skill-curator
+cp -r claude-code-skills-zh/skills/skill-curator/* ~/.claude/skills/skill-curator/</code></pre>
+        </div>
+      </div>
+
+      <div class="callout callout-cyan">
+        <div class="callout-title">💡 推荐触发指令示例</div>
+        <p>安装后可直接输入：“帮我核验这 5 个 GitHub 候选仓是否值得收录进精选目录，请用一次 GraphQL 批量取数核查真实资产和重复项，先输出评分报告与推荐分类，不要改 README。”</p>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>一个高星仓库（比如几千 Star）可以直接跳过资产核验直接收录吗？</h3>
+          <p>绝对不行。<code>skill-curator</code> 明确规定「不要因 Star 低而自动拒绝，也不要因 Star 高而跳过资产核验」。很多高星仓库只有营销落地页、概念文案或商业引流说明，必须确认真实存在 <code>SKILL.md</code>、<code>plugin.json</code>、<code>agents/</code>、MCP Server、CLI 或明确可复现的安装命令。</p>
+        </div>
+        <div class="faq-item">
+          <h3>为什么批量核验候选仓时强调合并为一次 gh api graphql 查询？</h3>
+          <p>逐仓库、逐文件高频调用 REST API 很容易触发 GitHub 限流甚至账号风控。<code>skill-curator</code> 优先将多个候选仓库的元数据与根目录结构合并进单次 <code>gh api graphql</code> 只读请求，既高效又合规。</p>
+        </div>
+        <div class="faq-item">
+          <h3>只是让 skill-curator 评估候选链接，它会自动改 README 或合并 PR 吗？</h3>
+          <p>不会。用户只要求评估时，<code>skill-curator</code> 仅输出结构化核验报告、评分、推荐分类与规范中文文案，不修改仓库或 GitHub 状态；仅当用户明确要求加入精选列表且候选通过核验后，才先更新 README 再运行官网同步与项目检查。</p>
+        </div>
+        <div class="faq-item">
+          <h3>涉及自动发帖、浏览器自动化或强商业 API 依赖的仓库会被直接淘汰吗？</h3>
+          <p>不一定直接淘汰（除非涉及盗号、恶意攻击、绕过付费、违法采集或明显侵权），但会按风险扣 0–30 分，并在核验报告与收录文案中显式写明前置条件、账号风控、订阅依赖或许可证限制，严禁暗示无风险全自动运行。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关技能策展与本地化原创技能</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/skill-translator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 技能本地化</span>
+            <h3>skill-translator</h3>
+            <p>核验通过海外高星英文 Skill 后，先做安全与 Windows 预检再无损汉化触发词与步骤。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/zh-readme/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 中文文档</span>
+            <h3>zh-readme</h3>
+            <p>按真实源码与命令生成清晰自然的中文 README，杜绝空泛营销词与假参数。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/zh-code-reviewer/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 代码审查</span>
+            <h3>zh-code-reviewer</h3>
+            <p>审阅社区 PR 的 diff、脚本与同步逻辑变更，确保收录与代码合入同样可靠。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>skill-curator</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/skill-curator/SKILL.md" target="_blank" rel="noopener noreferrer">skills/skill-curator/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var cases = {
+    solid: {
+      verdict: '建议收录 · 88 / 100 分',
+      verdictClass: 'cur-verdict',
+      route: '推荐分类：开发效率',
+      title: '场景 1：真实可复用的工程 Skill / Plugin 仓库',
+      asset: 'SKILL.md + .claude-plugin/plugin.json',
+      penalty: '-0 分（MIT 许可，无越权操作）',
+      dedup: 'rg 检索 README 无重复，非重定向 URL',
+      checks: [
+        '生态直接相关（23/25）：明确支持 Claude Code 与 Codex 工作流',
+        '可安装性（18/20）：提供真实包名与可复现命令，写清前置条件',
+        '真实资产（19/20）：根目录存在 skills/、SKILL.md 与 plugin.json',
+        '文档与中文价值（28/35）：解决高频开发需求，中文用户无需二次摸索即可上手'
+      ],
+      md: '### 推荐中文收录文案（示例）\n| [example-dev-skill](https://github.com/owner/example-dev-skill) | 面向接口联调与日志排查的 Claude Code / Codex 技能包，含 SKILL.md 与 plugin.json，按步骤引导只读定位常见构建报错（真实 Star 核验后填入）|'
+    },
+    hype: {
+      verdict: '暂不收录 · 32 / 100 分（触发硬性淘汰）',
+      verdictClass: 'cur-verdict is-reject',
+      route: '路由结论：不入库',
+      title: '场景 2：高星营销落地页 / 商业引流空壳仓库',
+      asset: '仅发现 README.md + 付费官网引流链接（无 Skill/MCP/CLI）',
+      penalty: '-25 分（名实不符 + 无可验证本地资产）',
+      dedup: '规范化核验通过，但触发「无可复用资产」硬性淘汰条件',
+      checks: [
+        '高星不免检：即使 Star 数千，仍通过只读目录树核查仓库实际文件',
+        '缺失真实资产（0/20）：找不到 SKILL.md、plugin.json、agents/、MCP Server 或真实 CLI 源码',
+        '不可复现安装（4/20）：README 仅引导注册闭源 SaaS 或加群领码',
+        '结论透明：在核验报告或 PR 回复中列明文件树证据后礼貌拒绝'
+      ],
+      md: '### 核验结论（不生成收录行）\n- 建议：暂不收录\n- 硬性淘汰证据：仓库根目录仅含营销 README 与外部付费入口，未检出可复用 Skill / Plugin / MCP / CLI 资产，不符合收录标准。'
+    },
+    risk: {
+      verdict: '谨慎收录 · 68 / 100 分（须补边界说明）',
+      verdictClass: 'cur-verdict is-warn',
+      route: '推荐分类：平台运营 / 自媒体 / 办公流量',
+      title: '场景 3：含真实 MCP 但涉平台登录态与自动发布的工具',
+      asset: '真实 MCP Server + Claude Code 配置文档',
+      penalty: '-18 分（需登录态 Cookie + 自动发帖触发平台风控）',
+      dedup: 'README 中未收录，且补齐国内平台场景缺口',
+      checks: [
+        '真实资产与可安装性达标：包含完整 MCP Server 代码、启动参数与前置条件',
+        '风险显式扣分：依赖本地浏览器登录态或第三方账号，且具备自动发布写操作',
+        '文案红线：必须写清依赖、风险与合法使用边界，绝不暗示「零风险全自动涨粉」',
+        '批量核验提醒：与其它运营类候选仓合并进单次 gh api graphql 查元数据'
+      ],
+      md: '### 推荐中文收录文案（带明确边界）\n| [example-social-mcp](https://github.com/owner/example-social-mcp) | 面向图文草稿整理与排版辅助的 MCP Server，支持 Claude Code 接入；需自备平台登录态，自动发布存在账号风控，建议仅作草稿辅助并遵守平台规范（真实 Star 核验后填入）|'
+    },
+    subdir: {
+      verdict: '更新现有条目 / 仓库级收录 · 79 / 100 分',
+      verdictClass: 'cur-verdict',
+      route: '推荐分类：AI Agent',
+      title: '场景 4：指向 tree/ 子路径的 Monorepo 候选与去重检查',
+      asset: 'skills/sub-tool/SKILL.md（但依赖根目录共享脚本，无法单目录独立安装）',
+      penalty: '-0 分（无高危边界问题）',
+      dedup: '从 tree/main/skills/sub-tool 提取 owner/repo 并 rg 检索 README 查重',
+      checks: [
+        '地址规范化：识别仓库是否已重命名或转移，统一采用最终规范地址，杜绝重定向 URL',
+        '独立安装核验：若子目录 Skill 无法脱离根仓独立运行，优先收录仓库级地址并注明子技能',
+        '重复项处理：若根仓已在精选列表中，改为「更新现有条目」说明，避免同仓无理由刷屏',
+        '批量策略：同时审多条 PR 时用单次 GraphQL 批量取数，推前只改 README 并跑同步脚本'
+      ],
+      md: '### 核验结论（去重与规范化）\n- 原始链接：https://github.com/owner/monorepo/tree/main/skills/sub-tool\n- 规范化仓库：owner/monorepo（子目录依赖根仓构建，建议按仓库级收录或在已有条目中补充能力说明）'
+    }
+  };
+
+  var btns = document.querySelectorAll('.cur-btn[data-case]');
+  btns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var data = cases[btn.getAttribute('data-case')];
+      if (!data) return;
+      btns.forEach(function (b) {
+        var active = b === btn;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      var verdictEl = document.getElementById('cur-verdict');
+      verdictEl.textContent = data.verdict;
+      verdictEl.className = data.verdictClass;
+      document.getElementById('cur-route').textContent = data.route;
+      document.getElementById('cur-title').textContent = data.title;
+      document.getElementById('cur-asset').textContent = data.asset;
+      document.getElementById('cur-penalty').textContent = data.penalty;
+      document.getElementById('cur-dedup').textContent = data.dedup;
+      var ul = document.getElementById('cur-checks');
+      while (ul.firstChild) ul.removeChild(ul.firstChild);
+      data.checks.forEach(function (txt) {
+        var li = document.createElement('li');
+        li.textContent = txt;
+        ul.appendChild(li);
+      });
+      document.getElementById('cur-md').textContent = data.md;
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve(); else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>

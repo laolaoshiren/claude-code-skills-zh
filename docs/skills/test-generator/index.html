@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>test-generator：契约驱动的单元测试与模块集成测试生成技能 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="原创 Claude Code Skill：先读真实代码契约、调用方与现有测试，再生成并复验函数、类与模块级单元或非 HTTP 服务层集成测试。不猜测空值异常行为，不擅自装框架或访问生产依赖；HTTP/API 路由测试明确交由 api-tester。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="original-skill" content="test-generator">
+<link rel="canonical" href="https://claude-skills.bt199.com/skills/test-generator/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="test-generator：契约驱动的单元测试与模块集成测试生成技能">
+<meta property="og:description" content="依据真实代码契约与调用方生成最小可验证测试，系统边界合理 Mock，不改动生产代码凑绿灯，未实际运行绝不声称通过。">
+<meta property="og:url" content="https://claude-skills.bt199.com/skills/test-generator/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="test-generator 契约驱动单元测试生成技能">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="test-generator：契约驱动的单元测试与模块集成测试生成技能">
+<meta name="twitter:description" content="先读契约再补测试、先红后绿回归验证、跨平台路径与编码安全，明确区分 test-generator 与 api-tester 边界。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：契约验证与测试断言（翠绿绿灯 + 靛蓝契约主题） */
+  :root {
+    --accent: #10b981;
+    --accent2: #6366f1;
+  }
+  .tg-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 12px; }
+  .tg-tab {
+    border: 1px solid rgba(148,163,184,0.28); background: rgba(15,23,42,0.75);
+    color: #e2e8f0; border-radius: 10px; padding: 9px 14px; font-size: 0.89rem;
+    font-weight: 600; cursor: pointer; transition: all .18s ease;
+  }
+  .tg-tab:hover { border-color: rgba(16,185,129,0.6); }
+  .tg-tab.is-active { border-color: #10b981; background: rgba(16,185,129,0.16); color: #6ee7b7; }
+  .tg-tab.is-handoff.is-active { border-color: #f59e0b; background: rgba(245,158,11,0.15); color: #fde68a; }
+  .tg-stack-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .tg-stack-label { font-size: 0.8rem; color: #94a3b8; font-weight: 600; }
+  .tg-chip {
+    border: 1px solid rgba(99,102,241,0.32); background: rgba(15,23,42,0.68);
+    color: #cbd5e1; border-radius: 999px; padding: 5px 12px; font-size: 0.8rem;
+    font-weight: 600; cursor: pointer; transition: all .16s ease;
+  }
+  .tg-chip.is-active { border-color: #6366f1; background: rgba(99,102,241,0.22); color: #c7d2fe; }
+  .tg-panel {
+    border: 1px solid rgba(16,185,129,0.34); border-radius: 14px;
+    background: rgba(10,15,28,0.88); padding: 18px 20px;
+  }
+  .tg-panel.is-handoff { border-color: rgba(245,158,11,0.45); }
+  .tg-badge-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .tg-badge {
+    display: inline-block; padding: 4px 11px; border-radius: 999px;
+    font-size: 0.8rem; font-weight: 700; background: rgba(16,185,129,0.16); color: #6ee7b7;
+  }
+  .tg-panel.is-handoff .tg-badge { background: rgba(245,158,11,0.18); color: #fde68a; }
+  .tg-fw-tag { font-size: 0.8rem; color: #a5b4fc; font-weight: 600; }
+  .tg-panel h3 { margin: 0 0 8px; font-size: 1.04rem; color: #f8fafc; }
+  .tg-panel p { margin: 0 0 12px; color: #cbd5e1; font-size: 0.92rem; line-height: 1.68; }
+  .tg-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+  @media (max-width: 760px) { .tg-grid { grid-template-columns: 1fr; } }
+  .tg-cell {
+    background: rgba(17,24,39,0.85); border: 1px solid rgba(148,163,184,0.18);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .tg-cell strong { display: block; font-size: 0.82rem; color: #6ee7b7; margin-bottom: 6px; }
+  .tg-cell span { display: block; font-size: 0.88rem; color: #cbd5e1; line-height: 1.6; }
+  .tg-cmd {
+    font-family: var(--mono); font-size: 0.82rem; color: #dbe4ff;
+    background: #0b0b12; border: 1px solid rgba(99,102,241,0.28);
+    border-radius: 9px; padding: 10px 12px; white-space: pre-wrap; word-break: break-word;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "test-generator",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/skills/test-generator/",
+  "codeRepository": "https://github.com/laolaoshiren/claude-code-skills-zh/tree/main/skills/test-generator",
+  "description": "依据真实代码契约生成并验证函数、类与模块级单元测试及非 HTTP 服务层集成测试：先读调用方与现有测试，系统边界隔离外部依赖，不猜测未定义行为，不自动安装测试框架。",
+  "author": {
+    "@type": "Organization",
+    "name": "claude-code-skills-zh",
+    "url": "https://github.com/laolaoshiren/claude-code-skills-zh"
+  },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "首页", "item": "https://claude-skills.bt199.com/" },
+    { "@type": "ListItem", "position": 2, "name": "原创中文技能", "item": "https://claude-skills.bt199.com/#original" },
+    { "@type": "ListItem", "position": 3, "name": "test-generator", "item": "https://claude-skills.bt199.com/skills/test-generator/" }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "test-generator 和 api-tester 在测试场景上怎么分工？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "test-generator 专注函数、类、领域逻辑、数据层以及非 HTTP 的模块间集成测试；一旦涉及 HTTP、REST、GraphQL、gRPC 路由、OpenAPI 契约或接口鉴权与业务信封校验，应交由 api-tester 处理。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "仓库里还没装测试框架，test-generator 会自动执行 npm install 或 pip install 吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。未经明确授权，技能不安装或升级测试框架，不修改 lockfile、全局测试配置、CI 或生产代码；它会优先沿用项目现有测试命令与风格，缺少框架时先报告并等待确认。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "如果代码当前实现和文档期望不一致，它会直接改代码凑绿灯吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "不会。技能严格区分「代码当前行为」和「产品期望行为」：契约不明确或存在冲突时先列出证据与待确认假设，不用测试固化猜测，也不会为了让测试通过而擅自改动生产代码。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "如果没有运行权限或缺少运行环境，它会把刚写好的测试标成通过吗？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "绝对不会。技能要求先运行新增测试并核对失败与通过结果，同时把基线已有失败与本轮新增失败分开记录；未能实际执行时，只能明确说明「已生成、未验证」。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#original">原创中文技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">test-generator</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-green">🧪 单元与模块集成测试</span>
+        <span class="pill pill-purple">📜 依据真实代码契约</span>
+        <span class="pill pill-cyan">🧱 系统边界 Mock 隔离</span>
+      </div>
+      <h1><span class="accent-text">test-generator</span>：依据真实代码契约生成并验证的单元/模块测试技能</h1>
+      <p class="hero-lead">面向函数、类、领域逻辑与数据层的精准补测技能。先读取类型定义、调用方与仓库现有测试配置，再写最小、可重复且跨平台安全的单元测试或非 HTTP 模块集成测试；拒绝猜测空值异常、拒绝 Mock 内部实现细节，也绝不在未实际执行时宣称测试通过。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">技能定位</div>
+          <div class="metric-value is-cyan">函数 / 类 / 服务层测试</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">明确分工</div>
+          <div class="metric-value">HTTP/API 路由交 api-tester</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">源文件入口</div>
+          <div class="metric-value"><a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/test-generator/SKILL.md" target="_blank" rel="noopener noreferrer">skills/test-generator/SKILL.md ↗</a></div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-primary">⚡ 复制安装命令</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/test-generator/SKILL.md" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📄 查看 SKILL.md 源码 ↗</a>
+        <a href="#selector" class="btn btn-cyan">🎛️ 体验测试场景选择器</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#selector">测试框架与场景选择器</a>
+      <a href="#workflow">5 步契约驱动流程</a>
+      <a href="#boundary">分工与安全边界</a>
+      <a href="#install">4 种安装方式</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="selector">
+      <h2>🎛️ 交互式测试框架与场景选择器</h2>
+      <p class="section-intro">选择你当前的补测场景与项目语言栈，预览 <code>test-generator</code> 的测试层级决策、Mock 边界与复验规则（含与 <code>api-tester</code> 的自动分工提示）：</p>
+
+      <div class="tg-toolbar" role="tablist" aria-label="测试场景选择">
+        <button type="button" class="tg-tab is-active" data-scene="unit">1. 单元测试（纯逻辑）</button>
+        <button type="button" class="tg-tab" data-scene="edge">2. 边界异常与缺陷回归</button>
+        <button type="button" class="tg-tab" data-scene="mock">3. Mock 隔离与模块集成</button>
+        <button type="button" class="tg-tab is-handoff" data-scene="api">4. HTTP / OpenAPI 路由？</button>
+      </div>
+
+      <div class="tg-stack-bar" role="group" aria-label="项目测试栈">
+        <span class="tg-stack-label">项目既有测试栈：</span>
+        <button type="button" class="tg-chip is-active" data-stack="ts">TypeScript (Vitest / Jest)</button>
+        <button type="button" class="tg-chip" data-stack="py">Python (pytest / unittest)</button>
+        <button type="button" class="tg-chip" data-stack="go">Go (testing)</button>
+      </div>
+
+      <div class="tg-panel" id="tg-panel" aria-live="polite">
+        <div class="tg-badge-row">
+          <span class="tg-badge" id="tg-badge">✅ 命中 test-generator · 快速确定性单元测试</span>
+          <span class="tg-fw-tag" id="tg-fw-tag">沿用仓库现有 Vitest / Jest 命令与命名规范</span>
+        </div>
+        <h3 id="tg-title">纯函数、领域计算、格式化与解析器优先写无副作用单元测试</h3>
+        <p id="tg-summary">先读目标函数签名、类型定义和真实调用方，只针对契约中实际可达的输入组合设计参数化断言，验证可观察输出，不把内部私有步骤写死成脆弱断言。</p>
+        <div class="tg-grid">
+          <div class="tg-cell">
+            <strong>取证与断言原则</strong>
+            <span id="tg-evidence">区分「代码当前行为」与「产品期望行为」；两者冲突时先列证据与待确认假设，不用测试固化猜测。</span>
+          </div>
+          <div class="tg-cell">
+            <strong>Mock 与资源隔离</strong>
+            <span id="tg-mock">纯逻辑无需 Mock；如涉及当前时间或随机数，仅在系统边界注入可控时钟或种子。</span>
+          </div>
+          <div class="tg-cell">
+            <strong>跨平台与复验护栏</strong>
+            <span id="tg-verify">使用 path API、系统临时目录与显式 UTF-8 编码；只运行目标测试，基线已有失败与本轮新增失败分开记录。</span>
+          </div>
+        </div>
+        <div class="tg-cmd" id="tg-cmd">优先运行 package.json 中已有测试脚本（例如 npm test -- path/to/target.test.ts），不擅自安装新测试框架或修改 lockfile。</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="workflow">
+      <h2>🧭 5 步契约驱动补测流程</h2>
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>读取真实契约与现有测试基线</h3>
+            <p>先检查目标函数的类型定义、公开文档、调用方、错误处理路径，以及仓库既有的测试文件、fixture、依赖清单与测试命令，并核对当前 <code>git status</code> 避免覆盖用户改动。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>按模块性质选择测试层级</h3>
+            <p>纯逻辑优先写快速确定的单元测试；涉及组件协作时使用临时目录、测试库或受控服务写模块集成测试；修 Bug 时先写能稳定复现问题的最小回归用例。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>按可达路径设计参数化用例</h3>
+            <p>每个用例写明对应契约或分支、输入安排、可观察结果和清理逻辑；只覆盖真实可达的正常、边界与失败路径，不机械堆砌空值、超时或无关数据库异常。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>最小范围实现与跨平台安全</h3>
+            <p>只改目标测试文件和必要 fixture，沿用仓库原有命名（不强行使用中文函数名）；跨 Windows/Linux 统一使用路径 API、系统临时目录和显式编码，不硬编码 <code>/tmp</code>、分隔符或时区。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <h3>先检查脚本副作用，再运行与复验</h3>
+            <p>运行前确认测试脚本不会下载依赖或访问外部服务；确认失败与通过状态、区分基线失败与新增失败，并检查 <code>git diff</code> 无残留快照、缓存或覆盖率产物。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="boundary">
+      <h2>🛡️ 分工边界与安全护栏</h2>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>场景类型</th>
+              <th>优先使用技能</th>
+              <th>核心区别与执行边界</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>函数 / 类 / 领域逻辑 / 数据层</strong></td>
+              <td><code>test-generator</code></td>
+              <td>依据代码签名、调用方与模块契约写单元测试或非 HTTP 集成测试，隔离时间/文件/网络边界。</td>
+            </tr>
+            <tr>
+              <td><strong>HTTP / REST / GraphQL / gRPC 路由</strong></td>
+              <td><a href="/skills/api-tester/"><code>api-tester</code></a></td>
+              <td>依据 OpenAPI、路由与响应拦截器测试接口状态码与业务信封，受三档环境授权门禁保护。</td>
+            </tr>
+            <tr>
+              <td><strong>代码规范与 Lint 规则报错</strong></td>
+              <td><a href="/skills/eslint-fix/"><code>eslint-fix</code></a></td>
+              <td>锁定项目本地 ESLint 版本，先只读基线再限定范围修复并复验，不属于功能单元测试范畴。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-amber">
+        <div class="callout-title">⚠️ 五条硬性授权与数据安全红线</div>
+        <ul class="prose-list">
+          <li><strong>不擅自改环境：</strong>未经明确授权，不安装或升级测试框架，不修改 lockfile、全局测试配置、CI 或生产代码。</li>
+          <li><strong>不碰真实生产资源：</strong>未经明确授权，不访问真实网络、生产数据库、云服务或带真实凭据的环境。</li>
+          <li><strong>测试数据零隐私：</strong>绝不在 fixture 或断言中写入真实个人信息、Token、Cookie、密码或客户数据。</li>
+          <li><strong>用例隔离可重复：</strong>不依赖测试执行顺序，结束后清理自建临时文件与状态。</li>
+          <li><strong>如实汇报验证态：</strong>未能实际跑通测试命令时，只能报告「已生成、未验证」，绝不虚报通过。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>⚡ 4 种安装方式</h2>
+      <div class="grid-2">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 1：Claude Code 2.1+ 一键安装</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-plugin">📋 复制</button>
+          </div>
+          <pre id="cmd-plugin"><code>/plugin marketplace add laolaoshiren/claude-code-skills-zh
+/plugin install zh-skills@claude-code-skills-zh</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 2：按需单装 test-generator</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-single">📋 复制</button>
+          </div>
+          <pre id="cmd-single"><code>npx skills add laolaoshiren/claude-code-skills-zh --skill test-generator</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 3：Windows PowerShell 5.1+</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-ps">📋 复制</button>
+          </div>
+          <pre id="cmd-ps"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\test-generator" | Out-Null
+Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\test-generator\*" "$HOME\.claude\skills\test-generator\"</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-title">方式 4：macOS / Linux</span>
+            <button type="button" class="copy-btn" data-copy-target="cmd-unix">📋 复制</button>
+          </div>
+          <pre id="cmd-unix"><code>git clone https://github.com/laolaoshiren/claude-code-skills-zh.git
+mkdir -p ~/.claude/skills/test-generator
+cp -r claude-code-skills-zh/skills/test-generator/* ~/.claude/skills/test-generator/</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <h3>test-generator 和 api-tester 在测试场景上怎么分工？</h3>
+          <p><code>test-generator</code> 聚焦函数、类、领域逻辑与非 HTTP 服务层模块测试；如果要测 HTTP/REST/GraphQL/gRPC 路由、OpenAPI 契约或接口鉴权与业务错误码信封，应使用 <a href="/skills/api-tester/"><code>api-tester</code></a>。</p>
+        </div>
+        <div class="faq-item">
+          <h3>仓库还没装测试框架，它会自动执行 npm install 或 pip install 吗？</h3>
+          <p>不会。未经明确授权，它不安装或升级测试框架，也不修改 lockfile、全局测试配置或 CI。缺失运行环境时会先列出证据并请用户授权。</p>
+        </div>
+        <div class="faq-item">
+          <h3>发现代码实现疑似有 Bug，它会顺手改业务代码让测试变绿吗？</h3>
+          <p>不会。技能严格区分「代码当前行为」与「产品期望行为」：若发现产品缺陷，会单独报告或在用户明确要求修复时先写最小复现回归用例，再验证修复。</p>
+        </div>
+        <div class="faq-item">
+          <h3>生成的测试文件为什么不会在 Windows 上翻车？</h3>
+          <p>规则明确禁止硬编码路径分隔符、<code>/tmp</code>、换行符、大小写、时区和 locale 行为，统一要求使用语言原生的路径 API、系统临时目录和显式编码。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/skills/api-tester/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 接口契约测试</span>
+            <h3>api-tester</h3>
+            <p>HTTP / REST / GraphQL / gRPC 接口测试与三档环境授权门禁，自动暴露 Spec Drift。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/eslint-fix/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 代码规范修复</span>
+            <h3>eslint-fix</h3>
+            <p>锁定本地 ESLint 版本，先建只读基线再限定范围修复，不随意禁用规则。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/zh-code-reviewer/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 代码审查</span>
+            <h3>zh-code-reviewer</h3>
+            <p>基于 git diff 的分级中文只读代码审查，补完测试后合入 PR 前做最终把关。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>来源与许可：</strong><code>test-generator</code> 为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">laolaoshiren/claude-code-skills-zh</a> 原创技能（<strong>MIT License</strong>）。完整源码见 <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/skills/test-generator/SKILL.md" target="_blank" rel="noopener noreferrer">skills/test-generator/SKILL.md ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏这份中文 Agent 技能工具箱</h2>
+        <p>22 个原创中文技能与 452+ 人工核验资源持续更新，支持按场景跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#original">原创技能</a>
+    <a href="/#skills">精选目录</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var state = { scene: 'unit', stack: 'ts' };
+  var stackMeta = {
+    ts: {
+      fwTag: '沿用仓库现有 Vitest / Jest 命令与命名规范',
+      unitCmd: '优先运行 package.json 中已有测试脚本（例如 npm test -- path/to/target.test.ts），不擅自安装新测试框架或修改 lockfile。',
+      edgeCmd: '先运行单个回归用例确认报错信息与缺陷一致（如 npx vitest run path/to/bug.test.ts，前提为本地已锁定安装），修复后再复验。',
+      mockCmd: '使用 fs.mkdtemp(path.join(os.tmpdir(), ...)) 与可控 fake timers 隔离边界，执行后清理临时目录并检查 git diff 无残留快照。',
+      apiCmd: '检测到 HTTP 路由/Controller 测试需求：建议切换至 api-tester，按三档环境门禁先读 OpenAPI/路由与响应拦截器。'
+    },
+    py: {
+      fwTag: '沿用仓库现有 pytest / unittest 配置与 fixture 风格',
+      unitCmd: '优先使用项目既有测试命令（例如 pytest tests/test_target.py -q），用 @pytest.mark.parametrize 复用重复输入场景。',
+      edgeCmd: '先运行最小复现回归用例确认失败原因准确，再验证修复；基线已有失败与本轮新增失败分开记录。',
+      mockCmd: '使用 pytest 内置 tmp_path 与 monkeypatch 在系统边界隔离文件系统或时钟，读写文件显式指定 encoding="utf-8"。',
+      apiCmd: '检测到 FastAPI / Django / Flask 外部接口契约验证需求：建议交由 api-tester 处理状态码、鉴权与响应信封断言。'
+    },
+    go: {
+      fwTag: '沿用仓库现有 go test 表格驱动测试规范',
+      unitCmd: '优先执行定向包测试（例如 go test ./internal/pricing -run TestCalculateDiscount -v），不引入未经授权的第三方断言库。',
+      edgeCmd: '使用 table-driven tests 先复现真实边界或并发缺陷，确认错误信息匹配后再验证修复与 -race（按风险选用）。',
+      mockCmd: '通过接口依赖注入与 t.TempDir() 隔离外部 I/O 与时间源，测试结束自动回收临时目录，保证执行顺序无关。',
+      apiCmd: '检测到 net/http、Gin、Echo 或 gRPC 接口契约测试需求：建议交由 api-tester 统一核查路由、鉴权与环境门禁。'
+    }
+  };
+  var scenes = {
+    unit: {
+      handoff: false,
+      badge: '✅ 命中 test-generator · 快速确定性单元测试',
+      title: '纯函数、领域计算、格式化与解析器优先写无副作用单元测试',
+      summary: '先读目标函数签名、类型定义和真实调用方，只针对契约中实际可达的输入组合设计参数化断言，验证可观察输出，不把内部私有步骤写死成脆弱断言。',
+      evidence: '区分「代码当前行为」与「产品期望行为」；两者冲突时先列证据与待确认假设，不用测试固化猜测。',
+      mock: '纯逻辑无需 Mock；如涉及当前时间或随机数，仅在系统边界注入可控时钟或种子。',
+      verify: '使用 path API、系统临时目录与显式 UTF-8 编码；只运行目标测试，基线已有失败与本轮新增失败分开记录。',
+      cmdKey: 'unitCmd'
+    },
+    edge: {
+      handoff: false,
+      badge: '✅ 命中 test-generator · 边界异常与最小回归复现',
+      title: '按真实可达路径覆盖边界条件，修缺陷坚持先红后绿',
+      summary: '空值、类型错误、超时和数据库异常不是每个函数的固定要求；只覆盖契约或调用链上真实可达的边界与失败分支，修 Bug 时先写能稳定复现问题的最小回归用例。',
+      evidence: '检查错误处理路径与既有调用方；发现产品缺陷时不擅自改生产代码凑绿灯，单独报告或按授权修复。',
+      mock: '模拟可预见的边界输入或外部依赖错误返回，绝不复制未经核实的示例期望值。',
+      verify: '先跑新增用例确认失败信息与预期一致，修复后复跑相关测试并确认无无关快照或缓存产物。',
+      cmdKey: 'edgeCmd'
+    },
+    mock: {
+      handoff: false,
+      badge: '✅ 命中 test-generator · 系统边界 Mock 与非 HTTP 集成测试',
+      title: '只在系统边界做隔离，模块协作优先用临时目录或受控测试实例',
+      summary: '在时间、随机数、文件系统、网络或第三方 SDK 边界隔离不确定性，避免 Mock 被测模块的内部实现；需要验证真实模块协作时使用可清理的临时资源或受控测试库。',
+      evidence: '梳理副作用、状态变化与并发语义，确保每个测试用例都说明清理逻辑和跨用例隔离方式。',
+      mock: '绝不访问真实网络、生产数据库或含真实凭据的环境；fixture 严禁混入真实 Token、Cookie 或隐私数据。',
+      verify: '先检查项目脚本是否会下载依赖或改共享状态，再按风险执行相关测试；未实际运行时仅报「已生成、未验证」。',
+      cmdKey: 'mockCmd'
+    },
+    api: {
+      handoff: true,
+      badge: '🔀 边界提示 · 请交由 api-tester 处理',
+      title: 'HTTP / REST / GraphQL / gRPC 路由与 OpenAPI 契约测试属于 api-tester',
+      summary: 'test-generator 专注内部函数、类、领域逻辑与非 HTTP 服务层测试。一旦涉及接口路由、请求鉴权、OpenAPI Spec Drift 偏差或国内 { code, msg, data } 业务信封，应交给 api-tester。',
+      evidence: 'api-tester 会按路由注册表、鉴权中间件、响应拦截器与错误码枚举提取真实接口契约。',
+      mock: 'api-tester 内置三档环境授权门禁，严格防止本地测试误连共享库或向线上发送写请求。',
+      verify: '避免用普通单元测试硬模拟整套 HTTP 网关协议，按职责分工才能同时守住代码契约与接口安全门禁。',
+      cmdKey: 'apiCmd'
+    }
+  };
+
+  function render() {
+    var s = scenes[state.scene];
+    var m = stackMeta[state.stack];
+    if (!s || !m) return;
+    var panel = document.getElementById('tg-panel');
+    panel.classList.toggle('is-handoff', Boolean(s.handoff));
+    document.getElementById('tg-badge').textContent = s.badge;
+    document.getElementById('tg-fw-tag').textContent = m.fwTag;
+    document.getElementById('tg-title').textContent = s.title;
+    document.getElementById('tg-summary').textContent = s.summary;
+    document.getElementById('tg-evidence').textContent = s.evidence;
+    document.getElementById('tg-mock').textContent = s.mock;
+    document.getElementById('tg-verify').textContent = s.verify;
+    document.getElementById('tg-cmd').textContent = m[s.cmdKey];
+  }
+
+  var sceneBtns = document.querySelectorAll('.tg-tab[data-scene]');
+  sceneBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      state.scene = btn.getAttribute('data-scene') || 'unit';
+      sceneBtns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+      render();
+    });
+  });
+
+  var stackBtns = document.querySelectorAll('.tg-chip[data-stack]');
+  stackBtns.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      state.stack = btn.getAttribute('data-stack') || 'ts';
+      stackBtns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+      render();
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text; area.setAttribute('readonly', ''); area.style.position = 'fixed'; area.style.opacity = '0';
+      document.body.appendChild(area); area.select();
+      try { var ok = document.execCommand('copy'); document.body.removeChild(area); if (ok) resolve(); else reject(new Error('copy failed')); }
+      catch (err) { document.body.removeChild(area); reject(err); }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied'); btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () { btn.classList.remove('copied'); btn.textContent = defaultLabel; }, 2000);
+      }).catch(function () {});
+    });
+  });
+})();
+</script>
+</body>
+</html>
