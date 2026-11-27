@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>obra/superpowers 中文深度指南：15 个 Agentic 工程技能、五阶段流水线与 15+ 客户端安装 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="327.9K+ Stars 开源编码 Agent 方法论框架 obra/superpowers（MIT）中文实战指南：详解 brainstorming → worktree → 计划拆解 → 红绿 TDD 子代理两阶段审校流水线、全部 15 个内置技能、Claude Code/Antigravity/Cursor/Codex/Qwen/Kimi 安装命令与遥测关闭方式。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="skill-repo" content="https://github.com/obra/superpowers">
+<link rel="canonical" href="https://claude-skills.bt199.com/p/superpowers/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="obra/superpowers 中文深度指南：Agentic 软件开发方法论与 15 个核心技能">
+<meta property="og:description" content="327.9K+ Stars 编码 Agent 工程工作流：先澄清规格再开 worktree 写红绿 TDD，含五阶段沙盘与 15+ 工具安装切换。">
+<meta property="og:url" content="https://claude-skills.bt199.com/p/superpowers/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="obra/superpowers 中文深度指南">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="obra/superpowers 中文深度指南：先定规格、再 TDD 的 Agent 工作流">
+<meta name="twitter:description" content="覆盖 Claude Code / Antigravity / Cursor / Codex / Gemini CLI / Qwen Code / Kimi Code 的统一工程技能库。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：深海蓝 + 琥珀工程标尺识别 */
+  :root {
+    --accent: #3b82f6;
+    --accent2: #f59e0b;
+    --cyan: #06b6d4;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    box-shadow: 0 4px 18px rgba(59, 130, 246, 0.36);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 8px 26px rgba(59, 130, 246, 0.52);
+  }
+  .nav-star,
+  .step-num {
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(59, 130, 246, 0.18) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+  }
+  .stage-rail {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+    gap: 10px;
+    margin: 14px 0;
+  }
+  .stage-btn {
+    text-align: left;
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 15, 0.72);
+    color: var(--text2);
+    border-radius: 12px;
+    padding: 11px 13px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.18s ease;
+  }
+  .stage-btn:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .stage-btn.is-active {
+    background: rgba(59, 130, 246, 0.18);
+    border-color: var(--accent);
+    color: #dbeafe;
+  }
+  .stage-num {
+    display: block;
+    font-size: 0.74rem;
+    font-family: var(--mono);
+    color: var(--amber);
+    margin-bottom: 3px;
+  }
+  .stage-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .stage-panel {
+    background: rgba(10, 10, 15, 0.74);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+  }
+  .stage-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .stage-chip {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: #bae6fd;
+    background: rgba(6, 182, 212, 0.14);
+    border: 1px solid rgba(6, 182, 212, 0.38);
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .client-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .client-tab {
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 15, 0.72);
+    color: var(--text2);
+    border-radius: 10px;
+    padding: 7px 12px;
+    font-size: 0.83rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .client-tab.is-active {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: var(--accent);
+    color: #dbeafe;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "obra/superpowers",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/p/superpowers/",
+  "codeRepository": "https://github.com/obra/superpowers",
+  "description": "Jesse Vincent (obra) 与 Prime Radiant 开源的编码 Agent 软件开发方法论框架，包含 15 个可组合技能，强制执行需求澄清、Git Worktree 隔离、计划拆解、红绿 TDD 与子代理两阶段审查。",
+  "author": {
+    "@type": "Person",
+    "name": "Jesse Vincent (obra)",
+    "url": "https://github.com/obra"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "首页",
+      "item": "https://claude-skills.bt199.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "精选第三方技能",
+      "item": "https://claude-skills.bt199.com/#skills"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "obra/superpowers",
+      "item": "https://claude-skills.bt199.com/p/superpowers/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Superpowers 装好后需要手动输入什么斜杠命令触发吗？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "不需要。Superpowers 通过 using-superpowers 引导技能在会话启动时自动生效：当你提出开发需求时，Agent 会自动停下来先执行 brainstorming 澄清规格，而不是直接乱改代码；只有当你觉得它在某轮会话跑偏时，才需要用文本提示触发 diagnosing-superpowers。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Superpowers 原仓库是英文的，有中文汉化版吗？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "原仓 obra/superpowers 为英文文档；如果你不想啃英文方法论文档，可以直接搭配本精选目录收录的 jnMetaCode/superpowers-zh（完整汉化版 + 6 个中国原创 Skills），或用本仓 skill-translator 自行按需汉化单个 SKILL.md。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Hermes Agent 或超长对话压缩（compaction）后为什么技能不触发了？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "原仓明确指出：Claude Code、Codex、Cursor、Gemini、Pi 和 Muse 支持在会话压缩后重新注入 using-superpowers 引导；但 Hermes Agent 没有 post-compaction hook，超长会话触发压缩后会丢失引导，建议开启新会话恢复。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "如何完全关闭 Superpowers 视觉伴侣的可选遥测？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "brainstorming 的可选视觉伴侣默认从 Prime Radiant 官网加载 Logo 并附带版本号（不包含代码、提示词或项目信息）。设置环境变量 SUPERPOWERS_DISABLE_TELEMETRY=true、DISABLE_TELEMETRY=true 或 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 即可完全关闭。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#skills">精选第三方技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">obra/superpowers</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-amber">📖 英文原仓 · 另有 superpowers-zh</span>
+        <span class="pill pill-cyan">MIT · 15 个高耦合工程技能</span>
+        <span class="pill pill-purple">15+ 编码 Agent 平台原生支持</span>
+      </div>
+      <h1><span class="accent-text">obra/superpowers</span> 中文深度指南：Agentic 软件开发方法论与红绿 TDD 流水线</h1>
+      <p class="hero-lead">由 Jesse Vincent（<strong>obra</strong>）与 Prime Radiant 开源的编码 Agent 完整方法论框架。它不是零散提示词包，而是用 <strong>15 个强制工作流技能</strong>管住 AI 编码全过程——看到需求不急着写代码，而是先做 <code>brainstorming</code> 对齐规格、开 Git Worktree 隔离分支、拆解颗粒度计划、执行 <strong>Red-Green-Refactor TDD</strong> 与两阶段子代理审查，让长周期开发不跑偏。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">GitHub Stars</div>
+          <div class="metric-value is-star">⭐ 327.9K+（核验 327,902）</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">核心技能</div>
+          <div class="metric-value is-cyan">15 个工程工作流 Skills</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">工程原则</div>
+          <div class="metric-value">TDD · YAGNI · DRY · 证据优先</div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#pipeline" class="btn btn-primary">🧭 体验五阶段工程流水线</a>
+        <a href="https://github.com/obra/superpowers" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📦 访问原仓库 GitHub ↗</a>
+        <a href="https://github.com/jnMetaCode/superpowers-zh" class="btn btn-cyan" target="_blank" rel="noopener noreferrer">🇨🇳 查看社区汉化版 superpowers-zh ↗</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#pipeline">五阶段流水线沙盘</a>
+      <a href="#skills-15">15 个核心技能全览</a>
+      <a href="#install-matrix">多客户端安装切换</a>
+      <a href="#diagnosis">自检诊断与遥测控制</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="pipeline">
+      <h2>🧭 Superpowers 五阶段工程流水线沙盘</h2>
+      <p class="section-intro">Superpowers 的核心价值在于把「凭感觉写代码」变成「分阶段、可签核、有门禁的工程流」。点击下方每个阶段查看自动触发的 Skill 与人类检查点：</p>
+
+      <div class="stage-rail" role="tablist" aria-label="Superpowers 五阶段流水线">
+        <button type="button" class="stage-btn is-active" data-stage="0">
+          <span class="stage-num">STAGE 01</span>
+          <span class="stage-title">需求澄清与规格</span>
+        </button>
+        <button type="button" class="stage-btn" data-stage="1">
+          <span class="stage-num">STAGE 02</span>
+          <span class="stage-title">Worktree 隔离</span>
+        </button>
+        <button type="button" class="stage-btn" data-stage="2">
+          <span class="stage-num">STAGE 03</span>
+          <span class="stage-title">执行计划拆解</span>
+        </button>
+        <button type="button" class="stage-btn" data-stage="3">
+          <span class="stage-num">STAGE 04</span>
+          <span class="stage-title">子代理 TDD 审查</span>
+        </button>
+        <button type="button" class="stage-btn" data-stage="4">
+          <span class="stage-num">STAGE 05</span>
+          <span class="stage-title">验证与分支收尾</span>
+        </button>
+      </div>
+
+      <div class="stage-panel" aria-live="polite">
+        <div class="stage-skills" id="sp-stage-skills"></div>
+        <p id="sp-stage-desc" style="color: var(--text2); margin-bottom: 8px;"></p>
+        <p id="sp-stage-gate" style="font-size: 0.88rem; color: #fde68a;"></p>
+      </div>
+    </section>
+
+    <section class="section-card" id="skills-15">
+      <h2>📚 15 个内置核心 Skills 分类清单（按原仓核验）</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>🧪 测试与调试（4 个）</h3>
+          <ul class="prose-list">
+            <li><code>test-driven-development</code>：严格红-绿-重构循环与反模式清单。</li>
+            <li><code>systematic-debugging</code>：四阶段根因定位（含 root-cause-tracing 与条件等待）。</li>
+            <li><code>verification-before-completion</code>：声明完成前强制实跑验证。</li>
+            <li><code>diagnosing-superpowers</code>：会话跑偏时追踪 transcript 定位问题并导出脱敏包。</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <h3>🤝 协作与子代理（9 个）</h3>
+          <ul class="prose-list">
+            <li><code>brainstorming</code> &amp; <code>writing-plans</code> &amp; <code>executing-plans</code></li>
+            <li><code>subagent-driven-development</code> &amp; <code>dispatching-parallel-agents</code></li>
+            <li><code>requesting-code-review</code> &amp; <code>receiving-code-review</code></li>
+            <li><code>using-git-worktrees</code> &amp; <code>finishing-a-development-branch</code></li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <h3>🧩 元技能与引导（2 个）</h3>
+          <ul class="prose-list">
+            <li><code>using-superpowers</code>：会话启动及压缩后自动注入的方法论总开关。</li>
+            <li><code>writing-skills</code>：按测试驱动规范编写和评估新 Skill。</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <h3>🇨🇳 中文用户最佳读法</h3>
+          <p>如果你平时主要写业务代码，推荐先读 <code>systematic-debugging</code> 与 <code>verification-before-completion</code>；做大需求重构时再让 <code>brainstorming</code> + <code>writing-plans</code> 接管全流程。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="install-matrix">
+      <h2>📦 跨 15+ AI 客户端安装命令切换器</h2>
+      <p class="section-intro">原仓针对 Claude Code、Antigravity、Codex、Cursor、Gemini CLI、Qwen Code、Kimi Code、GitHub Copilot CLI 与 OpenCode 都提供了原生适配目录，如果你同时用多个工具，需分别为每个客户端单独安装：</p>
+
+      <div class="client-tabs" role="tablist" aria-label="选择 AI 编码工具">
+        <button type="button" class="client-tab is-active" data-client="claude">Claude Code</button>
+        <button type="button" class="client-tab" data-client="agy">Antigravity</button>
+        <button type="button" class="client-tab" data-client="cursor">Cursor</button>
+        <button type="button" class="client-tab" data-client="codex">Codex CLI/App</button>
+        <button type="button" class="client-tab" data-client="gemini">Gemini CLI</button>
+        <button type="button" class="client-tab" data-client="qwen">Qwen Code</button>
+        <button type="button" class="client-tab" data-client="kimi">Kimi Code</button>
+        <button type="button" class="client-tab" data-client="copilot">Copilot CLI</button>
+        <button type="button" class="client-tab" data-client="opencode">OpenCode / Pi</button>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title" id="sp-cli-title">Claude Code 安装命令</span>
+          <button type="button" class="copy-btn" data-copy-target="sp-cli-code">📋 复制</button>
+        </div>
+        <pre id="sp-cli-code"><code></code></pre>
+      </div>
+    </section>
+
+    <section class="section-card" id="diagnosis">
+      <h2>🩺 会话诊断技巧与可选遥测边界</h2>
+      <div class="callout callout-amber">
+        <div class="callout-title">🔍 Agent 没按计划走、重复劳动或该触发的技能没触发？</div>
+        <p>直接对编码 Agent 说：<code>figure out what went wrong with superpowers in this session</code>（或指定 <code>in session &lt;id&gt;</code>），它会自动调用 <code>diagnosing-superpowers</code> 读取会话记录并给出逐行证据分析。</p>
+      </div>
+      <div class="callout callout-red">
+        <div class="callout-title">📡 关于 Visual Companion 遥测与隐私保护</div>
+        <p><code>brainstorming</code> 可选视觉伴侣加载 Prime Radiant Logo 时默认附带 Superpowers 版本号（不含项目、代码或提示词内容）。如在严格内网或注重零外联请求的环境使用，建议在环境变量中配置：<code>SUPERPOWERS_DISABLE_TELEMETRY=true</code> 或 <code>CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1</code>。</p>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <article class="faq-item">
+          <h3>Q1：小改一行文案也要走 brainstorming + worktree 吗？会不会太慢？</h3>
+          <p>Superpowers 专为「从零做功能、复杂重构和跨多文件改动」设计。日常修一个拼写或改几行 CSS 时，过于沉重的工作流反而会多消耗 Token；可以仅在主力开发仓开启，或明确指示跳过规划直接修复单点 bug。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q2：为什么社区贡献者不能随便往 obra/superpowers 提新技能 PR？</h3>
+          <p>原仓明确说明一般不接受新增独立 Skill 的 PR，因为每个技能都必须跨 15+ 种编码 Agent 兼容维护，且需要通过 <code>superpowers-evals</code> 行为评测。如果你想分享自己写的中文专项技能，更适合放到本仓库或独立 Skill 仓库。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q3：用 Qwen Code / Kimi Code / Trae 等国内工具能完整享受这套流程吗？</h3>
+          <p>Qwen Code 可直接通过 <code>qwen extensions install obra/superpowers</code> 从 Claude 市场格式安装；Kimi Code 在插件市场搜索 <code>Superpowers</code> 或运行 <code>/plugins install https://github.com/obra/superpowers</code> 即可接入。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q4：我想给现有项目先补单元测试或做中文 Diff 审查，有更轻量的替代吗？</h3>
+          <p>如果你暂时不想引入整套强制流程，可以直接单装本仓 MIT 原创技能 <code>test-generator</code>（测试生成）和 <code>zh-code-reviewer</code>（中文 git diff 审查），按需唤起、零上下文侵入。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/p/everything-claude-code/">
+          <div>
+            <span class="related-tag">🧠 全栈开发体系 · 311.5K+ ⭐</span>
+            <h3>affaan-m/ECC</h3>
+            <p>72 个代理、328 个技能与多语言 Rules 目录，与 Superpowers 同为 Agentic 研发两大标杆体系。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/test-generator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 单元测试</span>
+            <h3>test-generator</h3>
+            <p>轻量单技能补全单元与边界测试，适配 Vitest / Jest / pytest / Go test，无需整套工作流改造。</p>
+          </div>
+          <span class="related-go">查看原创技能 →</span>
+        </a>
+        <a class="related-card" href="/skills/skill-translator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · Skill 汉化</span>
+            <h3>skill-translator</h3>
+            <p>把 Superpowers 里喜欢的英文技能（如 <code>systematic-debugging</code>）无损本地化为简体中文版本。</p>
+          </div>
+          <span class="related-go">查看原创技能 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>原作者与开源许可声明：</strong>本页为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">claude-code-skills-zh</a> 基于原仓库公开文档整理的中文方法论导览与安装指南。项目版权归原作者 <strong>Jesse Vincent (obra)</strong> 与 <strong>Prime Radiant</strong> 及社区贡献者所有，采用 <strong>MIT License</strong> 开源，完整源码请访问 <a href="https://github.com/obra/superpowers" target="_blank" rel="noopener noreferrer">github.com/obra/superpowers ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏中文 Claude Code Skills 精选集</h2>
+        <p>452+ 人工核验第三方技能与 22 个原创中文技能持续维护，官网支持跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#skills">精选目录</a>
+    <a href="/#original">原创技能</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var stages = [
+    {
+      skills: ['using-superpowers', 'brainstorming'],
+      desc: 'Agent 收到开发任务后不会立刻动手改代码，而是反问澄清真实目标，并将设计规格拆成人类一眼能读懂的短段落逐块确认。',
+      gate: '人工检查点：在你明确签核（Sign off）设计方案前，不允许直接进入编码。'
+    },
+    {
+      skills: ['using-git-worktrees'],
+      desc: '设计通过后自动创建独立 Git Worktree 分支工作区，运行项目基线测试，确保不污染主分支当前工作现场。',
+      gate: '人工检查点：确认隔离目录与基线测试全绿，避免在破损环境上继续叠加改动。'
+    },
+    {
+      skills: ['writing-plans'],
+      desc: '把规格拆解成粒度极细（通常几分钟可完成一步）的实现计划，明确文件路径、验证命令和预期输出，遵循 YAGNI 与 DRY。',
+      gate: '人工检查点：审阅计划步骤与变更范围，说 "go" 后才移交执行。'
+    },
+    {
+      skills: ['subagent-driven-development', 'test-driven-development', 'requesting-code-review'],
+      desc: '派生子代理按任务推进，严格执行 Red-Green-Refactor TDD（先写失败测试，再写最小实现，再重构），每步完成后依次做「规格一致性」与「代码质量」两阶段审查。',
+      gate: '质量门禁：测试不红不写业务代码，两阶段审查不通过不推进下一任务。'
+    },
+    {
+      skills: ['verification-before-completion', 'finishing-a-development-branch'],
+      desc: '全部任务完成后实跑验证命令，给出合并（merge）、提 PR、保留或丢弃分支四种收尾选项，并自动清理 worktree。',
+      gate: '证据门禁：必须看到最新验证输出才能声明完成，禁止凭记忆汇报成功。'
+    }
+  ];
+
+  var clients = {
+    claude: {
+      title: 'Claude Code（官方市场 / Superpowers 市场任选其一）',
+      cmd: '# 方式 1：从 Anthropic 官方市场安装\n/plugin install superpowers@claude-plugins-official\n\n# 方式 2：从 Superpowers 专属市场安装\n/plugin marketplace add obra/superpowers-marketplace\n/plugin install superpowers@superpowers-marketplace'
+    },
+    agy: {
+      title: 'Antigravity (AGY CLI)',
+      cmd: '# 安装 Superpowers 插件（更新时重新执行同命令）\nagy plugin install https://github.com/obra/superpowers'
+    },
+    cursor: {
+      title: 'Cursor Agent Chat',
+      cmd: '# 在 Cursor Agent 对话框中输入\n/add-plugin superpowers\n# 或在插件市场中搜索 "superpowers" 安装'
+    },
+    codex: {
+      title: 'OpenAI Codex CLI / Codex App',
+      cmd: '# Codex CLI：打开插件搜索并选择 superpowers 安装\n/plugins\n\n# Codex App：在侧边栏 Plugins -> Coding 分类中点击 superpowers 右侧 +'
+    },
+    gemini: {
+      title: 'Google Gemini CLI',
+      cmd: '# 安装扩展\ngemini extensions install https://github.com/obra/superpowers\n\n# 后续更新\ngemini extensions update superpowers'
+    },
+    qwen: {
+      title: 'Qwen Code（通义千问 CLI）',
+      cmd: '# 安装扩展并在提示时选择 superpowers\nqwen extensions install obra/superpowers\n\n# 后续更新\nqwen extensions update superpowers'
+    },
+    kimi: {
+      title: 'Kimi Code',
+      cmd: '# 直接从仓库安装（或在 /plugins -> Marketplace 搜索 Superpowers）\n/plugins install https://github.com/obra/superpowers'
+    },
+    copilot: {
+      title: 'GitHub Copilot CLI',
+      cmd: 'copilot plugin marketplace add obra/superpowers-marketplace\ncopilot plugin install superpowers@superpowers-marketplace'
+    },
+    opencode: {
+      title: 'OpenCode / Pi',
+      cmd: '# Pi 包安装\npi install git:github.com/obra/superpowers\n\n# OpenCode：在会话中让 Agent 拉取官方 .opencode/INSTALL.md 指引安装\n# https://raw.githubusercontent.com/obra/superpowers/refs/heads/main/.opencode/INSTALL.md'
+    }
+  };
+
+  function renderStage(idx) {
+    var st = stages[idx];
+    var wrap = document.getElementById('sp-stage-skills');
+    while (wrap.firstChild) wrap.removeChild(wrap.firstChild);
+    st.skills.forEach(function (name) {
+      var chip = document.createElement('span');
+      chip.className = 'stage-chip';
+      chip.textContent = name;
+      wrap.appendChild(chip);
+    });
+    document.getElementById('sp-stage-desc').textContent = st.desc;
+    document.getElementById('sp-stage-gate').textContent = st.gate;
+  }
+
+  function renderClient(key) {
+    var c = clients[key];
+    document.getElementById('sp-cli-title').textContent = c.title;
+    document.getElementById('sp-cli-code').querySelector('code').textContent = c.cmd;
+  }
+
+  document.querySelectorAll('.stage-btn[data-stage]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var idx = Number(btn.getAttribute('data-stage'));
+      document.querySelectorAll('.stage-btn').forEach(function (b) {
+        b.classList.toggle('is-active', b === btn);
+      });
+      renderStage(idx);
+    });
+  });
+
+  document.querySelectorAll('.client-tab[data-client]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-client');
+      document.querySelectorAll('.client-tab').forEach(function (b) {
+        b.classList.toggle('is-active', b === btn);
+      });
+      renderClient(key);
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve();
+        else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+
+  renderStage(0);
+  renderClient('claude');
+})();
+</script>
+</body>
+</html>

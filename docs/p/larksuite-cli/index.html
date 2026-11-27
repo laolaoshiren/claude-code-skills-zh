@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>larksuite/cli 中文深度指南：飞书官方 CLI、26 个 Agent Skills 与三层调用架构 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="18.2K+ Stars 飞书官方开源 CLI（MIT）larksuite/cli 中文实战指南：覆盖 npm/源码安装、26 个内置 Agent Skills（日历/文档/多维表格/IM/会议/OKR）、三层调用架构、JSON 输出契约（ok==true）与风控边界。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="skill-repo" content="https://github.com/larksuite/cli">
+<link rel="canonical" href="https://claude-skills.bt199.com/p/larksuite-cli/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="larksuite/cli 中文深度指南：飞书官方 CLI 与 26 个 AI Agent Skills">
+<meta property="og:description" content="覆盖 18 大飞书业务域、200+ 精选命令、26 个 AI Agent Skills 与 2500+ OpenAPI 的官方 CLI 接入指南与安全边界。">
+<meta property="og:url" content="https://claude-skills.bt199.com/p/larksuite-cli/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="larksuite/cli 飞书官方 CLI 中文深度指南">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="larksuite/cli 中文深度指南：飞书官方 CLI 与 26 个 Agent Skills">
+<meta name="twitter:description" content="飞书/Lark 官方 CLI：快捷命令 + API 命令 + 通用调用三层架构，OS 密钥链凭证与 dry-run 安全实践。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：飞书青碧 + 蓝智协同视觉识别 */
+  :root {
+    --accent: #00b894;
+    --accent2: #3370ff;
+    --cyan: #00d6b9;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #00b894, #3370ff);
+    box-shadow: 0 4px 18px rgba(0, 184, 148, 0.34);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 8px 26px rgba(51, 112, 255, 0.45);
+  }
+  .nav-star,
+  .step-num {
+    background: linear-gradient(135deg, #00b894, #3370ff);
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(0, 214, 185, 0.16) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(51, 112, 255, 0.14) 0%, transparent 50%);
+  }
+  .domain-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .domain-tab {
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 15, 0.72);
+    color: var(--text2);
+    border-radius: 10px;
+    padding: 7px 13px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.18s ease;
+  }
+  .domain-tab:hover {
+    border-color: var(--cyan);
+    color: var(--text);
+  }
+  .domain-tab.is-active {
+    background: rgba(0, 214, 185, 0.15);
+    border-color: var(--cyan);
+    color: #b2fff2;
+  }
+  .skill-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0 14px;
+  }
+  .skill-pill {
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 15, 0.68);
+    color: var(--text2);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    font-family: var(--mono);
+    cursor: pointer;
+    transition: all 0.16s ease;
+  }
+  .skill-pill:hover {
+    border-color: var(--accent2);
+    color: var(--text);
+  }
+  .skill-pill.is-active {
+    background: rgba(51, 112, 255, 0.22);
+    border-color: #6ea8ff;
+    color: #dbeafe;
+  }
+  .skill-inspector {
+    background: rgba(10, 10, 15, 0.72);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+  }
+  .skill-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .skill-badge {
+    font-family: var(--mono);
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #b2fff2;
+    background: rgba(0, 214, 185, 0.15);
+    border: 1px solid rgba(0, 214, 185, 0.42);
+    padding: 3px 10px;
+    border-radius: 8px;
+  }
+  .skill-domain {
+    font-size: 0.78rem;
+    color: #93c5fd;
+    background: rgba(51, 112, 255, 0.16);
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .skill-desc {
+    color: var(--text2);
+    font-size: 0.92rem;
+    margin-bottom: 10px;
+  }
+  .tier-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tier-btn {
+    border: 1px solid var(--border);
+    background: rgba(20, 20, 32, 0.9);
+    color: var(--text2);
+    border-radius: 8px;
+    padding: 5px 11px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .tier-btn.is-active {
+    border-color: var(--cyan);
+    color: #b2fff2;
+    background: rgba(0, 214, 185, 0.14);
+  }
+  .tier-cmd {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: #cbd5e1;
+    background: #070910;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 10px 12px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "larksuite/cli (lark-cli)",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/p/larksuite-cli/",
+  "codeRepository": "https://github.com/larksuite/cli",
+  "description": "飞书官方开源 CLI 与 26 个 AI Agent Skills，覆盖即时通讯、日历、云文档、多维表格、电子表格、任务、邮件、会议与 OKR 等 18 大业务域，支持三层调用架构与 OS 密钥链存储。",
+  "author": {
+    "@type": "Organization",
+    "name": "larksuite",
+    "url": "https://github.com/larksuite"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "首页",
+      "item": "https://claude-skills.bt199.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "精选第三方技能",
+      "item": "https://claude-skills.bt199.com/#skills"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "larksuite/cli",
+      "item": "https://claude-skills.bt199.com/p/larksuite-cli/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "判断 lark-cli 命令是否成功，为什么不能检查 JSON 里的 code == 0？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "在默认 --format json 模式下，lark-cli 使用统一信封格式：成功响应写入 stdout 并包含 ok: true（没有 code 和 msg 字段），退出码为 0；失败响应写入 stderr 并包含 ok: false 与 error 对象，只有 error 内才带有上游 OpenAPI 的 numeric code。正确判断标准是检查退出码或 ok == true。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "个人本地用和企业自研 Agent 平台集成应该选哪种接入路径？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "个人开发者直接通过 npx @larksuite/cli@latest install 安装并运行 lark-cli config init 与 lark-cli auth login --recommend 即可；企业 IT 或 ISV 需要中心化凭证管理（Vault/数据库）、统一审计日志或裁剪命令集时，应使用仓库中的 extension/ 扩展包通过 wrapper main 扩展，无需修改 CLI 源码。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "lark-cli 的三层命令架构有什么区别，Agent 应该优先用哪一层？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "第一层是以 + 为前缀的快捷命令（如 lark-cli calendar +agenda），带有智能默认值与 --dry-run 预览，最适合人类与 Agent 高频调用；第二层是按 OpenAPI 自动生成的 100+ 精选 API 命令；第三层是 lark-cli api GET/POST 通用调用，覆盖 2500+ 开放平台端点，用于前两层尚未覆盖的长尾接口。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "为什么官方文档提醒不要把对接 lark-cli 的飞书机器人拉进多人大群？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "授权飞书权限后，Agent 会以你的用户身份在授权范围内执行读写与发送操作。如果在群聊中允许其他成员通过消息触发机器人，极易面临提示词注入、越权操作或敏感文档泄露风险，因此官方建议仅将其作为私人对话助手使用，并在写操作前启用 --dry-run。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#skills">精选第三方技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">larksuite/cli</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-green">🇨🇳 飞书官方中文文档</span>
+        <span class="pill pill-cyan">MIT · Go &gt;= 1.23 + npm</span>
+        <span class="pill pill-amber">26 个 Agent Skills · 200+ 命令</span>
+      </div>
+      <h1><span class="accent-text">larksuite/cli</span> 中文深度指南：飞书官方 CLI 与 Agent 协同架构</h1>
+      <p class="hero-lead">由飞书（Lark）官方 <strong>larksuite</strong> 团队维护的原生 Agent CLI。覆盖即时通讯、日历、云文档、多维表格、电子表格、幻灯片、任务、邮件、会议、OKR 与审批等 <strong>18 大业务域</strong>，内置 <strong>26 个开箱即用 AI Agent Skills</strong> 与三层调用架构，让 Claude Code、Codex 与企业 Agent 安全操控飞书生态。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">GitHub Stars</div>
+          <div class="metric-value is-star">⭐ 18.2K+（核验 18,233）</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可与语言</div>
+          <div class="metric-value">MIT · Go &amp; npm</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">核心资产</div>
+          <div class="metric-value is-cyan">26 Skills · 200+ 命令 · 2500+ API</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">凭证与风控</div>
+          <div class="metric-value">OS 密钥链 · --dry-run</div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#skill-explorer" class="btn btn-primary">🧩 浏览 26 个飞书 Skills 与命令</a>
+        <a href="https://github.com/larksuite/cli" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📦 访问原仓库 GitHub ↗</a>
+        <a href="https://github.com/larksuite/cli/blob/main/README.zh.md" class="btn btn-cyan" target="_blank" rel="noopener noreferrer">📖 官方中文 README ↗</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#skill-explorer">26 Skills 与三层架构</a>
+      <a href="#install">人类与 Agent 双路安装</a>
+      <a href="#contract">JSON 契约与进阶参数</a>
+      <a href="#security">安全与风控边界</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="skill-explorer">
+      <h2>🧩 飞书 26 个官方 Agent Skills 与三层命令工作台</h2>
+      <p class="section-intro">原仓在 <code>skills/</code> 目录内置 26 个面向 Agent 的标准技能（其中 <code>lark-shared</code> 会被其余技能自动加载）。按业务域点击查看具体 Skill 与对应三层调用示例：</p>
+
+      <div class="domain-tabs" role="tablist" aria-label="按飞书业务域筛选">
+        <button type="button" class="domain-tab is-active" data-domain="all">全部精选 (23 类展示)</button>
+        <button type="button" class="domain-tab" data-domain="collab">沟通与日程</button>
+        <button type="button" class="domain-tab" data-domain="docs">文档与表格</button>
+        <button type="button" class="domain-tab" data-domain="biz">审批、OKR 与会议</button>
+        <button type="button" class="domain-tab" data-domain="meta">基础与开发扩展</button>
+      </div>
+
+      <div class="skill-pills" id="lark-skill-pills" aria-label="飞书 Skills 列表"></div>
+
+      <div class="skill-inspector" aria-live="polite">
+        <div class="skill-head">
+          <span class="skill-badge" id="lk-name">lark-shared</span>
+          <span class="skill-domain" id="lk-domain">基础认证与规则</span>
+        </div>
+        <p class="skill-desc" id="lk-desc">应用配置、认证登录、身份切换、权限管理与安全规则（所有其他飞书 Skill 自动加载）。</p>
+        <div class="tier-row" role="group" aria-label="切换命令层级">
+          <button type="button" class="tier-btn is-active" data-tier="shortcut">1️⃣ 快捷命令 (+ 前缀)</button>
+          <button type="button" class="tier-btn" data-tier="api">2️⃣ 精选 API 命令</button>
+          <button type="button" class="tier-btn" data-tier="raw">3️⃣ 通用 OpenAPI 调用</button>
+        </div>
+        <div class="tier-cmd" id="lk-cmd">lark-cli auth status</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>📦 人类开发者与 AI Agent 双路径快速上手</h2>
+      <p class="section-intro">前置条件：<code>Node.js</code>（npm/npx）；仅从源码编译时需 <code>Go v1.23+</code> 与 <code>Python 3</code>。官方 README 专门区分了「人类交互式」与「AI Agent 协作式」两种初始化流程：</p>
+
+      <div class="os-grid">
+        <div class="os-card is-featured">
+          <div class="os-card-head">
+            <h3>路径 A：npm 一键安装（个人首选）</h3>
+            <span class="pill pill-cyan">Windows / macOS / Linux</span>
+          </div>
+          <p class="os-note">先装 CLI，再初始化应用凭证并完成 OAuth 授权，三步跑通第一条日历查询。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">PowerShell / Shell</span>
+              <button type="button" class="copy-btn" data-copy-target="lk-npm">📋 复制</button>
+            </div>
+            <pre id="lk-npm"><code># 1. 全局安装 CLI（含嵌入 Skills）
+npx @larksuite/cli@latest install
+
+# 2. 交互式初始化飞书应用凭证（仅需一次）
+lark-cli config init
+
+# 3. 授权常用推荐权限并验证
+lark-cli auth login --recommend
+lark-cli calendar +agenda</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>路径 B：源码编译 + 单独装 Skills</h3>
+            <span class="pill pill-purple">Go v1.23+</span>
+          </div>
+          <p class="os-note">若需二次裁剪或排查源码，构建后务必额外执行 <code>npx skills add</code> 装入 Skill 定义。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">源码构建</span>
+              <button type="button" class="copy-btn" data-copy-target="lk-src">📋 复制</button>
+            </div>
+            <pre id="lk-src"><code>git clone https://github.com/larksuite/cli.git
+cd cli
+make install
+
+# 安装全部官方 Agent Skills（必需）
+npx skills add larksuite/cli -y -g</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>路径 C：让 AI Agent 引导用户授权</h3>
+            <span class="pill pill-amber">无头 / 后台协作</span>
+          </div>
+          <p class="os-note">Agent 在后台运行命令并提取输出的授权 URL 发给用户，用户在浏览器确认后命令自动返回。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Agent 协作流</span>
+              <button type="button" class="copy-btn" data-copy-target="lk-agent">📋 复制</button>
+            </div>
+            <pre id="lk-agent"><code># Agent 后台运行，输出授权链接交由用户打开
+lark-cli config init --new
+lark-cli auth login --recommend
+
+# 验证当前用户/应用身份状态
+lark-cli auth status</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>企业级接入与自省技巧</h3>
+            <span class="pill pill-green">ISV / 团队自研</span>
+          </div>
+          <p class="os-note">任意飞书开放平台文档 URL 后加 <code>.md</code> 即可让 Agent 直读原始 Markdown；企业定制使用仓库 <code>extension/</code>。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Schema 自省与文档</span>
+              <button type="button" class="copy-btn" data-copy-target="lk-schema">📋 复制</button>
+            </div>
+            <pre id="lk-schema"><code># 离线自省任意 API 参数、请求体与 scopes
+lark-cli schema
+lark-cli schema calendar.events.instance_view
+lark-cli schema im.messages.delete</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="contract">
+      <h2>⚙️ JSON 输出契约、分页控制与 Dry-Run 预览</h2>
+      <p class="section-intro">编写自动化脚本或让 Claude Code 解析命令行返回时，以下原仓约定非常关键：</p>
+      <ul class="prose-list">
+        <li><strong>判断成功看 <code>ok == true</code>（切勿用 <code>code == 0</code>）</strong>：默认 <code>--format json</code> 下，成功信封输出到 <code>stdout</code>（<code>{"ok":true,"identity":"user","data":...}</code>，不含 <code>code</code> 字段）；错误信封输出到 <code>stderr</code>（<code>{"ok":false,"error":{"type":"api","code":99991679,...}}</code>）。</li>
+        <li><strong>五种输出格式与安全分页</strong>：支持 <code>json</code>、<code>pretty</code>、<code>table</code>、<code>ndjson</code>（适合管道流式处理）与 <code>csv</code>；批量拉取可配合 <code>--page-all --page-limit 5 --page-delay 500</code> 防止触发频率限制。</li>
+        <li><strong>有副作用命令先加 <code>--dry-run</code></strong>：发消息、改多维表格或创建日程前，建议让 Agent 先加 <code>--dry-run</code> 打印真实请求载荷给人类确认。</li>
+      </ul>
+    </section>
+
+    <section class="section-card" id="security">
+      <h2>🛡️ 安全防护机制与使用边界</h2>
+      <div class="callout callout-amber">
+        <div class="callout-title">⚠️ 授权边界：私人助理优先，严禁拉入公共群聊</div>
+        <ul class="prose-list">
+          <li><strong>以你的用户身份执行</strong>：完成 OAuth 授权后，Agent 拥有对应 Scopes 内的读写与发送权限。官方明确建议仅将接入机器人的终端作为<strong>私人对话助手</strong>，不要拉入多人大群，以防群成员通过消息实施提示词注入或越权套取云文档数据。</li>
+          <li><strong>OS 原生密钥链与输出净化</strong>：凭证默认存储在系统原生 Keychain/Credential Manager 中，内置输入防注入与终端输出净化保护，不要随意关闭默认安全配置。</li>
+        </ul>
+      </div>
+      <div class="callout callout-red">
+        <div class="callout-title">📡 最小化风控信号说明与开关命令</div>
+        <ul class="prose-list">
+          <li>为降低访问令牌被盗用后的风险，CLI 向飞书官方精确 HTTPS 域名发起 OpenAPI 请求时，默认附带两条最小化设备特征：<strong>操作系统类型</strong>（macOS/Windows/Linux）与<strong>设备硬件型号</strong>（如 Mac17,9）。</li>
+          <li>如需在当前工作区退出或恢复该保护，可使用原生命令控制：<code>lark-cli config risk-control off</code> / <code>on</code> / <code>default</code>。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <article class="faq-item">
+          <h3>Q1：如何让 Claude Code 读取最新的飞书开放平台文档而不被网页 HTML 干扰？</h3>
+          <p>飞书官方在文档中给出技巧：任意飞书开放平台文档 URL 加上 <code>.md</code> 后缀即可直接返回原始 Markdown（例如 <code>embed-feishu-cli-in-agent.md</code>），也可直接执行 <code>lark-cli schema &lt;method&gt;</code> 本地自省参数与所需权限 scopes。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q2：跟第三方飞书 MCP（如 <code>cso1z/Feishu-MCP</code>）或 <code>openclaw-china</code> 怎么选？</h3>
+          <p>如果你主要通过终端 Agent（Claude Code / Codex）操作飞书文档、多维表格、日程、审批和 OKR，首选官方维护且 MIT 开源的 <code>larksuite/cli</code>（能力覆盖最全、更新同步开放平台）；如果是把消息机器人接入 OpenClaw IM 渠道网关，可搭配本库收录的 <code>openclaw-china</code> 或 <code>feishu-openclaw</code>。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q3：快捷命令和通用 <code>lark-cli api</code> 怎么配合？</h3>
+          <p>高频操作（如发消息、查议程、创建 Markdown 文档）直接用带 <code>+</code> 前缀的快捷命令；需要尚未封装的冷门 OpenAPI 时，先用 <code>lark-cli schema</code> 查清参数，再通过 <code>lark-cli api GET/POST /open-apis/...</code> 直接调用，避免自己手写鉴权和签名。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q4：企业想限制 Agent 只能读文档不能删文件、还要把 Token 存到 Vault 怎么办？</h3>
+          <p>不要改 CLI 源码。官方提供了 <code>extension/</code> 扩展包，支持通过 wrapper <code>main</code> 注入企业级中心化凭证管理、统一审计日志以及命令白名单裁剪。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/p/everything-claude-code/">
+          <div>
+            <span class="related-tag">🧠 全栈开发体系 · 311.5K+ ⭐</span>
+            <h3>affaan-m/ECC</h3>
+            <p>72 个代理 + 328 个技能 + 多语言规则系统，可与飞书官方 CLI 组合成研发到办公汇报闭环。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/p/xiaohongshu-mcp/">
+          <div>
+            <span class="related-tag">📣 中文平台自动化 · 17.3K+ ⭐</span>
+            <h3>xpzouying/xiaohongshu-mcp</h3>
+            <p>小红书 MCP Server，配合 <code>lark-base</code> 技能可把竞品笔记调研结果自动归档到飞书多维表格。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/zh-docgen/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 文档生成</span>
+            <h3>zh-docgen</h3>
+            <p>生成规范的中文 API 与架构文档，再通过 <code>lark-markdown</code> 或 <code>lark-doc</code> 同步至飞书团队知识库。</p>
+          </div>
+          <span class="related-go">查看原创技能 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>原作者与开源许可声明：</strong>本页为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">claude-code-skills-zh</a> 基于原仓库公开中文文档整理的接入指南与架构解析。项目版权归飞书官方 <strong>larksuite</strong> 团队及社区贡献者所有，采用 <strong>MIT License</strong> 开源，完整源码与更新说明请访问 <a href="https://github.com/larksuite/cli" target="_blank" rel="noopener noreferrer">github.com/larksuite/cli ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏中文 Claude Code Skills 精选集</h2>
+        <p>452+ 人工核验第三方技能与 22 个原创中文技能持续维护，官网支持跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#skills">精选目录</a>
+    <a href="/#original">原创技能</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var skills = [
+    { name: 'lark-shared', domain: 'meta', label: '基础认证与规则', desc: '应用配置、认证登录、身份切换、权限管理与安全规则（其他飞书 Skill 自动加载）。', shortcut: 'lark-cli auth status', api: 'lark-cli config show', raw: 'lark-cli schema auth' },
+    { name: 'lark-calendar', domain: 'collab', label: '沟通与日程', desc: '查看/创建/更新日程，查找会议室，查询忙闲与时间建议，回复日程邀请。', shortcut: 'lark-cli calendar +agenda', api: 'lark-cli calendar events instance_view --params \'{"calendar_id":"primary","start_time":"1700000000","end_time":"1700086400"}\'', raw: 'lark-cli api GET /open-apis/calendar/v4/calendars' },
+    { name: 'lark-im', domain: 'collab', label: '沟通与日程', desc: '发送/回复消息、群聊管理、消息搜索、上传下载图片与文件、表情回复。', shortcut: 'lark-cli im +messages-send --chat-id "oc_xxx" --text "Hello" --dry-run', api: 'lark-cli im messages list --params \'{"container_id_type":"chat","container_id":"oc_xxx"}\'', raw: 'lark-cli api POST /open-apis/im/v1/messages --params \'{"receive_id_type":"chat_id"}\' --data \'{"receive_id":"oc_xxx","msg_type":"text","content":"{\\"text\\":\\"Hello\\"}"}\'' },
+    { name: 'lark-mail', domain: 'collab', label: '沟通与日程', desc: '浏览、搜索、阅读邮件，发送、回复、转发与草稿管理，监听新邮件事件。', shortcut: 'lark-cli mail +list', api: 'lark-cli schema mail', raw: 'lark-cli api GET /open-apis/mail/v1/user_mailboxes/me/messages' },
+    { name: 'lark-contact', domain: 'collab', label: '沟通与日程', desc: '按姓名、邮箱或手机号搜索飞书通讯录用户并获取基础组织信息。', shortcut: 'lark-cli contact +search --query "张三"', api: 'lark-cli schema contact', raw: 'lark-cli api POST /open-apis/contact/v3/users/batch_get_id' },
+    { name: 'lark-event', domain: 'collab', label: '沟通与日程', desc: 'WebSocket 实时事件订阅，支持正则路由与 Agent 友好结构化输出。', shortcut: 'lark-cli event +listen', api: 'lark-cli schema event', raw: 'lark-cli api GET /open-apis/event/v1/outbound_ip' },
+    { name: 'lark-doc', domain: 'docs', label: '文档与表格', desc: '创建、读取、更新与搜索飞书云文档（基于 Markdown 双向转换）。', shortcut: 'lark-cli docs +create --doc-format markdown --content "# 周报\\n- 完成上线"', api: 'lark-cli schema docs', raw: 'lark-cli api POST /open-apis/docx/v1/documents' },
+    { name: 'lark-markdown', domain: 'docs', label: '文档与表格', desc: '创建、读取、局部 patch 与覆盖更新云空间中的原生 .md 文件。', shortcut: 'lark-cli drive +md-patch --help', api: 'lark-cli schema drive', raw: 'lark-cli api GET /open-apis/drive/v1/files' },
+    { name: 'lark-drive', domain: 'docs', label: '文档与表格', desc: '上传与下载云空间文件，搜索知识库文档，管理协作者权限与评论。', shortcut: 'lark-cli drive +search --query "PRD"', api: 'lark-cli schema drive.files', raw: 'lark-cli api GET /open-apis/drive/v1/files?page_size=20' },
+    { name: 'lark-wiki', domain: 'docs', label: '文档与表格', desc: '访问与维护飞书知识空间（Wiki）、目录树节点与内部关联文档。', shortcut: 'lark-cli wiki +spaces', api: 'lark-cli schema wiki', raw: 'lark-cli api GET /open-apis/wiki/v2/spaces' },
+    { name: 'lark-base', domain: 'docs', label: '文档与表格', desc: '多维表格（Bitable）数据表、字段、记录、视图、仪表盘与数据聚合分析。', shortcut: 'lark-cli base +records-list --help', api: 'lark-cli schema bitable', raw: 'lark-cli api GET /open-apis/bitable/v1/apps/{app_token}/tables' },
+    { name: 'lark-sheets', domain: 'docs', label: '文档与表格', desc: '电子表格读取、写入、追加行、范围查找与数据导出。', shortcut: 'lark-cli sheets +read --help', api: 'lark-cli schema sheets', raw: 'lark-cli api GET /open-apis/sheets/v3/spreadsheets/{spreadsheet_token}' },
+    { name: 'lark-slides', domain: 'docs', label: '文档与表格', desc: '创建和管理飞书幻灯片、读取演示内容以及增删幻灯片页面。', shortcut: 'lark-cli slides --help', api: 'lark-cli schema slides', raw: 'lark-cli api GET /open-apis/slides/v1/presentations/{presentation_id}' },
+    { name: 'lark-whiteboard', domain: 'docs', label: '文档与表格', desc: '通过画板/图表 DSL 让 Agent 自动绘制流程图、架构图与白板节点。', shortcut: 'lark-cli whiteboard --help', api: 'lark-cli schema board', raw: 'lark-cli api GET /open-apis/board/v1/whiteboards/{whiteboard_id}/nodes' },
+    { name: 'lark-task', domain: 'biz', label: '审批、OKR 与会议', desc: '创建、查询、更新和完成飞书任务，管理清单、子任务、评论与提醒。', shortcut: 'lark-cli task +list', api: 'lark-cli schema task', raw: 'lark-cli api GET /open-apis/task/v2/tasks' },
+    { name: 'lark-meeting', domain: 'biz', label: '审批、OKR 与会议', desc: '查询进行中或历史会议与参会人，分析逐字稿、管理飞书妙记并提供会中协助。', shortcut: 'lark-cli meeting --help', api: 'lark-cli schema vc', raw: 'lark-cli api GET /open-apis/vc/v1/meetings/list_by_no' },
+    { name: 'lark-approval', domain: 'biz', label: '审批、OKR 与会议', desc: '查询待办审批任务，执行同意/拒绝/转交、撤回与抄送审批实例。', shortcut: 'lark-cli approval --help', api: 'lark-cli schema approval', raw: 'lark-cli api GET /open-apis/approval/v4/instances/{instance_id}' },
+    { name: 'lark-attendance', domain: 'biz', label: '审批、OKR 与会议', desc: '查询个人考勤打卡记录与班次状态。', shortcut: 'lark-cli attendance --help', api: 'lark-cli schema attendance', raw: 'lark-cli api POST /open-apis/attendance/v1/user_tasks/query' },
+    { name: 'lark-okr', domain: 'biz', label: '审批、OKR 与会议', desc: '查询、创建、更新 OKR，管理目标、关键结果（KR）、对齐关系与进展记录。', shortcut: 'lark-cli okr --help', api: 'lark-cli schema okr', raw: 'lark-cli api GET /open-apis/okr/v1/periods' },
+    { name: 'lark-workflow-meeting-summary', domain: 'biz', label: '审批、OKR 与会议', desc: '开箱即用的工作流技能：自动提取会议逐字稿并生成结构化纪要报告。', shortcut: '# 在对话中触发：@lark-workflow-meeting-summary 总结今天评审会纪要', api: 'lark-cli meeting --help', raw: 'lark-cli docs +create --doc-format markdown --content "# 会议纪要"' },
+    { name: 'lark-workflow-standup-report', domain: 'biz', label: '审批、OKR 与会议', desc: '开箱即用的工作流技能：聚合日历与任务生成每日站会待办摘要。', shortcut: 'lark-cli calendar +agenda --format json && lark-cli task +list --format json', api: 'lark-cli calendar events instance_view', raw: 'lark-cli api GET /open-apis/task/v2/tasks' },
+    { name: 'lark-openapi-explorer', domain: 'meta', label: '基础与开发扩展', desc: '帮助 Agent 直接检索与探索飞书开放平台底层 2500+ OpenAPI 端点。', shortcut: 'lark-cli schema', api: 'lark-cli schema --help', raw: 'lark-cli api --help' },
+    { name: 'lark-skill-maker', domain: 'meta', label: '基础与开发扩展', desc: '自定义飞书 Skill 创建框架，按团队业务场景封装专属组合技能。', shortcut: '# 基于原仓 skill-template/ 与 lark-skill-maker 创建团队私有 Skill', api: 'lark-cli config show', raw: 'npx skills add larksuite/cli -y -g' }
+  ];
+
+  var currentDomain = 'all';
+  var currentSkill = skills[0];
+  var currentTier = 'shortcut';
+  var pillsWrap = document.getElementById('lark-skill-pills');
+
+  function renderDetail() {
+    document.getElementById('lk-name').textContent = currentSkill.name;
+    document.getElementById('lk-domain').textContent = currentSkill.label;
+    document.getElementById('lk-desc').textContent = currentSkill.desc;
+    document.getElementById('lk-cmd').textContent = currentSkill[currentTier];
+  }
+
+  function renderPills() {
+    while (pillsWrap.firstChild) {
+      pillsWrap.removeChild(pillsWrap.firstChild);
+    }
+    var filtered = skills.filter(function (s) {
+      return currentDomain === 'all' || s.domain === currentDomain;
+    });
+    if (filtered.indexOf(currentSkill) === -1 && filtered.length > 0) {
+      currentSkill = filtered[0];
+    }
+    filtered.forEach(function (item) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'skill-pill' + (item === currentSkill ? ' is-active' : '');
+      btn.textContent = item.name;
+      btn.addEventListener('click', function () {
+        currentSkill = item;
+        pillsWrap.querySelectorAll('.skill-pill').forEach(function (el) {
+          el.classList.toggle('is-active', el === btn);
+        });
+        renderDetail();
+      });
+      pillsWrap.appendChild(btn);
+    });
+    renderDetail();
+  }
+
+  document.querySelectorAll('.domain-tab[data-domain]').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      currentDomain = tab.getAttribute('data-domain');
+      document.querySelectorAll('.domain-tab').forEach(function (t) {
+        t.classList.toggle('is-active', t === tab);
+      });
+      renderPills();
+    });
+  });
+
+  document.querySelectorAll('.tier-btn[data-tier]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      currentTier = btn.getAttribute('data-tier');
+      document.querySelectorAll('.tier-btn').forEach(function (b) {
+        b.classList.toggle('is-active', b === btn);
+      });
+      renderDetail();
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve();
+        else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+
+  renderPills();
+})();
+</script>
+</body>
+</html>

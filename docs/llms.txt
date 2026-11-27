@@ -1,6 +1,6 @@
 # Claude Code Skills 中文精选集（claude-code-skills-zh）
 
-> 面向中文开发者的 Claude Code Skills / Agents / Plugins 精选仓库，收录 452+ 个精选技能，按场景分类并提供中文说明，另含 22 个可直接安装的原创中文技能。MIT 许可，持续更新，由 laolaoshiren 维护。
+> 面向中文开发者的 Claude Code Skills / Agents / Plugins 精选仓库，收录 453+ 个精选技能，按场景分类并提供中文说明，另含 22 个可直接安装的原创中文技能。MIT 许可，持续更新，由 laolaoshiren 维护。
 
 ## 关键事实
 
@@ -30,9 +30,12 @@
 <!-- detail-pages-start -->
 - [tt-a1i/archify 中文深度指南：99.7K+ Stars 交互式 HTML 架构图与 PR 可视化 Skill | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/archify/)
 - [JimLiu/baoyu-skills 中文深度指南：22 个自媒体与创作 Agent Skills 按需选型与安装 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/baoyu-skills/)
+- [affaan-m/ECC (Everything Claude Code) 中文深度指南：72 代理、328 技能与防重复安装避坑 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/everything-claude-code/)
 - [heygen-com/hyperframes 中文深度指南：HTML 写视频、9 个官方 Skills 与 Remotion 对比 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/hyperframes/)
 - [pbakaus/impeccable 中文深度指南：62 条反 AI 味检测规则与 24 个 UI 设计指令 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/impeccable/)
+- [larksuite/cli 中文深度指南：飞书官方 CLI、26 个 Agent Skills 与三层调用架构 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/larksuite-cli/)
 - [alibaba/open-code-review 中文深度指南：阿里混合架构 AI 代码审查工具与委托模式配置 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/open-code-review/)
+- [obra/superpowers 中文深度指南：15 个 Agentic 工程技能、五阶段流水线与 15+ 客户端安装 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/superpowers/)
 - [xpzouying/xiaohongshu-mcp 中文深度指南：小红书 MCP 部署、13 个工具与防踢号避坑 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/p/xiaohongshu-mcp/)
 - [ai-video-producer：中文八阶段 AI 视频流水线技能（防抽卡成本门禁） | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/skills/ai-video-producer/)
 - [api-tester：三档环境门禁与契约驱动 API 测试技能 | Claude Code Skills 中文精选集](https://claude-skills.bt199.com/skills/api-tester/)

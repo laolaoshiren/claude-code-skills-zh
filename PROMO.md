@@ -5,7 +5,7 @@
 
 ## 1️⃣ V2EX 发帖
 
-**标题：** [分享] Claude Code Skills 中文精选集 — 452+ 精选技能 + 22 个原创可安装技能
+**标题：** [分享] Claude Code Skills 中文精选集 — 453+ 精选技能 + 22 个原创可安装技能
 
 **正文：**
 做了个 Claude Code Skills 的中文资源站，不只是 awesome 列表，还包含可直接安装的原创中文技能：
@@ -18,7 +18,7 @@
 - Skill 收录核验器（`skill-curator`）
 ...
 
-还整理了 452+ 第三方精选资源，按场景分类，并提供项目入口、Windows/macOS/Linux 安装指引和跨工具路径速查，已同步到可搜索官网。
+还整理了 453+ 第三方精选资源，按场景分类，并提供项目入口、Windows/macOS/Linux 安装指引和跨工具路径速查，已同步到可搜索官网。
 
 链接：https://github.com/laolaoshiren/claude-code-skills-zh
 官网：https://claude-skills.bt199.com
@@ -65,7 +65,7 @@ Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\*" "$HOME\.claude\skil
 
 🛠️ 做了个 Claude Code Skills 中文精选集！
 
-✅ 452+ 精选资源列表
+✅ 453+ 精选资源列表
 ✅ 22 个原创可安装技能
 ✅ 按场景分类，中文说明，官网支持实时搜索
 
@@ -84,7 +84,7 @@ Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\*" "$HOME\.claude\skil
 
 github.com/laolaoshiren/claude-code-skills-zh
 
-不只列出了 452+ 优质资源，还带了 22 个原创技能可以直接装：
+不只列出了 453+ 优质资源，还带了 22 个原创技能可以直接装：
 - `skill-translator`：把海外高星英文 Skill 无损转为中文触发 + 安全/Windows 体检版
 - `ai-video-producer`：面向中文口播与抖音/B 站/小红书的八阶段 AI 视频流水线
 - `zh-code-reviewer`、`api-tester`、`zh-readme`、`perf-profiler` 等日常高频研发技能
@@ -97,7 +97,7 @@ github.com/laolaoshiren/claude-code-skills-zh
 
 分享个资源，做了个 Claude Code Skills 的中文精选集 📋
 
-不只列了 452+ 好用的资源，还带了 22 个原创技能可以直接装：
+不只列了 453+ 好用的资源，还带了 22 个原创技能可以直接装：
 英文 Skill 汉化体检（skill-translator）、AI 视频流水线（ai-video-producer）、中文代码审查、API 测试、Git 自动化...
 
 一键安装 👇

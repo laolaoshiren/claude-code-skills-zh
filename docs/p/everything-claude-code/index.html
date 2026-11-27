@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>affaan-m/ECC (Everything Claude Code) 中文深度指南：72 代理、328 技能与防重复安装避坑 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="311.5K+ Stars Anthropic 黑客松获胜者系统 affaan-m/ECC 中文实战指南：详解 /plugin install ecc@ecc 与 install.ps1 冲突红线、语言 Rules 手动拷贝、multi-* 需 ccg-workflow 依赖、ecc-memory-vault 多客户端隔离与跨平台命令生成。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="skill-repo" content="https://github.com/affaan-m/ECC">
+<link rel="canonical" href="https://claude-skills.bt199.com/p/everything-claude-code/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="affaan-m/ECC 中文深度指南：全栈 Claude Code 代理、技能、规则与记忆体系">
+<meta property="og:description" content="311.5K+ Stars 全栈 Agent 配置系统：72 个代理、328 个技能、99 个命令，含防重复叠加安装生成器与 Windows 避坑。">
+<meta property="og:url" content="https://claude-skills.bt199.com/p/everything-claude-code/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="affaan-m/ECC Everything Claude Code 中文深度指南">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="affaan-m/ECC 中文深度指南：72 代理、328 技能与安全规则">
+<meta name="twitter:description" content="覆盖 Claude Code / Codex / Cursor / OpenCode / Gemini CLI 的全栈配置体系，含防重复安装命令构建器。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：星紫架构 + 琥珀警示识别 */
+  :root {
+    --accent: #8b5cf6;
+    --accent2: #f59e0b;
+    --cyan: #22d3ee;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    box-shadow: 0 4px 18px rgba(139, 92, 246, 0.36);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 8px 26px rgba(139, 92, 246, 0.5);
+  }
+  .nav-star,
+  .step-num {
+    background: linear-gradient(135deg, #8b5cf6, #f59e0b);
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(139, 92, 246, 0.18) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+  }
+  .ecc-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .ecc-btn {
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 15, 0.72);
+    color: var(--text2);
+    border-radius: 10px;
+    padding: 8px 13px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.18s ease;
+  }
+  .ecc-btn:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .ecc-btn.is-active {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: var(--accent);
+    color: #ede9fe;
+  }
+  .ecc-lang-pill {
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 15, 0.65);
+    color: var(--text2);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    font-family: var(--mono);
+    cursor: pointer;
+  }
+  .ecc-lang-pill.is-active {
+    background: rgba(34, 211, 238, 0.16);
+    border-color: var(--cyan);
+    color: #cffafe;
+  }
+  .ecc-guard {
+    border: 1px solid rgba(245, 158, 11, 0.42);
+    background: rgba(245, 158, 11, 0.08);
+    border-radius: 12px;
+    padding: 12px 15px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    color: #fde68a;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "affaan-m/ECC (Everything Claude Code)",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/p/everything-claude-code/",
+  "codeRepository": "https://github.com/affaan-m/ECC",
+  "description": "Anthropic 黑客松获胜者 affaan-m 开源的全栈 Claude Code 与多 Agent 配置体系，包含 72 个代理、328 个技能、99 个命令、hooks、持续学习本能（instincts）、ecc-agentshield 安全扫描与多语言 rules。",
+  "author": {
+    "@type": "Person",
+    "name": "affaan-m",
+    "url": "https://github.com/affaan-m"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "首页",
+      "item": "https://claude-skills.bt199.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "精选第三方技能",
+      "item": "https://claude-skills.bt199.com/#skills"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "affaan-m/ECC",
+      "item": "https://claude-skills.bt199.com/p/everything-claude-code/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "通过 /plugin install ecc@ecc 安装后，为什么不能再运行 install.sh --profile full？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "原仓明确警告：插件安装方式会自动加载 ECC 的技能、命令与 hooks；如果再运行 ./install.sh --profile full、.\\install.ps1 --profile full 或 npx ecc-universal install --profile full，会把同一批内容复制到用户目录，导致技能重复和 hooks 重复执行。走插件路线时只需手动拷贝 rules/common 和对应语言 rules 目录即可。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "为什么运行 /multi-plan 或 /multi-execute 提示缺少组件？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "ECC 的基础插件和 rules 安装不包含 multi-* 多智能体命令所需的底层运行时。使用 /multi-plan、/multi-execute、/multi-backend、/multi-frontend 和 /multi-workflow 前，必须额外执行 npx ccg-workflow 完成初始化，以安装 ~/.claude/bin/codeagent-wrapper 与 ~/.claude/.ccg/prompts/*。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "同时使用 Claude Code 和 Codex 时，ecc-memory-vault 能共用记忆服务进程吗？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "不能共用同一个服务进程。不同 harness（如 Claude Code 与 Codex）可以共享同一个二进制文件和底层记忆库目录，但必须分别为每个 harness 启动独立进程（例如设置 ECC_MEMORY_HARNESS=codex ecc-memory-mcp）。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Windows 用户运行 ECC 的 hooks 会遇到 bash 脚本不兼容问题吗？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "不会。ECC 已将全部 hooks 与脚手架脚本用 Node.js 重写，原生支持 Windows（PowerShell）、macOS 与 Linux，并支持 Cursor、OpenCode、Codex、Gemini 与 Antigravity 等多工具；包管理器可通过 CLAUDE_PACKAGE_MANAGER 或 /setup-pm 自动识别 npm/pnpm/yarn/bun。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#skills">精选第三方技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">affaan-m/ECC</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-green">🇨🇳 官方完整简体中文文档</span>
+        <span class="pill pill-purple">Anthropic 黑客松获胜者</span>
+        <span class="pill pill-amber">MIT · 72 代理 · 328 技能 · 99 命令</span>
+      </div>
+      <h1><span class="accent-text">affaan-m/ECC</span> 中文深度指南：全栈 Agent 配置体系与防冲突安装</h1>
+      <p class="hero-lead">旧称 <code>everything-claude-code</code>（现主仓 <code>affaan-m/ECC</code>）。由 Anthropic 黑客马拉松获胜者 <strong>affaan-m</strong> 与 170+ 贡献者共同打磨的生产级配置系统：集成了 <strong>72 个智能体、328 个技能、99 个命令</strong>、跨会话记忆优化、持续学习本能（<code>/evolve</code>）、<code>ecc-agentshield</code> 安全扫描与 12+ 语言规则目录，兼容 Claude Code、Codex、Cursor、OpenCode、Gemini 与 Antigravity。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">GitHub Stars</div>
+          <div class="metric-value is-star">⭐ 311.5K+（核验 311,527）</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">MIT License</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">体系规模</div>
+          <div class="metric-value is-cyan">72 Agents · 328 Skills · 99 Cmds</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">生态兼容</div>
+          <div class="metric-value">Win / macOS / Linux · 多 CLI</div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#install-guard" class="btn btn-primary">🛡️ 生成防冲突安装命令</a>
+        <a href="https://github.com/affaan-m/ECC" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📦 访问原仓库 GitHub ↗</a>
+        <a href="https://github.com/affaan-m/ECC/blob/main/README.zh-CN.md" class="btn btn-cyan" target="_blank" rel="noopener noreferrer">📖 官方简体中文 README ↗</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#install-guard">防重复安装生成器</a>
+      <a href="#architecture">核心模块拆解</a>
+      <a href="#warnings">三大高频踩坑红线</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="install-guard">
+      <h2>🛡️ 防重复冲突安装向导（Plugin vs 手动安装二选一）</h2>
+      <p class="section-intro">ECC 社区最高频的故障是「装完插件又跑 <code>--profile full</code> 导致全部技能和 Hooks 执行两遍」。选择你的安装方式、操作系统与目标语言规则目录，生成干净命令：</p>
+
+      <div class="ecc-row" role="tablist" aria-label="选择安装路径">
+        <button type="button" class="ecc-btn is-active" data-mode="plugin">方案 1：Claude Code 插件 + 手动 Rules（官方推荐）</button>
+        <button type="button" class="ecc-btn" data-mode="manual">方案 2：纯手动脚本安装（不走 /plugin）</button>
+        <button type="button" class="ecc-btn" data-mode="universal">方案 3：跨工具通用安装器（ecc-universal）</button>
+      </div>
+
+      <div class="ecc-row" role="group" aria-label="选择操作系统与目标语言规则">
+        <button type="button" class="ecc-btn is-active" data-os="win">🪟 Windows PowerShell</button>
+        <button type="button" class="ecc-btn" data-os="unix">🐧 macOS / Linux</button>
+        <button type="button" class="ecc-lang-pill is-active" data-lang="typescript">rules/typescript</button>
+        <button type="button" class="ecc-lang-pill" data-lang="python">rules/python</button>
+        <button type="button" class="ecc-lang-pill" data-lang="golang">rules/golang</button>
+      </div>
+
+      <div class="ecc-guard" id="ecc-guard-note">
+        ⚠️ 重要：选「插件安装」后，切勿再执行 ./install.sh --profile full 或 .\install.ps1 --profile full；插件无法自动分发 rules，仅需把 rules/common 与对应语言整个目录拷贝到 ~/.claude/rules/。
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-title" id="ecc-cmd-title">Claude Code 插件安装 + Windows PowerShell 规则复制</span>
+          <button type="button" class="copy-btn" data-copy-target="ecc-cmd-out">📋 复制</button>
+        </div>
+        <pre id="ecc-cmd-out"><code></code></pre>
+      </div>
+    </section>
+
+    <section class="section-card" id="architecture">
+      <h2>🧱 核心能力拆解：不只是提示词，而是一套工程操作系统</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>🤖 72 Agents + 328 Skills</h3>
+          <p>按角色拆分子代理（架构师、代码审查、Go/Python 专项审校、安全检查），命令支持插件命名空间 <code>/ecc:plan</code> 与手动短命令 <code>/plan</code>。</p>
+        </div>
+        <div class="feature-card">
+          <h3>🧠 持续学习与记忆本能</h3>
+          <p>通过 <code>/instinct-status</code>、<code>/instinct-import</code>、<code>/instinct-export</code> 与 <code>/evolve</code> 把会话经验聚类为可复用 Skill，另有独立 <code>ecc-memory-vault</code> MCP。</p>
+        </div>
+        <div class="feature-card">
+          <h3>🛡️ AgentShield 安全与包管理器</h3>
+          <p>自带 <code>ecc-agentshield</code> 安全扫描工具；内置 6 级包管理器优先级检测（<code>CLAUDE_PACKAGE_MANAGER</code> / 锁文件 / <code>/setup-pm</code>），无需手改脚本。</p>
+        </div>
+        <div class="feature-card">
+          <h3>🌐 14+ 客户端适配目录</h3>
+          <p>仓库顶层原生提供 <code>.claude-plugin/</code>、<code>.codex-plugin/</code>、<code>.cursor/</code>、<code>.gemini/</code>、<code>.opencode/</code>、<code>.qwen/</code>、<code>.trae/</code> 与 <code>.qoder-plugin/</code> 等配置。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="warnings">
+      <h2>🚨 上手前必看的三条硬坑与边界</h2>
+      <div class="callout callout-red">
+        <div class="callout-title">1. 插件标识符已简化为 ecc@ecc，且严禁与 --profile full 混用</div>
+        <p>早期文章常出现较长标识符，现已统一为 <code>/plugin install ecc@ecc</code>。如同时运行 <code>--profile full</code>，会导致技能与 Hooks 重复注册、Token 暴涨甚至死循环。</p>
+      </div>
+      <div class="callout callout-amber">
+        <div class="callout-title">2. /multi-* 多智能体编排命令必须单装 ccg-workflow</div>
+        <p>想运行 <code>/multi-plan</code>、<code>/multi-execute</code>、<code>/multi-backend</code>、<code>/multi-frontend</code> 或 <code>/multi-workflow</code>，需额外执行 <code>npx ccg-workflow</code> 安装 <code>~/.claude/bin/codeagent-wrapper</code> 与对应 prompts，否则无法执行。</p>
+      </div>
+      <div class="callout callout-amber">
+        <div class="callout-title">3. 复制 rules 时必须拷贝整个语言目录 &amp; 分离记忆进程</div>
+        <p>不要只拷贝 <code>rules/</code> 里的单个 <code>.md</code>，必须整目录拷贝（如 <code>rules/common</code>、<code>rules/golang</code>）以保证相对引用正常；多工具接入 <code>ecc-memory-vault</code> 时，不同 harness 需通过 <code>ECC_MEMORY_HARNESS</code> 各自启动独立 MCP 进程。</p>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <article class="faq-item">
+          <h3>Q1：国内开发者第一次看 ECC 仓库文件那么多，从哪几份文档读起？</h3>
+          <p>建议按原仓顺序：先看 <code>README.zh-CN.md</code> 快速开始，再按需查阅根目录下 <code>the-shortform-guide.md</code>（速览）、<code>the-longform-guide.md</code>（深度工作流）和 <code>the-security-guide.md</code>（安全边界），不要一次性把 328 个技能全塞进上下文。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q2：以前用过 /tdd、/eval、/verify 等老命令，现在找不到怎么办？</h3>
+          <p>原仓已在 <code>legacy-command-shims/</code> 中归档了退役短命令并给出迁移指引：例如用 <code>tdd-workflow</code> 技能替代 <code>/tdd</code>，用 <code>verification-loop</code> 替代 <code>/verify</code>，用 <code>eval-harness</code> 替代 <code>/eval</code>。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q3：ECC 跟 obra/superpowers 有什么定位差异？可以同时用吗？</h3>
+          <p><code>affaan-m/ECC</code> 偏「全栈工具箱 + 规则库 + 语言审查命令 + 持续学习本能」；<code>obra/superpowers</code> 偏「强制先出规格、再走红绿 TDD 与子代理两阶段审校的研发流程」。两者可互补，但建议不要在同一项目里同时开启两套冲突的 TDD/plan 触发规则，先选一套作为主流程。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q4：只想给现有英文 Skill 做汉化或先做单点 Code Review，需要装整个 ECC 吗？</h3>
+          <p>不需要。轻量场景可直接安装本仓库自带的 <code>zh-code-reviewer</code>、<code>security-audit</code> 或 <code>skill-translator</code> 单个 MIT 技能；当你希望给整个团队沉淀跨语言的规则、Hooks 与记忆体系时再引入 ECC。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/p/superpowers/">
+          <div>
+            <span class="related-tag">🦸 Agentic 方法论 · 327.9K+ ⭐</span>
+            <h3>obra/superpowers</h3>
+            <p>15 个高度耦合的软件工程核心技能，强调 brainstorming → worktree → TDD → 两阶段审查。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/p/open-code-review/">
+          <div>
+            <span class="related-tag">🔍 混合代码审查 · 56.2K+ ⭐</span>
+            <h3>alibaba/open-code-review</h3>
+            <p>阿里开源的多 Agent 混合代码审查引擎，可补充 ECC 之外的深度跨文件语义审查。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/skill-translator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · Skill 汉化</span>
+            <h3>skill-translator</h3>
+            <p>想把 ECC 里感兴趣的英文专精 Skill 无损汉化并检查 Windows 路径兼容性？用它一键完成。</p>
+          </div>
+          <span class="related-go">查看原创技能 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>原作者与开源许可声明：</strong>本页为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">claude-code-skills-zh</a> 基于原仓库公开中文文档整理的实战安装与避坑指南。项目版权归原作者 <strong>affaan-m</strong> 及 170+ 社区贡献者所有，采用 <strong>MIT License</strong> 开源，完整源码与指南请访问 <a href="https://github.com/affaan-m/ECC" target="_blank" rel="noopener noreferrer">github.com/affaan-m/ECC ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏中文 Claude Code Skills 精选集</h2>
+        <p>452+ 人工核验第三方技能与 22 个原创中文技能持续维护，官网支持跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#skills">精选目录</a>
+    <a href="/#original">原创技能</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var state = { mode: 'plugin', os: 'win', lang: 'typescript' };
+
+  function renderCmd() {
+    var titleEl = document.getElementById('ecc-cmd-title');
+    var guardEl = document.getElementById('ecc-guard-note');
+    var codeEl = document.getElementById('ecc-cmd-out').querySelector('code');
+    var lang = state.lang;
+
+    if (state.mode === 'plugin') {
+      guardEl.textContent = '⚠️ 安全边界：插件已自动加载技能、命令与 hooks，切勿再执行 --profile full；仅需手动拷贝 rules/common 与整个 rules/' + lang + ' 目录。';
+      if (state.os === 'win') {
+        titleEl.textContent = 'Claude Code 插件 + Windows PowerShell 手动复制 Rules（推荐）';
+        codeEl.textContent =
+          '# 1. 在 Claude Code 会话中安装插件（已简化为 ecc@ecc）\n' +
+          '/plugin marketplace add https://github.com/affaan-m/ECC\n' +
+          '/plugin install ecc@ecc\n\n' +
+          '# 2. 克隆仓库后仅手动复制需要的规则目录（PowerShell）\n' +
+          'git clone https://github.com/affaan-m/ECC.git\n' +
+          'cd ECC\n' +
+          'New-Item -ItemType Directory -Force -Path "$HOME/.claude/rules" | Out-Null\n' +
+          'Copy-Item -Recurse rules/common "$HOME/.claude/rules/"\n' +
+          'Copy-Item -Recurse rules/' + lang + ' "$HOME/.claude/rules/"\n\n' +
+          '# 3. 验证命令（插件版带 ecc: 命名空间）\n' +
+          '/ecc:plan "添加用户认证"';
+      } else {
+        titleEl.textContent = 'Claude Code 插件 + macOS/Linux 手动复制 Rules（推荐）';
+        codeEl.textContent =
+          '# 1. 在 Claude Code 会话中安装插件\n' +
+          '/plugin marketplace add https://github.com/affaan-m/ECC\n' +
+          '/plugin install ecc@ecc\n\n' +
+          '# 2. 仅复制需要的整套规则目录\n' +
+          'git clone https://github.com/affaan-m/ECC.git && cd ECC\n' +
+          'mkdir -p ~/.claude/rules\n' +
+          'cp -R rules/common ~/.claude/rules/\n' +
+          'cp -R rules/' + lang + ' ~/.claude/rules/\n\n' +
+          '# 3. 验证\n' +
+          '/plugin list ecc@ecc';
+      }
+    } else if (state.mode === 'manual') {
+      guardEl.textContent = '⚠️ 安全边界：仅当你完全不走 /plugin install 时才使用全量安装脚本；不要与方案 1 叠加执行。';
+      if (state.os === 'win') {
+        titleEl.textContent = '纯手动全量安装（Windows PowerShell）';
+        codeEl.textContent =
+          'git clone https://github.com/affaan-m/ECC.git\n' +
+          'cd ECC\n' +
+          'npm install\n' +
+          '.\\install.ps1 --profile full\n\n' +
+          '# 手动安装版使用无前缀短命令\n' +
+          '# /plan "添加用户认证"';
+      } else {
+        titleEl.textContent = '纯手动全量安装（macOS / Linux）';
+        codeEl.textContent =
+          'git clone https://github.com/affaan-m/ECC.git\n' +
+          'cd ECC\n' +
+          'npm install\n' +
+          './install.sh --profile full\n\n' +
+          '# 手动安装版使用无前缀短命令\n' +
+          '# /plan "添加用户认证"';
+      }
+    } else {
+      guardEl.textContent = 'ℹ️ 提示：ecc-universal 适用于不走 Claude Code 插件市场、需要通过 npm 统一分发到其他工具的用户；multi-* 命令仍需额外执行 npx ccg-workflow。';
+      titleEl.textContent = 'ecc-universal 通用 CLI 安装与 multi-* 运行时补充';
+      codeEl.textContent =
+        '# 通用包管理器安装（先确认未通过 /plugin 安装重复副本）\n' +
+        'npx ecc-universal install --profile full\n\n' +
+        '# 可选：若要使用 /multi-plan /multi-execute 等多智能体编排\n' +
+        'npx ccg-workflow\n\n' +
+        '# 可选：全局设置包管理器偏好\n' +
+        'node scripts/setup-package-manager.js --global pnpm';
+    }
+  }
+
+  document.querySelectorAll('.ecc-btn[data-mode]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      state.mode = btn.getAttribute('data-mode');
+      document.querySelectorAll('.ecc-btn[data-mode]').forEach(function (b) {
+        b.classList.toggle('is-active', b === btn);
+      });
+      renderCmd();
+    });
+  });
+
+  document.querySelectorAll('.ecc-btn[data-os]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      state.os = btn.getAttribute('data-os');
+      document.querySelectorAll('.ecc-btn[data-os]').forEach(function (b) {
+        b.classList.toggle('is-active', b === btn);
+      });
+      renderCmd();
+    });
+  });
+
+  document.querySelectorAll('.ecc-lang-pill[data-lang]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      state.lang = btn.getAttribute('data-lang');
+      document.querySelectorAll('.ecc-lang-pill[data-lang]').forEach(function (b) {
+        b.classList.toggle('is-active', b === btn);
+      });
+      renderCmd();
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve();
+        else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+
+  renderCmd();
+})();
+</script>
+</body>
+</html>

@@ -1,11 +1,11 @@
 # 🛠️ Claude Code Skills 中文精选集
 
-> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 452+ | 按场景分类 | 复制即装 | 持续更新
+> 🚀 最实用的 Claude Code Skills / Agents / Plugins 合集 | 精选 453+ | 按场景分类 | 复制即装 | 持续更新
 
 [![Stars](https://img.shields.io/github/stars/laolaoshiren/claude-code-skills-zh?style=social)](https://github.com/laolaoshiren/claude-code-skills-zh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-452%2B-green.svg)](#original-skills)
-[![Updated](https://img.shields.io/badge/updated-2026--11--26-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
+[![Skills](https://img.shields.io/badge/skills-453%2B-green.svg)](#original-skills)
+[![Updated](https://img.shields.io/badge/updated-2026--11--27-brightgreen.svg)](https://github.com/laolaoshiren/claude-code-skills-zh/commits/main)
 [![Website](https://img.shields.io/badge/website-claude--skills.bt199.com-6c5ce7.svg)](https://claude-skills.bt199.com)
 
 **中文开发者最好的 Claude Code Skills 资源站。** 不只是列表，更包含可直接安装的原创技能包。
@@ -45,9 +45,9 @@ Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\*" "$HOME\.claude\skil
 <!-- fact-summary -->
 ## 📌 一句话事实
 
-**claude-code-skills-zh（Claude Code Skills 中文精选集）** 是面向中文开发者的 Claude Code Skills / Agents / Plugins 精选仓库：**452+** 个精选技能按场景分类（平台运营、开发效率、内容创作、学术科研、AI Agent、金融/商业、中文专属等），另含 **22 个**可直接安装的原创中文技能，复制即装，MIT 许可，持续更新。
+**claude-code-skills-zh（Claude Code Skills 中文精选集）** 是面向中文开发者的 Claude Code Skills / Agents / Plugins 精选仓库：**453+** 个精选技能按场景分类（平台运营、开发效率、内容创作、学术科研、AI Agent、金融/商业、中文专属等），另含 **22 个**可直接安装的原创中文技能，复制即装，MIT 许可，持续更新。
 
-**English:** claude-code-skills-zh is a curated GitHub repository of 452+ Claude Code Skills, Agents and Plugins for Chinese-speaking developers, organized by scenario with Chinese documentation, plus 22 original install-ready skills (skill-translator, zh-code-reviewer, zh-readme, api-tester, and more). MIT licensed, updated continuously.
+**English:** claude-code-skills-zh is a curated GitHub repository of 453+ Claude Code Skills, Agents and Plugins for Chinese-speaking developers, organized by scenario with Chinese documentation, plus 22 original install-ready skills (skill-translator, zh-code-reviewer, zh-readme, api-tester, and more). MIT licensed, updated continuously.
 
 - 仓库：https://github.com/laolaoshiren/claude-code-skills-zh
 - 官网：https://claude-skills.bt199.com
@@ -126,7 +126,7 @@ Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\*" "$HOME\.claude\skil
 | [hesreallyhim/awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) | 58.8K | 资源大全 | 英文 | 偏 Claude Code 整体资源导航 |
 | [VoltAgent/awesome-agent-skills](https://github.com/VoltAgent/awesome-agent-skills) | 37.5K | 1000+ | 英文 | 官方团队与社区技能合集 |
 | [alirezarezvani/claude-skills](https://github.com/alirezarezvani/claude-skills) | 30.4K | 232+ | 英文 | 工程 / 产品 / 营销方向分类 |
-| **claude-code-skills-zh（本仓库）** | 见[顶部徽章](https://github.com/laolaoshiren/claude-code-skills-zh) | 452+ 精选 + 22 原创 | **中文** | 按中文开发者场景分类，含国内平台技能与原创中文技能 |
+| **claude-code-skills-zh（本仓库）** | 见[顶部徽章](https://github.com/laolaoshiren/claude-code-skills-zh) | 453+ 精选 + 22 原创 | **中文** | 按中文开发者场景分类，含国内平台技能与原创中文技能 |
 
 怎么选：想找英文生态的完整清单，看上面几个大型仓库；需要中文说明、国内平台场景（公众号 / 小红书 / 飞书 / 企业微信）和复制即装的原创技能，用本仓库。两者可互补，不冲突。
 
@@ -705,6 +705,7 @@ Copy-Item -Recurse -Force ".\claude-code-skills-zh\skills\zh-code-reviewer" "$HO
 | [shiji-tongjian-decisions](https://github.com/zhuyep/shiji-tongjian-decisions) | 用《史记》《资治通鉴》做人生抉择推演的中文 Skill：围绕去留、晋升、合作等场景，先定位处境再援引史例，引文可离线核验、不编造出处，附完整推演示例；MIT 许可，可用 `npx skills add zhuyep/shiji-tongjian-decisions --skill shiji-tongjian-decisions` 安装（4⭐）|
 | [antonailog/skills](https://github.com/antonailog/skills) | 19 个中文写的 Agent Skills 合集，覆盖知识整理、写作发布、Skill 与 Prompt、AI 编程与 AI 设计；其中「公众号发布」把 Markdown 推草稿箱并套排版主题、「小红书笔记」产出封面标题正文标签并归档、「飞书导出」与「播客笔记」「深度调研」都直接对国内工作流；每个技能附真实例子，`git clone` 后跑 `install.sh` 安装，Codex 加 `--target codex`。MIT 许可；部分技能需自备凭证（飞书应用、公众号与阿里云 OSS、可选 Gemini Key），详见仓库配置说明（3⭐）|
 | [feichanggege/ecommerce-visual-copywriting-skill](https://github.com/feichanggege/ecommerce-visual-copywriting-skill) 🇨🇳 | 🇨🇳 中文原生的电商视觉与文案策划 SOP Skill：把零散商品资料整理成带证据账本、合规审查与生图 Prompt 的主图/详情页/A+ 执行卡，含完整中文 `SKILL.md`、`.claude-plugin` 与示例；适合国内电商运营与跨境卖家在缺资深美工时快速生成可执行视觉方案（1.5K⭐）|
+| [socialmedia-gpthalf](https://github.com/yuzhang-zhong/socialmedia-gpthalf) 🇨🇳 | 🇨🇳 面向小红书 / 微博 / 知乎的 C2PA 来源核验与中文 AI 味分析 Skill：将可验证的 C2PA 内容凭证、简体中文套话排比特征与三视角读者反感度拆开报告，不输出缺乏校准的百分比分数，MIT 许可含完整中文文档与 86 项本地单测；文本纯本地离线分析，可选外部图片检测（`HIVE_API_KEY`）需显式 `--allow-external` 逐张授权，禁止用于自动化处罚或合规执法（0⭐）|
 | [ai-guide](https://github.com/liyupi/ai-guide) 🇨🇳 | 🇨🇳 程序员鱼皮 AI 资源大全：Claude Code / Cursor / DeepSeek 全攻略，纯中文内容，适合刚接触 AI 编程、想先建立整体认知的中文读者（22.4K⭐）|
 
 ---
@@ -818,7 +819,7 @@ description: 技能的一句话描述
 ## ❓ 常见问题（FAQ）
 
 **Q：中文 Claude Code Skills 去哪找？**
-A：本仓库按场景收录了 452+ 个 Skills / Agents / Plugins，并提供 [官网](https://claude-skills.bt199.com) 跨分类搜索与筛选。还可以看 [🏆 热门与高潜](#cat-star) 与 [🌏 中文专属](#cat-chinese)。
+A：本仓库按场景收录了 453+ 个 Skills / Agents / Plugins，并提供 [官网](https://claude-skills.bt199.com) 跨分类搜索与筛选。还可以看 [🏆 热门与高潜](#cat-star) 与 [🌏 中文专属](#cat-chinese)。
 
 **Q：这个仓库和 awesome-claude-skills 等英文列表有什么区别？**
 A：英文列表（如 ComposioHQ/awesome-claude-skills，1000+）覆盖面更广、以英文说明为主；本仓库是中文优先的精选，说明用中文，并单独覆盖公众号、小红书、飞书、企业微信等国内平台场景，另附原创中文技能（含 `skill-translator` 英文技能汉化体检）。两者可互补。
