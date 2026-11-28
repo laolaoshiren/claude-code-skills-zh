@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent-Reach 中文深度指南：免官方 API 让 AI Agent 读搜 X、小红书、B 站与 YouTube | Claude Code Skills 中文精选集</title>
+<meta name="description" content="115.5K+ Stars 开源项目 Panniantong/Agent-Reach（MIT）中文实战指南：一条 CLI 让 Claude Code / Codex / OpenClaw 读搜 B 站、小红书、V2EX、雪球、GitHub、YouTube 与 X，含 14 渠道降级架构、PyPI 假包避坑与账号隔离边界。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="skill-repo" content="https://github.com/Panniantong/Agent-Reach">
+<link rel="canonical" href="https://claude-skills.bt199.com/p/agent-reach/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="Agent-Reach 中文深度指南：让 AI Agent 读搜全网 14 个平台">
+<meta property="og:description" content="115.5K+ Stars MIT 开源互联网读取底座：无需官方昂贵 API，统一 agent-reach CLI 与首选/备选降级链路，覆盖小红书、B 站、V2EX、雪球、YouTube 与 X。">
+<meta property="og:url" content="https://claude-skills.bt199.com/p/agent-reach/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="Agent-Reach 多平台互联网读取 CLI 中文深度指南">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Agent-Reach 中文深度指南：让 AI Agent 读搜 14 个互联网平台">
+<meta name="twitter:description" content="只读架构、专用浏览器会话隔离与 14 渠道分级启用实战手册，附 PyPI 假包避坑提醒。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：雷达探测青蓝 + 信号翠绿 */
+  :root {
+    --accent: #0ea5e9;
+    --accent2: #10b981;
+    --cyan: #22d3ee;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #0ea5e9, #10b981);
+    box-shadow: 0 4px 18px rgba(14, 165, 233, 0.34);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 8px 26px rgba(16, 185, 129, 0.42);
+  }
+  .nav-star,
+  .step-num {
+    background: linear-gradient(135deg, #0ea5e9, #10b981);
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(14, 165, 233, 0.18) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(16, 185, 129, 0.12) 0%, transparent 50%);
+  }
+  .tier-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .tier-tab {
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 15, 0.72);
+    color: var(--text2);
+    border-radius: 10px;
+    padding: 7px 13px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.18s ease;
+  }
+  .tier-tab:hover {
+    border-color: var(--cyan);
+    color: var(--text);
+  }
+  .tier-tab.is-active {
+    background: rgba(14, 165, 233, 0.16);
+    border-color: var(--cyan);
+    color: #cffafe;
+  }
+  .channel-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0 14px;
+  }
+  .channel-pill {
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 15, 0.68);
+    color: var(--text2);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    font-family: var(--mono);
+    cursor: pointer;
+    transition: all 0.16s ease;
+  }
+  .channel-pill:hover {
+    border-color: var(--accent2);
+    color: var(--text);
+  }
+  .channel-pill.is-active {
+    background: rgba(16, 185, 129, 0.18);
+    border-color: #34d399;
+    color: #d1fae5;
+  }
+  .channel-card {
+    background: rgba(10, 10, 15, 0.74);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+  }
+  .channel-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .channel-name {
+    font-family: var(--mono);
+    font-size: 0.94rem;
+    font-weight: 700;
+    color: #cffafe;
+    background: rgba(14, 165, 233, 0.16);
+    border: 1px solid rgba(34, 211, 238, 0.42);
+    padding: 3px 10px;
+    border-radius: 8px;
+  }
+  .channel-badge {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+  .channel-badge.is-default {
+    color: #a7f3d0;
+    background: rgba(16, 185, 129, 0.16);
+  }
+  .channel-badge.is-optional {
+    color: #fde68a;
+    background: rgba(245, 158, 11, 0.16);
+  }
+  .channel-badge.is-exp {
+    color: #fecaca;
+    background: rgba(239, 68, 68, 0.16);
+  }
+  .channel-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 10px 0 12px;
+  }
+  .channel-meta-item {
+    background: rgba(20, 20, 32, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .channel-meta-label {
+    font-size: 0.74rem;
+    color: var(--text3);
+    margin-bottom: 3px;
+    font-weight: 600;
+  }
+  .channel-meta-val {
+    font-size: 0.86rem;
+    color: var(--text);
+  }
+  .channel-cmd {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: #dbeafe;
+    background: #070910;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 10px 12px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  @media (max-width: 720px) {
+    .channel-meta-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Agent-Reach",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/p/agent-reach/",
+  "codeRepository": "https://github.com/Panniantong/Agent-Reach",
+  "description": "面向 AI Agent 的统一互联网读取 CLI，无需昂贵官方 API 即可搜索和读取 B 站、小红书、V2EX、雪球、GitHub、YouTube、Reddit 与 X 等 14 个平台。",
+  "author": {
+    "@type": "Person",
+    "name": "Panniantong",
+    "url": "https://github.com/Panniantong"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "首页",
+      "item": "https://claude-skills.bt199.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "精选第三方技能",
+      "item": "https://claude-skills.bt199.com/#skills"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Panniantong/Agent-Reach",
+      "item": "https://claude-skills.bt199.com/p/agent-reach/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "为什么不能直接执行 pip install agent-reach 安装？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "原仓库 README 明确警告：PyPI 上名为 agent-reach 的包并不是本项目，切勿从 PyPI 安装。正确方式是将官方 GitHub 的 docs/install.md 发给 Agent 引导安装，或通过项目提供的 uv / GitHub 地址安装到 ~/.agent-reach/ 独立目录。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Agent-Reach 会读取我主浏览器的密码库或替我发帖点赞吗？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "不会。Agent-Reach 采用严格只读设计，只搜索和读取，不执行发帖、评论、点赞或私信操作；需要登录态的平台会在后台使用专用隔离浏览器（仅本机可连），首次使用时仅复制对应网站的登录态而不会碰密码库，且官方建议换成小号登录。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "默认渠道和可选/实验渠道分别有哪些，哪些需要额外 Key？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "默认 5 个渠道（bilibili、v2ex、github、youtube、web）装完即用，其中仅 B 站字幕和 YouTube 语音转文字需额外登录或 Groq/OpenAI Key；可选 6 个渠道（xiaohongshu、xueqiu、boss、xiaoyuzhou、linkedin、reddit）按需开启；实验 3 个渠道（twitter、facebook、instagram）受平台反爬限制较严。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "当某个平台改版或上游爬虫工具失效时，Agent-Reach 如何保证稳定？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "每个平台的每个动作都封装了首选加备选的有序上游工具列表（例如读 B 站优先用 bili-cli，失败自动切换 B 站公开接口；读网页优先用 Jina Reader，备选 Exa）。即使底层工具切换，Agent 调用的 agent-reach 命令语法保持不变。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#skills">精选第三方技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">Panniantong/Agent-Reach</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-green">🇨🇳 中文原生文档</span>
+        <span class="pill pill-cyan">MIT · Python 3.10+ · uv</span>
+        <span class="pill pill-amber">14 大平台 · 只读检索底座</span>
+      </div>
+      <h1><span class="accent-text">Agent-Reach</span> 中文深度指南：免 API 读搜 14 个互联网平台</h1>
+      <p class="hero-lead">由中文开发者 <strong>Panniantong</strong> 开源的高星基础设施，解决 Claude Code、Codex、OpenClaw 等 CLI Agent「自带网页检索但够不着中文社区、登录态内容与视频字幕」的核心痛点。通过统一 <code>agent-reach</code> CLI 串联上游开源工具与首选/备选降级链路，一句大白话即可按需启停 14 个平台。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">GitHub Stars</div>
+          <div class="metric-value is-star">⭐ 115.5K+（核验 115,495）</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可与环境</div>
+          <div class="metric-value">MIT · Python 3.10+</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">覆盖渠道</div>
+          <div class="metric-value is-cyan">5 默认 + 6 可选 + 3 实验</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">安全与安装边界</div>
+          <div class="metric-value">严格只读 · 禁 PyPI 假包</div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#channel-radar" class="btn btn-primary">📡 交互检索 14 渠道与降级链</a>
+        <a href="https://github.com/Panniantong/Agent-Reach" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📦 访问原仓库 GitHub ↗</a>
+        <a href="https://raw.githubusercontent.com/Panniantong/Agent-Reach/main/docs/install.md" class="btn btn-cyan" target="_blank" rel="noopener noreferrer">📄 官方 install.md ↗</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#channel-radar">14 渠道雷达查询台</a>
+      <a href="#install">Agent 引导安装与管理</a>
+      <a href="#architecture">首选 + 备选降级架构</a>
+      <a href="#security">安全红线与 PyPI 避坑</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="channel-radar">
+      <h2>📡 14 个互联网渠道状态与实战命令速查</h2>
+      <p class="section-intro">原仓 <code>agent_reach/channels/</code> 将平台分为<strong>默认即用（5）</strong>、<strong>按需开启（6）</strong>与<strong>实验高风控（3）</strong>三个等级。点击下方分类或平台胶囊，查看依赖边界、备用工具链与真实 CLI 示例：</p>
+
+      <div class="tier-tabs" role="tablist" aria-label="按渠道等级筛选">
+        <button type="button" class="tier-tab is-active" data-tier="all">全部 14 渠道</button>
+        <button type="button" class="tier-tab" data-tier="default">默认即用 (5)</button>
+        <button type="button" class="tier-tab" data-tier="optional">可选开启 (6)</button>
+        <button type="button" class="tier-tab" data-tier="exp">实验性 / 高反爬 (3)</button>
+      </div>
+
+      <div class="channel-pills" id="ar-channel-pills" aria-label="平台渠道列表"></div>
+
+      <div class="channel-card" aria-live="polite">
+        <div class="channel-head">
+          <span class="channel-name" id="ar-name">bilibili</span>
+          <span class="channel-badge is-default" id="ar-tier-badge">默认 · 装好即用</span>
+        </div>
+        <div class="channel-meta-grid">
+          <div class="channel-meta-item">
+            <div class="channel-meta-label">核心读取能力</div>
+            <div class="channel-meta-val" id="ar-cap">搜索视频、读取视频信息、热门榜单、提取视频字幕</div>
+          </div>
+          <div class="channel-meta-item">
+            <div class="channel-meta-label">认证 / API Key 要求</div>
+            <div class="channel-meta-val" id="ar-req">基础搜索免登录；仅提取字幕需扫码登录</div>
+          </div>
+          <div class="channel-meta-item">
+            <div class="channel-meta-label">首选 → 备选降级链</div>
+            <div class="channel-meta-val" id="ar-fallback">bili-cli → B 站公开接口</div>
+          </div>
+          <div class="channel-meta-item">
+            <div class="channel-meta-label">适用中文高频场景</div>
+            <div class="channel-meta-val" id="ar-scene">技术课程/发布会视频总结、UP 主内容调研</div>
+          </div>
+        </div>
+        <div class="channel-cmd" id="ar-cmd">agent-reach bilibili search "大模型"</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>📦 Agent 一句话安装与统一目录管理</h2>
+      <p class="section-intro">Agent-Reach 把所有渠道工具、专用浏览器会话和配置统一收敛在 <code>~/.agent-reach/</code> 目录下（不污染系统 Python 与全局环境）。安装、升级和卸载都可以直接用自然语言交给 Claude Code / Codex / OpenClaw 完成：</p>
+
+      <div class="os-grid">
+        <div class="os-card is-featured">
+          <div class="os-card-head">
+            <h3>方式 A：发给 Agent 自动安装（官方首选）</h3>
+            <span class="pill pill-cyan">Windows / macOS / Linux</span>
+          </div>
+          <p class="os-note">允许 Agent 执行命令后发送以下指令；若系统未装 <code>uv</code>，Agent 会自动免管理员安装并初始化 5 个默认渠道。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">发给 Claude Code / Codex 的指令</span>
+              <button type="button" class="copy-btn" data-copy-target="ar-prompt">📋 复制</button>
+            </div>
+            <pre id="ar-prompt"><code>帮我安装 Agent Reach：https://raw.githubusercontent.com/Panniantong/Agent-Reach/main/docs/install.md</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>方式 B：常用 CLI 查询与口语化管理</h3>
+            <span class="pill pill-green">全平台统一口令</span>
+          </div>
+          <p class="os-note">装好后 Agent 可按 URL 自动识别渠道，或随时增减可选渠道与检查健康度。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">CLI 与日常管理</span>
+              <button type="button" class="copy-btn" data-copy-target="ar-cli">📋 复制</button>
+            </div>
+            <pre id="ar-cli"><code># 查看各渠道可用状态与健康检查
+agent-reach channels
+
+# 搜索 B 站或按链接自动识别平台读取
+agent-reach bilibili search "大模型"
+agent-reach read https://www.v2ex.com/t/123
+
+# 配置语音转文字 Key（务必在本地终端输入，勿发给聊天框）
+agent-reach configure groq-key</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="architecture">
+      <h2>🔌 核心设计理念：首选 + 备选的有序降级链路</h2>
+      <p class="section-intro">社交平台改版、反爬升级和上游脚本失效是常态。Agent-Reach 不让 Agent 直接硬编码某个脆弱爬虫，而是把每个渠道拆成「统一口令层 → 策略路由层 → 多工具备选池」：</p>
+      <div class="grid-3">
+        <div class="info-box">
+          <h3>1. 稳定调用契约</h3>
+          <p>Agent 始终只需记住 <code>agent-reach &lt;渠道&gt; &lt;动作&gt;</code> 或 <code>agent-reach read &lt;URL&gt;</code>，并配有自带技能说明 <code>agent_reach/skill/</code>。</p>
+        </div>
+        <div class="info-box is-good">
+          <h3>2. 自动失败回退</h3>
+          <p>如 B 站先走 <code>bili-cli</code> 失败再回退公开接口；网页正文先走 <code>Jina Reader</code> 再切 <code>Exa</code>，单点失效不影响整体交付。</p>
+        </div>
+        <div class="info-box">
+          <h3>3. 一键体检与换账号</h3>
+          <p>对 Agent 说「看看 Agent Reach 状态」「小红书登录过期了」或「卸载 Agent Reach」，即可精准定位坏掉的渠道或清理单一站点登录态。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="security">
+      <h2>🛡️ 安全红线、假包避坑与合法使用边界</h2>
+      <div class="callout callout-red">
+        <div class="callout-title">🚫 警惕 PyPI 同名假包与虚假加密代币</div>
+        <ul class="prose-list">
+          <li><strong>严禁从 PyPI 安装 <code>agent-reach</code></strong>：官方明确声明 PyPI 上的同名包<strong>并非本项目</strong>，务必只使用 GitHub 仓库与 <code>docs/install.md</code> 安装。</li>
+          <li><strong>防诈骗声明</strong>：项目没有任何官方代币、空投或钱包连接活动，切勿连接任何借用 Agent-Reach 名义的加密站点。</li>
+        </ul>
+      </div>
+      <div class="callout callout-amber">
+        <div class="callout-title">⚠️ 账号风控、Key 保密与合规采集边界</div>
+        <ul class="prose-list">
+          <li><strong>专用浏览器隔离 + 建议用小号</strong>：需要登录的平台只在后台启动本机可连的专用浏览器，初次会复制 Chrome 对应站点的 Cookie（不触碰密码库）；因平台可能对自动化访问限流，<strong>强烈建议切为小号</strong>。</li>
+          <li><strong>Key 勿入聊天上下文</strong>：YouTube / 小宇宙转文字所需的 Groq 或 OpenAI Key，请直接在终端运行 <code>agent-reach configure groq-key</code> 写入，不要直接粘贴到 AI 对话框。</li>
+          <li><strong>只读不写与平台合规</strong>：工具定位为辅助调研与个人阅读，请遵守目标平台服务条款与频率控制，勿用于大规模商业爬取。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <article class="faq-item">
+          <h3>Q1：国内网络环境下访问 GitHub raw 地址安装困难怎么办？</h3>
+          <p>官方 README 底部提供了 <strong>AtomGit 同步镜像</strong>（<code>atomgit.com/qq_51337814/Agent-Reach</code>），国内拉取代码或参考安装文档更稳定，但仍需注意核对上游原仓说明，避免使用来源不明的 PyPI 包。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q2：它和 <code>xpzouying/xiaohongshu-mcp</code> 有什么区别，该怎么选？</h3>
+          <p>如果你只需要把<strong>小红书图文搜索/读取/发笔记</strong>作为独立 MCP 接入，<code>xiaohongshu-mcp</code> 专注度更高；如果你希望用一个统一 CLI 同时覆盖 <strong>B 站、V2EX、雪球、GitHub、YouTube、X、小红书</strong> 等多平台调研并坚持严格只读，首选 <code>Agent-Reach</code>。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q3：为什么装完默认只有 5 个渠道，小红书和雪球要单独加？</h3>
+          <p>为了降低首次安装体积与账号风险，默认只启用免登录的 5 个通用渠道（<code>bilibili</code>、<code>v2ex</code>、<code>github</code>、<code>youtube</code>、<code>web</code>）。需要某平台时再对 Agent 说「帮我加上小红书」，才会按需安装该渠道依赖。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q4：小宇宙播客和 YouTube 无字幕视频怎么转文字？</h3>
+          <p>项目内置 <code>transcribe.py</code> 转录链路，当视频没有现成字幕或处理小宇宙播客音频时，需在本地终端通过 <code>agent-reach configure groq-key</code> 配置 Groq（或 OpenAI）密钥即可启用语音转文字。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/p/xiaohongshu-mcp/">
+          <div>
+            <span class="related-tag">📣 小红书专项 MCP · 17.3K+ ⭐</span>
+            <h3>xpzouying/xiaohongshu-mcp</h3>
+            <p>专注小红书自动化与 MCP 工具接入，配合 Agent-Reach 可覆盖更细粒度的笔记检索工作流。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/p/larksuite-cli/">
+          <div>
+            <span class="related-tag">🏢 飞书官方 CLI · 18.2K+ ⭐</span>
+            <h3>larksuite/cli</h3>
+            <p>把 Agent-Reach 调研到的 B 站、V2EX、雪球情报自动沉淀到飞书云文档或多维表格。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/skill-curator/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 候选核验</span>
+            <h3>skill-curator</h3>
+            <p>配合 GitHub 渠道搜索新工具后，自动核验候选仓库的真实资产、许可证与风险边界。</p>
+          </div>
+          <span class="related-go">查看原创技能 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>原作者与开源许可声明：</strong>本页为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">claude-code-skills-zh</a> 基于原仓公开中文文档与源码目录整理的技术指南。项目版权归作者 <strong>Panniantong</strong> 及开源贡献者所有，采用 <strong>MIT License</strong> 开源，完整源码与更新说明请访问 <a href="https://github.com/Panniantong/Agent-Reach" target="_blank" rel="noopener noreferrer">github.com/Panniantong/Agent-Reach ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏中文 Claude Code Skills 精选集</h2>
+        <p>453+ 人工核验第三方技能与 22 个原创中文技能持续维护，官网支持跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#skills">精选目录</a>
+    <a href="/#original">原创技能</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var channels = [
+    { name: 'bilibili', tier: 'default', tierLabel: '默认 · 装好即用', cap: '搜索视频、读取视频信息、热门榜单、提取视频字幕', req: '基础搜索免登录；仅字幕需扫码登录', fallback: 'bili-cli → B 站公开接口', scene: '技术课程总结、UP 主内容调研、热点追踪', cmd: 'agent-reach bilibili search "Claude Code"' },
+    { name: 'v2ex', tier: 'default', tierLabel: '默认 · 装好即用', cap: '热门主题、节点浏览、帖子正文与完整回复、用户信息', req: '无需登录与 API Key', fallback: 'V2EX 结构化公开接口', scene: '中文开发者社区风向调研、技术方案踩坑检索', cmd: 'agent-reach read https://www.v2ex.com/t/123456' },
+    { name: 'github', tier: 'default', tierLabel: '默认 · 装好即用', cap: '搜索仓库、读取 README、Issue 与 PR（含完整评论）', req: '无需额外配置（公开仓库直读）', fallback: 'GitHub CLI / REST 公开接口', scene: '竞品开源项目拆解、Issue 排错对照', cmd: 'agent-reach github search "claude code skills"' },
+    { name: 'youtube', tier: 'default', tierLabel: '默认 · 装好即用', cap: '视频信息、关键词搜索、字幕提取、语音转文字', req: '搜索与字幕免 Key；无字幕语音转文字需 Groq / OpenAI Key', fallback: 'yt-dlp + transcribe.py', scene: '海外技术大会演讲提炼、英文教程转中文笔记', cmd: 'agent-reach youtube search "AI coding agents"' },
+    { name: 'web', tier: 'default', tierLabel: '默认 · 装好即用', cap: '通用网页搜索与正文 Markdown 干净提取（保底通道）', req: '无需登录与付费 API', fallback: 'Jina Reader → Exa', scene: '任意技术文档、官网公告与长文结构化阅读', cmd: 'agent-reach read https://code.claude.com/docs/en/skills' },
+    { name: 'xiaohongshu', tier: 'optional', tierLabel: '可选 · 按需开启', cap: '搜索笔记、读取图文正文、抓取高赞评论区', req: '需专用浏览器登录态（建议小号）', fallback: '专用隔离浏览器 + 上游工具链', scene: '爆款选题调研、真实用户口碑与痛点挖掘', cmd: '# 对 Agent 说："帮我加上小红书"\nagent-reach xiaohongshu search "AI编程"' },
+    { name: 'xueqiu', tier: 'optional', tierLabel: '可选 · 按需开启', cap: '实时行情、股票搜索、热门帖子与热股讨论', req: '行情免登录；热帖与热股需登录态', fallback: '雪球数据渠道模块', scene: '财报前市场情绪观察、个股讨论摘要', cmd: '# 对 Agent 说："帮我加上雪球"\nagent-reach xueqiu search "英伟达"' },
+    { name: 'boss', tier: 'optional', tierLabel: '可选 · 按需开启', cap: '检索岗位列表与完整职位 JD 描述', req: '需登录态', fallback: 'boss-agent-cli', scene: '招聘市场技能栈趋势分析、JD 要求对比', cmd: '# 对 Agent 说："帮我加上 boss"\nagent-reach boss search "AI Agent 工程师"' },
+    { name: 'xiaoyuzhou', tier: 'optional', tierLabel: '可选 · 按需开启', cap: '国内播客单集音频拉取与语音转文字', req: '需本地终端配置 Groq Key', fallback: '音频解析 + transcribe.py (Groq)', scene: '中文科技/商业播客万字逐字稿与精华提取', cmd: 'agent-reach configure groq-key\nagent-reach read https://www.xiaoyuzhoufm.com/episode/xxx' },
+    { name: 'linkedin', tier: 'optional', tierLabel: '可选 · 按需开启', cap: '搜索职位信息与读取职位详情', req: '公开职位免登录；站内深度搜索需登录', fallback: 'LinkedIn 渠道适配器', scene: '海外岗位要求调研与团队背景参考', cmd: '# 对 Agent 说："帮我加上 linkedin"\nagent-reach linkedin search "Staff AI Engineer"' },
+    { name: 'reddit', tier: 'optional', tierLabel: '可选 · 按需开启', cap: '搜索讨论帖、读取正文与盖楼评论、浏览指定版块', req: '需登录态（避免触发匿名限流）', fallback: 'Reddit 渠道适配器', scene: '海外开发者真实吐槽、r/ClaudeAI 讨论追踪', cmd: '# 对 Agent 说："帮我加上 reddit"\nagent-reach reddit search "Claude Code MCP"' },
+    { name: 'twitter', tier: 'exp', tierLabel: '实验 · 反爬严格', cap: '搜索推文、用户资料、时间线推文与 Thread 推文串', req: '需登录态（强反爬，建议使用小号）', fallback: 'X/Twitter 实验渠道链', scene: '海外 AI 团队一手发布动态与技术 Thread 整理', cmd: '# 对 Agent 说："帮我加上 twitter"\nagent-reach twitter search "Claude Code"' },
+    { name: 'facebook', tier: 'exp', tierLabel: '实验 · 反爬严格', cap: '基础搜索与公开主页资料读取', req: '需登录态（可能随平台改版波动）', fallback: 'Facebook 实验渠道链', scene: '特定海外品牌主页信息核验', cmd: '# 对 Agent 说："帮我加上 facebook"' },
+    { name: 'instagram', tier: 'exp', tierLabel: '实验 · 反爬严格', cap: '搜索账号、读取主页资料与用户公开帖子', req: '需登录态（反爬严格，可能随时失效）', fallback: 'Instagram 实验渠道链', scene: '海外视觉品牌账号参考追踪', cmd: '# 对 Agent 说："帮我加上 instagram"' }
+  ];
+
+  var currentTier = 'all';
+  var currentItem = channels[0];
+  var pillsWrap = document.getElementById('ar-channel-pills');
+
+  function renderDetail() {
+    document.getElementById('ar-name').textContent = currentItem.name;
+    var badge = document.getElementById('ar-tier-badge');
+    badge.textContent = currentItem.tierLabel;
+    badge.className = 'channel-badge ' + (currentItem.tier === 'default' ? 'is-default' : (currentItem.tier === 'optional' ? 'is-optional' : 'is-exp'));
+    document.getElementById('ar-cap').textContent = currentItem.cap;
+    document.getElementById('ar-req').textContent = currentItem.req;
+    document.getElementById('ar-fallback').textContent = currentItem.fallback;
+    document.getElementById('ar-scene').textContent = currentItem.scene;
+    document.getElementById('ar-cmd').textContent = currentItem.cmd;
+  }
+
+  function renderPills() {
+    while (pillsWrap.firstChild) {
+      pillsWrap.removeChild(pillsWrap.firstChild);
+    }
+    var list = channels.filter(function (c) {
+      return currentTier === 'all' || c.tier === currentTier;
+    });
+    if (list.indexOf(currentItem) === -1 && list.length > 0) {
+      currentItem = list[0];
+    }
+    list.forEach(function (item) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'channel-pill' + (item === currentItem ? ' is-active' : '');
+      btn.textContent = item.name;
+      btn.addEventListener('click', function () {
+        currentItem = item;
+        pillsWrap.querySelectorAll('.channel-pill').forEach(function (el) {
+          el.classList.toggle('is-active', el === btn);
+        });
+        renderDetail();
+      });
+      pillsWrap.appendChild(btn);
+    });
+    renderDetail();
+  }
+
+  document.querySelectorAll('.tier-tab[data-tier]').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      currentTier = tab.getAttribute('data-tier');
+      document.querySelectorAll('.tier-tab').forEach(function (t) {
+        t.classList.toggle('is-active', t === tab);
+      });
+      renderPills();
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve();
+        else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+
+  renderPills();
+})();
+</script>
+</body>
+</html>

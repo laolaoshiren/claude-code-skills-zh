@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpenDesign 中文深度指南：151 套品牌设计系统、100+ 设计 Skills 与 MCP 协同工作台 | Claude Code Skills 中文精选集</title>
+<meta name="description" content="109.9K+ Stars 开源协作式 AI 设计 Agent 工作台 nexu-io/open-design（Apache-2.0）中文深度指南：覆盖 151 套 DESIGN.md 品牌设计系统、171 项 skills/ 资产、HyperFrames MP4 渲染、16+ 客户端 od mcp install 接入与本地安全模型。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="skill-repo" content="https://github.com/nexu-io/open-design">
+<link rel="canonical" href="https://claude-skills.bt199.com/p/open-design/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="OpenDesign 中文深度指南：151 套品牌级设计系统与 16+ 编码 Agent 协同工作台">
+<meta property="og:description" content="Apache-2.0 开源本地优先 AI 设计工作台：支持 Claude Code、Codex、Cursor、Antigravity、Trae、Kimi 等通过 MCP 直读实时 DESIGN.md 与 tokens.css。">
+<meta property="og:url" content="https://claude-skills.bt199.com/p/open-design/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="OpenDesign 协作式 AI 设计 Agent 工作台中文深度指南">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="OpenDesign 中文深度指南：本地优先开源 AI 设计工作台">
+<meta name="twitter:description" content="151 套品牌级 DESIGN.md、100+ 功能技能、277 官方插件，一行 od mcp install 接入编码 Agent。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：工业级设计系统钴蓝 + 靛紫 */
+  :root {
+    --accent: #3b82f6;
+    --accent2: #818cf8;
+    --cyan: #38bdf8;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    box-shadow: 0 4px 18px rgba(59, 130, 246, 0.34);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 8px 26px rgba(99, 102, 241, 0.45);
+  }
+  .nav-star,
+  .step-num {
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(59, 130, 246, 0.18) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(129, 140, 248, 0.14) 0%, transparent 50%);
+  }
+  .studio-group-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text3);
+    margin: 12px 0 6px;
+  }
+  .pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .studio-btn {
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 15, 0.72);
+    color: var(--text2);
+    border-radius: 9px;
+    padding: 6px 12px;
+    font-size: 0.81rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.16s ease;
+  }
+  .studio-btn:hover {
+    border-color: var(--cyan);
+    color: var(--text);
+  }
+  .studio-btn.is-active {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: #60a5fa;
+    color: #dbeafe;
+  }
+  .studio-preview {
+    margin-top: 14px;
+    background: rgba(10, 10, 15, 0.76);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+  }
+  .studio-summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .studio-badge {
+    font-family: var(--mono);
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #bae6fd;
+    background: rgba(56, 189, 248, 0.14);
+    border: 1px solid rgba(56, 189, 248, 0.36);
+    padding: 3px 10px;
+    border-radius: 8px;
+  }
+  .studio-output-note {
+    font-size: 0.89rem;
+    color: var(--text2);
+    margin-bottom: 10px;
+  }
+  .studio-cmd {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: #e0e7ff;
+    background: #070910;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 12px 14px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "OpenDesign (nexu-io/open-design)",
+  "applicationCategory": "DesignApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://www.apache.org/licenses/LICENSE-2.0",
+  "url": "https://claude-skills.bt199.com/p/open-design/",
+  "codeRepository": "https://github.com/nexu-io/open-design",
+  "description": "开源协作式 AI 设计 Agent 工作台（Apache-2.0）：将插件、100+ 功能技能、115+ 设计模板与 151 套品牌级 DESIGN.md 设计系统结合，支持通过 od mcp install 接入 Claude Code、Codex、Cursor、Antigravity 等 16+ 编码 Agent。",
+  "author": {
+    "@type": "Organization",
+    "name": "nexu-io",
+    "url": "https://github.com/nexu-io"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "首页",
+      "item": "https://claude-skills.bt199.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "精选第三方技能",
+      "item": "https://claude-skills.bt199.com/#skills"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "nexu-io/open-design",
+      "item": "https://claude-skills.bt199.com/p/open-design/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "OpenDesign 为什么既包含 151 套设计系统，又强调 MCP 与本地编码 Agent？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "OpenDesign 自身不绑定独家大模型或私有编辑器，而是直接调度你本机 PATH 上已安装的 Claude Code、Codex、Cursor Agent、Kimi、Trae 或 Antigravity。通过 stdio MCP，你的编码 Agent 可以按名称实时读取项目里的 tokens.css、JSX 组件与 HTML，避免导出 Zip 再粘贴造成的版本脱节。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "仓库里 skills/、design-templates/ 和 design-systems/ 有什么分工？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "skills/（当前已扩展至 171 个目录）存放 Agent 可复用的功能行为（如设计审查、Figma 还原、动效调优）；design-templates/ 存放 Prototype、Web PPT、图文报告、HyperFrames MP4 等独立渲染模板；design-systems/ 存放 151 个以 DESIGN.md 为核心的品牌设计系统包。三者可按四平面自由混搭。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "没有本地 Node.js 24 环境，如何最快跑通 OpenDesign？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "零配置首选直接从 GitHub Releases 或官网下载 macOS/Windows/Linux 桌面应用（自动探测 PATH 上的编码 Agent）；也可以在 deploy/ 目录配置 OD_API_TOKEN 后用 docker compose up -d 在 7456 端口启动；仅从源码二次开发时才需要 Node.js ~24 与 pnpm 10.33.x。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "用 OpenDesign 重构已有的老前端仓库该怎么操作？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "可以把现有 git 仓库和选中的品牌 DESIGN.md 交给 Agent（或启用内置 od-code-migration / od-design-refine 插件），Agent 会直接按照 DESIGN.md 的色板、字体层级和组件规范把真实业务组件重构对齐，而不是另起一个演示壳。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#skills">精选第三方技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">nexu-io/open-design</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-green">🇨🇳 官方简体中文文档</span>
+        <span class="pill pill-cyan">Apache-2.0 · 桌面端 / Docker / MCP</span>
+        <span class="pill pill-amber">151 套设计系统 · 171 项技能目录</span>
+      </div>
+      <h1><span class="accent-text">OpenDesign</span> 中文深度指南：协作式 AI 设计 Agent 工作台</h1>
+      <p class="hero-lead"><strong>nexu-io/open-design</strong> 是本地优先的开源 AI 设计工作台（从早期 19 套基础技能 + 71 套设计系统已持续演进至 <strong>171 个 <code>skills/</code> 目录、151 套品牌级 <code>DESIGN.md</code> 设计系统、115+ 渲染模板与 277 个官方插件</strong>）。它不强制绑定闭源引擎，直接复用你本机已有的 Claude Code、Codex、Cursor、Antigravity、Trae 或 Kimi，让没有专职设计师的小团队也能输出品牌一致的网页原型、Web PPT、文档与 MP4 动效。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">GitHub Stars</div>
+          <div class="metric-value is-star">⭐ 109.9K+（核验 109,954）</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可</div>
+          <div class="metric-value">Apache-2.0（部分模板 MIT）</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">核心四平面资产</div>
+          <div class="metric-value is-cyan">277 插件 · 151 设计系统 · 171 技能目录</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">支持编码 Agent</div>
+          <div class="metric-value">16+ CLI（含 Claude/Trae/Kimi）</div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#composer" class="btn btn-primary">🧩 四平面 + MCP 命令组合器</a>
+        <a href="https://github.com/nexu-io/open-design" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📦 访问原仓库 GitHub ↗</a>
+        <a href="https://github.com/nexu-io/open-design/blob/main/docs/i18n/README.zh-CN.md" class="btn btn-cyan" target="_blank" rel="noopener noreferrer">📖 官方简体中文 README ↗</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#composer">四平面与 MCP 命令器</a>
+      <a href="#architecture">四平面可组合架构</a>
+      <a href="#install">桌面 / Docker / 源码部署</a>
+      <a href="#security">本地回环与安全模型</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="composer">
+      <h2>🧩 四平面组合与 <code>od mcp install</code> 命令生成器</h2>
+      <p class="section-intro">选择你常用的编码 Agent CLI、品牌设计系统（来自 <code>design-systems/</code>）与目标产物模板，实时生成 MCP 安装指令与开箱即用对话提示词：</p>
+
+      <div class="studio-group-label">1. 选择本地编码 Agent（支持 16+ CLI）</div>
+      <div class="pill-row" id="od-agent-row">
+        <button type="button" class="studio-btn is-active" data-agent="claude">Claude Code</button>
+        <button type="button" class="studio-btn" data-agent="codex">Codex</button>
+        <button type="button" class="studio-btn" data-agent="cursor">Cursor</button>
+        <button type="button" class="studio-btn" data-agent="antigravity">Antigravity</button>
+        <button type="button" class="studio-btn" data-agent="trae">Trae</button>
+        <button type="button" class="studio-btn" data-agent="kimi">Kimi</button>
+        <button type="button" class="studio-btn" data-agent="opencode">OpenCode</button>
+        <button type="button" class="studio-btn" data-agent="copilot">GitHub Copilot</button>
+      </div>
+
+      <div class="studio-group-label">2. 选择品牌级 DESIGN.md（节选自 151 套设计系统包）</div>
+      <div class="pill-row" id="od-ds-row">
+        <button type="button" class="studio-btn is-active" data-ds="linear-app">Linear</button>
+        <button type="button" class="studio-btn" data-ds="stripe">Stripe</button>
+        <button type="button" class="studio-btn" data-ds="apple">Apple</button>
+        <button type="button" class="studio-btn" data-ds="vercel">Vercel</button>
+        <button type="button" class="studio-btn" data-ds="notion">Notion</button>
+        <button type="button" class="studio-btn" data-ds="airbnb">Airbnb</button>
+        <button type="button" class="studio-btn" data-ds="warm-editorial">Warm Editorial</button>
+      </div>
+
+      <div class="studio-group-label">3. 选择产出平面与设计场景</div>
+      <div class="pill-row" id="od-plane-row">
+        <button type="button" class="studio-btn is-active" data-plane="prototype">Prototype 交互网页原型</button>
+        <button type="button" class="studio-btn" data-plane="deck">Deck 杂志风 Web PPT</button>
+        <button type="button" class="studio-btn" data-plane="video">HyperFrames HTML→MP4</button>
+        <button type="button" class="studio-btn" data-plane="migrate">已有仓库组件品牌翻新</button>
+      </div>
+
+      <div class="studio-preview" aria-live="polite">
+        <div class="studio-summary">
+          <span class="studio-badge" id="od-summary-badge">claude + linear-app + Prototype</span>
+        </div>
+        <p class="studio-output-note" id="od-note">通过 stdio MCP 直连本地 OpenDesign 项目，Agent 直接读写 tokens.css 与入口 HTML 并实时刷新预览。</p>
+        <div class="studio-cmd" id="od-cmd"># 1. 一行命令注入 MCP 配置</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="architecture">
+      <h2>🏗️ 四平面可组合架构：插件 × 技能 × 模板 × 设计系统</h2>
+      <p class="section-intro">OpenDesign 把以往混杂在一堆 Prompt 里的设计工程拆成四个职责清晰的可版本化目录，任何团队都可以按需替换或自建私有包：</p>
+      <div class="grid-2">
+        <div class="info-box is-good">
+          <h3>🎨 <code>design-systems/</code>（151 套品牌契约）</h3>
+          <p>每套包以 <code>DESIGN.md</code> 为核心品牌契约，新包还附带 <code>manifest.json</code>、编译后的 <code>tokens.css</code> 与样例组件，覆盖 Stripe、Linear、Apple、Notion、Vercel 等主流产品语言与入门模板。</p>
+        </div>
+        <div class="info-box">
+          <h3>🧩 <code>skills/</code>（171 项功能技能目录）</h3>
+          <p>严格遵循 <code>SKILL.md</code> 协议，为 Agent 提供行为规范与参考资料——包含 <code>apple-hig</code>、<code>figma-implement-design</code>、<code>d3-visualization</code>、<code>impeccable-design-polish</code>、<code>web-clone</code>（MIT）等。</p>
+        </div>
+        <div class="info-box">
+          <h3>🖼️ <code>design-templates/</code>（115+ 渲染蓝图）</h3>
+          <p>覆盖网页原型（<code>saas-landing</code> / <code>pm-spec</code>）、15 套 Deck × 36 主题 Web PPT（含 <code>guizang-ppt</code>）、小红书卡片模板以及内置的 <code>hyperframes</code> HTML→MP4 动效模板。</p>
+        </div>
+        <div class="info-box">
+          <h3>🔌 <code>plugins/_official/</code>（277 官方插件）</h3>
+          <p>以 <code>open-design.json</code> 封装完整场景包，如 <code>od-design-refine</code>、<code>od-figma-migration</code>、<code>od-react-export</code>、<code>od-nextjs-export</code> 与 <code>od-vue-export</code>。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>📦 三种零门槛运行方式（桌面版 / Docker / 源码开发）</h2>
+      <p class="section-intro">普通产品/研发团队无需配置 Node 24；仅需要二次开发源码或定制后台守护进程时才需要本地安装 <code>Node ~24</code> 与 <code>pnpm@10.33.2</code>：</p>
+
+      <div class="os-grid">
+        <div class="os-card is-featured">
+          <div class="os-card-head">
+            <h3>方式 A：独立桌面应用 + MCP（推荐首选）</h3>
+            <span class="pill pill-cyan">Windows x64 / macOS / Linux</span>
+          </div>
+          <p class="os-note">从 GitHub Releases 下载安装包，自动探测本机编码 Agent，再用 <code>od mcp install</code> 暴露实时项目文件给终端 Agent。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">MCP 接入与项目检查</span>
+              <button type="button" class="copy-btn" data-copy-target="od-mcp">📋 复制</button>
+            </div>
+            <pre id="od-mcp"><code># 按所用编码 Agent 注入 MCP（支持 claude / codex / cursor / antigravity / trae / kimi 等）
+od mcp install claude
+
+# Agent 可按名称实时查询项目与设计文件
+od project list --json
+od files list &lt;project-id&gt; --json
+od skills list --json</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>方式 B：Docker Compose 自托管</h3>
+            <span class="pill pill-green">免 Node.js 环境</span>
+          </div>
+          <p class="os-note">适合不想在本机装前端工具链的用户，启动后访问 <code>http://127.0.0.1:7456</code>；务必配置随机 <code>OD_API_TOKEN</code>。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Shell / Docker</span>
+              <button type="button" class="copy-btn" data-copy-target="od-docker">📋 复制</button>
+            </div>
+            <pre id="od-docker"><code>git clone https://github.com/nexu-io/open-design.git
+cd open-design/deploy
+cp .env.example .env
+# Linux/macOS 生成随机 Token 写入 OD_API_TOKEN=
+echo "OD_API_TOKEN=$(openssl rand -hex 32)" >> .env
+docker compose up -d</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>方式 C：源码开发模式（tools-dev）</h3>
+            <span class="pill pill-purple">Node ~24 + pnpm 10.33.x</span>
+          </div>
+          <p class="os-note">官方仅支持 <code>pnpm tools-dev</code> 作为本地生命周期入口（已移除旧版 <code>pnpm dev</code> 等别名），Windows 用户可先查阅 <code>docs/windows-troubleshooting.md</code>。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">源码启动</span>
+              <button type="button" class="copy-btn" data-copy-target="od-src">📋 复制</button>
+            </div>
+            <pre id="od-src"><code>git clone https://github.com/nexu-io/open-design.git
+cd open-design
+corepack enable
+pnpm install
+pnpm tools-dev run web</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>常用生命周期排查命令</h3>
+            <span class="pill pill-amber">daemon + web + desktop</span>
+          </div>
+          <p class="os-note">当后台进程端口冲突或需要排查日志时，使用 <code>tools-dev</code> 自检命令。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">tools-dev 诊断</span>
+              <button type="button" class="copy-btn" data-copy-target="od-diag">📋 复制</button>
+            </div>
+            <pre id="od-diag"><code>pnpm tools-dev status
+pnpm tools-dev check
+pnpm tools-dev restart --daemon-port 7457 --web-port 5175
+pnpm tools-dev stop</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="security">
+      <h2>🛡️ 架构安全模型与 Windows 环境注意事项</h2>
+      <div class="callout callout-cyan">
+        <div class="callout-title">🔒 本地回环绑定、只读 MCP 与 SSRF 防护</div>
+        <ul class="prose-list">
+          <li><strong>默认绑定 <code>127.0.0.1</code> 且 MCP 默认只读</strong>：本地守护进程不会主动暴露在局域网；若确需远程或团队共享访问，必须显式设置 <code>OD_BIND_HOST</code> 与 <code>OD_ALLOWED_ORIGINS</code> 白名单，并在反向代理层加鉴权。</li>
+          <li><strong>BYOK 代理边界</strong>：支持自备 API Key（BYOK）并内置 SSRF 防护；使用云端模型或 OpenDesign Cloud 时，请求会发送至对应服务端，涉及保密商业原型建议保持纯本地运行。</li>
+        </ul>
+      </div>
+      <div class="callout callout-amber">
+        <div class="callout-title">⚠️ 源码运行环境与多许可证提醒</div>
+        <ul class="prose-list">
+          <li><strong>Windows 原生 vs WSL2</strong>：若你的 Claude Code / Codex 装在 WSL2 中，请按仓库 <code>docs/wsl-setup.md</code> 配置跨环境路径检测；Windows 原生源码启动先检查 Node 24 与 Corepack 下的 pnpm 10.33.2 版本。</li>
+          <li><strong>子包许可证区分</strong>：主仓为 <code>Apache-2.0</code>，但部分内置模板（如 <code>guizang-ppt</code>、<code>html-ppt</code>）与技能（如 <code>web-clone</code>）沿用各自目录内的 <code>MIT</code> 许可，商用二次分发时请留意对应子目录声明。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <article class="faq-item">
+          <h3>Q1：我和 `pbakaus/impeccable` 相比，OpenDesign 更适合哪类需求？</h3>
+          <p><code>impeccable</code> 专注于在已有代码工程中通过 24 条设计指令消除 AI 模板味、优化视觉细节；<code>OpenDesign</code> 则是一个完整的可视化设计工作台 + 设计系统仓库（151 套 <code>DESIGN.md</code>），除了生成原型，还能直接出 Web PPT、HyperFrames MP4 动效视频以及导出 React/Next.js/Vue 组件。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q2：为什么仓库目录里既有 <code>skills/</code> 又有 <code>design-templates/</code>？</h3>
+          <p><code>skills/</code> 提供“怎么做”的功能性 Agent 能力（如 Figma 还原、设计走查、3D 样机、图像增强），<code>design-templates/</code> 提供“长成什么样”的可渲染起点蓝图（如看板、OKR 记分卡、商业计划书 Deck）。实际工作流中把二者和 <code>DESIGN.md</code> 组合调用。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q3：不装本地大模型或不想登录云端，能白嫖免费模型吗？</h3>
+          <p>OpenDesign 本体开源免费，不强制购买云端额度。它直接调用你本地已认证的 <code>claude</code>、<code>codex</code>、<code>kimi</code>、<code>trae</code> 等 CLI，或者接入你自己的 BYOK 接口。只有需要云端托管协作或使用 OpenDesign Cloud 付费模型套餐时才涉及额外计费。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q4：可以把团队自己的企业 UI 规范做进 OpenDesign 吗？</h3>
+          <p>可以。按照 <code>design-systems/README.md</code> 规范，把包含色彩、字号、间距、组件约束的 <code>DESIGN.md</code>（以及可选 <code>tokens.css</code>）放进 <code>design-systems/&lt;brand&gt;/</code> 目录，选择器就会自动识别你的企业设计系统。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/p/impeccable/">
+          <div>
+            <span class="related-tag">✨ 反 AI 味设计指令 · 117.2K+ ⭐</span>
+            <h3>pbakaus/impeccable</h3>
+            <p>24 条精细化前端设计修正指令与 62 条检测器，和 OpenDesign 的设计系统完美互补。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/p/hyperframes/">
+          <div>
+            <span class="related-tag">🎬 HTML 转视频 · 90.4K+ ⭐</span>
+            <h3>heygen-com/hyperframes</h3>
+            <p>OpenDesign 内置的 HTML→MP4 动态图形引擎上游，深入掌握时间轴与帧精确渲染机制。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/p/baoyu-skills/">
+          <div>
+            <span class="related-tag">✍️ 中文视觉内容 · 宝玉开源</span>
+            <h3>JimLiu/baoyu-skills</h3>
+            <p>如果侧重中文公众号排版、信息图与小红书卡片，可结合宝玉的多模态配图技能链路使用。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>原作者与开源许可声明：</strong>本页为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">claude-code-skills-zh</a> 基于原仓官方简体中文文档与源码目录整理的技术指南。项目版权归 <strong>nexu-io</strong> 团队及各子模块原作者所有，主仓采用 <strong>Apache-2.0 License</strong>（部分内置模板/技能保留 MIT 许可），完整源码请访问 <a href="https://github.com/nexu-io/open-design" target="_blank" rel="noopener noreferrer">github.com/nexu-io/open-design ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏中文 Claude Code Skills 精选集</h2>
+        <p>453+ 人工核验第三方技能与 22 个原创中文技能持续维护，官网支持跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#skills">精选目录</a>
+    <a href="/#original">原创技能</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var state = {
+    agent: 'claude',
+    ds: 'linear-app',
+    plane: 'prototype'
+  };
+
+  var planes = {
+    prototype: {
+      label: 'Prototype 网页原型',
+      note: '按选中 DESIGN.md 绑定样式契约，在本地项目写入可预览 HTML/CSS 或 React 组件，并支持导出 Next.js / Vue。',
+      promptPrefix: 'Use open-design to generate a responsive SaaS landing page with the '
+    },
+    deck: {
+      label: 'Deck Web PPT',
+      note: '调用 design-templates/guizang-ppt 或 15 套 html-ppt 模板生成带演讲者备注的演示文稿，支持导出 PPTX / PDF。',
+      promptPrefix: 'Use open-design deck-guizang-editorial template to create a 10-slide product pitch deck using the '
+    },
+    video: {
+      label: 'HyperFrames MP4 动效',
+      note: '通过内置 hyperframes HTML→MP4 渲染管线生成 16:9 品牌宣传片、数据竞速图或 9:16 竖屏短视频。',
+      promptPrefix: 'Use open-design hyperframes template to produce a 15-second launch promo video styled with the '
+    },
+    migrate: {
+      label: '仓库品牌翻新',
+      note: '将现有 git 仓库与目标 DESIGN.md 交给 Agent（配合 od-code-migration / od-design-refine），把真实业务组件重构对齐品牌规范。',
+      promptPrefix: 'Use open-design od-code-migration workflow to refactor our existing frontend components to match the '
+    }
+  };
+
+  function render() {
+    var p = planes[state.plane];
+    document.getElementById('od-summary-badge').textContent = state.agent + ' + ' + state.ds + ' + ' + p.label;
+    document.getElementById('od-note').textContent = p.note;
+    document.getElementById('od-cmd').textContent =
+      '# 1. 注入 ' + state.agent + ' 的本地 MCP 配置\n' +
+      'od mcp install ' + state.agent + '\n\n' +
+      '# 2. 查看当前 OpenDesign 项目与可用设计系统\n' +
+      'od project list --json\n\n' +
+      '# 3. 在 ' + state.agent + ' 对话框中直接调用：\n' +
+      '> ' + p.promptPrefix + state.ds + ' design system';
+  }
+
+  function bindGroup(rowId, attr, key) {
+    var row = document.getElementById(rowId);
+    if (!row) return;
+    row.querySelectorAll('.studio-btn[' + attr + ']').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state[key] = btn.getAttribute(attr);
+        row.querySelectorAll('.studio-btn').forEach(function (b) {
+          b.classList.toggle('is-active', b === btn);
+        });
+        render();
+      });
+    });
+  }
+
+  bindGroup('od-agent-row', 'data-agent', 'agent');
+  bindGroup('od-ds-row', 'data-ds', 'ds');
+  bindGroup('od-plane-row', 'data-plane', 'plane');
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve();
+        else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

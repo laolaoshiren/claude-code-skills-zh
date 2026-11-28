@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ecommerce-visual-copywriting 中文深度指南：证据账本与电商主图/详情页 SOP Skill | Claude Code Skills 中文精选集</title>
+<meta name="description" content="1.5K+ Stars 中文电商视觉与文案策划 SOP Skill（feichanggege/ecommerce-visual-copywriting-skill，MIT）深度指南：覆盖 Step 0-6 策划流、四级证据账本、Style Lock、国内外平台合规门禁与 80 分五维自审。">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="skill-repo" content="https://github.com/feichanggege/ecommerce-visual-copywriting-skill">
+<link rel="canonical" href="https://claude-skills.bt199.com/p/ecommerce-visual-copywriting/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Claude Code Skills 中文精选集">
+<meta property="og:title" content="电商视觉策划 SOP Skill 中文深度指南：证据账本 + 合规审查 + 生图执行卡">
+<meta property="og:description" content="把零散商品资料转化为带 Style Lock、逐图执行卡、Negative Prompt 与广告法合规核验的电商视觉方案，支持淘宝/京东/小红书与 Amazon/Shopify。">
+<meta property="og:url" content="https://claude-skills.bt199.com/p/ecommerce-visual-copywriting/">
+<meta property="og:image" content="https://claude-skills.bt199.com/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="ecommerce-visual-copywriting 电商视觉策划 SOP Skill 中文深度指南">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ecommerce-visual-copywriting：中文电商主图与 A+ 详情页 SOP Skill">
+<meta name="twitter:description" content="4 种执行模式、四级证据账本、80 分五维自审门禁，覆盖国内电商与跨境本地化重写。">
+<meta name="twitter:image" content="https://claude-skills.bt199.com/social-preview.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/detail-page.css">
+<style>
+  /* 题材定制魂：电商陶土珊瑚橙 + 暖金 */
+  :root {
+    --accent: #e17055;
+    --accent2: #fdcb6e;
+    --cyan: #ff9f43;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #e17055, #ff9f43);
+    box-shadow: 0 4px 18px rgba(225, 112, 85, 0.34);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 8px 26px rgba(255, 159, 67, 0.44);
+  }
+  .nav-star,
+  .step-num {
+    background: linear-gradient(135deg, #e17055, #ff9f43);
+  }
+  .page-bg-glow {
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(225, 112, 85, 0.18) 0%, transparent 62%),
+      radial-gradient(ellipse at 82% 28%, rgba(253, 203, 110, 0.12) 0%, transparent 50%);
+  }
+  .mode-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .mode-tab {
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 15, 0.72);
+    color: var(--text2);
+    border-radius: 10px;
+    padding: 7px 14px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.18s ease;
+  }
+  .mode-tab:hover {
+    border-color: var(--cyan);
+    color: var(--text);
+  }
+  .mode-tab.is-active {
+    background: rgba(225, 112, 85, 0.18);
+    border-color: #ff9f43;
+    color: #ffeaa7;
+  }
+  .ledger-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .ledger-pill {
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 15, 0.68);
+    color: var(--text2);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .ledger-pill.is-active {
+    background: rgba(253, 203, 110, 0.18);
+    border-color: #fdcb6e;
+    color: #fef3c7;
+  }
+  .workbench-box {
+    background: rgba(10, 10, 15, 0.74);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+  }
+  .workbench-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .workbench-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #ffeaa7;
+  }
+  .workbench-tag {
+    font-size: 0.76rem;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: rgba(225, 112, 85, 0.18);
+    color: #ffcdb2;
+    border: 1px solid rgba(225, 112, 85, 0.4);
+  }
+  .workbench-desc {
+    color: var(--text2);
+    font-size: 0.91rem;
+    margin-bottom: 12px;
+  }
+  .workbench-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .workbench-cell {
+    background: rgba(20, 20, 32, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .workbench-cell-label {
+    font-size: 0.74rem;
+    color: var(--text3);
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .workbench-cell-val {
+    font-size: 0.86rem;
+    color: var(--text);
+  }
+  .workbench-prompt {
+    font-family: var(--mono);
+    font-size: 0.81rem;
+    color: #fed7aa;
+    background: #070910;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 10px 12px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  @media (max-width: 720px) {
+    .workbench-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "ecommerce-visual-copywriting",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Windows, macOS, Linux",
+  "inLanguage": "zh-CN",
+  "license": "https://opensource.org/licenses/MIT",
+  "url": "https://claude-skills.bt199.com/p/ecommerce-visual-copywriting/",
+  "codeRepository": "https://github.com/feichanggege/ecommerce-visual-copywriting-skill",
+  "description": "中文原生电商视觉与文案策划 SOP Skill（v3.0）：将商品资料、包装图与资质转化为带证据账本、Campaign Style Lock、逐图执行卡、生图 Prompt 与合规审查的完整视觉方案。",
+  "author": {
+    "@type": "Person",
+    "name": "feichanggege",
+    "url": "https://github.com/feichanggege"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "CNY"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "首页",
+      "item": "https://claude-skills.bt199.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "精选第三方技能",
+      "item": "https://claude-skills.bt199.com/#skills"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "ecommerce-visual-copywriting",
+      "item": "https://claude-skills.bt199.com/p/ecommerce-visual-copywriting/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "为什么手动安装时不能只复制 SKILL.md，必须连带 references/ 和 examples/？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "SKILL.md 明确规定输出完整策略、Storyboard 或审查报告前必须读取 references/output-contracts.md 统一输出契约，并结合 examples/ 中的榴莲样稿与脚本（scripts/count-copy.py、scripts/scan-final-copy.py）做字数与占位符检查。只复制 SKILL.md 会导致格式与验收规则缺失。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "什么是 v3.0 新增的「证据账本（Evidence Ledger）」？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "为了防止 AI 自动编造销量、检测数据、专利资质或医疗功效，Skill 在策划第一步会把所有卖点对照商品包装和质检材料，逐条标记为「已确认 / 有依据 / 待补证 / 禁止」，确保无依据的宣称绝不进入可见图内文案。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "文字渲染「留白排版」和「模型出字」应该怎么选？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "默认优先采用「留白排版」（由生图模型留出安全区、后期设计师或程序叠字），避免中文复杂汉字乱码；仅当用户明确要求直接出图带字且文案为极短主标题/数字标签时，才走「模型出字」并强制附带逐字验收与回退办法。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "如果我已经有现成的主图或详情页想做合规检查，会被推翻重做吗？",
+      "acceptedAnswer": {
+        "@type": "AcceptedAnswer",
+        "text": "不会。当识别到输入是已有待审成品（主图、详情页、文案或 Prompt）时，Skill 会自动路由到「C 审查/改稿模式」，从转化逻辑、视觉层级、证据合规、平台适配、图文一致和风格漂移 6 个维度找出问题并给出最小必要修改。"
+      }
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<nav class="navbar" aria-label="主导航">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">🛠️ <span>Claude Code Skills</span></a>
+    <div class="nav-links">
+      <a href="/">🏠 首页</a>
+      <a href="/#skills">🔍 精选目录</a>
+      <a href="/#original">🎁 原创技能</a>
+      <a href="/#install">📦 安装指南</a>
+    </div>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="nav-star" target="_blank" rel="noopener noreferrer">⭐ GitHub</a>
+  </div>
+</nav>
+
+<div class="page-shell">
+  <div class="page-bg-glow" aria-hidden="true"></div>
+  <main class="container">
+
+    <nav class="breadcrumb" aria-label="面包屑导航">
+      <a href="/">首页</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <a href="/#skills">精选第三方技能</a>
+      <span class="breadcrumb-sep" aria-hidden="true">/</span>
+      <span class="breadcrumb-current">ecommerce-visual-copywriting</span>
+    </nav>
+
+    <header class="detail-hero">
+      <div class="hero-tag-row">
+        <span class="pill pill-green">🇨🇳 中文原生 SOP</span>
+        <span class="pill pill-cyan">MIT · Skill v3.0 · .claude-plugin</span>
+        <span class="pill pill-amber">淘宝 / 小红书 / Amazon / TikTok Shop</span>
+      </div>
+      <h1><span class="accent-text">ecommerce-visual-copywriting</span> 深度指南：电商视觉策划与合规 SOP</h1>
+      <p class="hero-lead">由 <strong>feichanggege</strong> 打造的中文原生电商视觉策划 Skill。它不是泛泛写几句营销口号的 Prompt，而是一套面向设计师、运营与跨境卖家的工程化 SOP：从<strong>商品身份识别 → 四级证据账本 → Campaign Style Lock → 逐图执行卡 + Negative Prompt → 五维 80 分自审</strong>，把零散资料变成直接开工的执行稿。</p>
+
+      <div class="metrics-strip">
+        <div class="metric-item">
+          <div class="metric-label">GitHub Stars</div>
+          <div class="metric-value is-star">⭐ 1.5K+（核验 1,531）</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">开源许可与版本</div>
+          <div class="metric-value">MIT · v3.0</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">覆盖平台生态</div>
+          <div class="metric-value is-cyan">国内 6 大平台 + 跨境 6 平台</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">质量与合规门禁</div>
+          <div class="metric-value">四级证据账本 · 80 分自审线</div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#mode-workbench" class="btn btn-primary">🛒 体验四模式与证据账本工作台</a>
+        <a href="https://github.com/feichanggege/ecommerce-visual-copywriting-skill" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📦 访问原仓库 GitHub ↗</a>
+        <a href="https://github.com/feichanggege/ecommerce-visual-copywriting-skill/blob/main/examples/durian-worked-example.md" class="btn btn-cyan" target="_blank" rel="noopener noreferrer">📖 榴莲完整样稿复盘 ↗</a>
+      </div>
+    </header>
+
+    <nav class="toc-bar" aria-label="页面目录">
+      <span class="toc-label">本页导航</span>
+      <a href="#mode-workbench">四模式与证据账本</a>
+      <a href="#workflow">Step 0-6 策划流水线</a>
+      <a href="#install">全客户端安装与打包</a>
+      <a href="#boundaries">文案规格与合规红线</a>
+      <a href="#faq">常见问题 FAQ</a>
+    </nav>
+
+    <section class="section-card" id="mode-workbench">
+      <h2>🛒 四大执行模式 × 证据账本交互演练台</h2>
+      <p class="section-intro">该 Skill 会根据用户是否已有成品、资料是否完备自动路由执行模式，并强制结合四级证据状态过滤虚假宣称。点击切换模式与证据级别查看工作流行为：</p>
+
+      <div class="mode-tabs" role="tablist" aria-label="切换执行模式">
+        <button type="button" class="mode-tab is-active" data-mode="standard">A. 标准模式</button>
+        <button type="button" class="mode-tab" data-mode="oneshot">B. 一次性交付</button>
+        <button type="button" class="mode-tab" data-mode="review">C. 审查 / 改稿</button>
+        <button type="button" class="mode-tab" data-mode="handoff">D. 设计师交接</button>
+      </div>
+
+      <div class="ledger-tabs" role="group" aria-label="查看证据账本分级示例">
+        <button type="button" class="ledger-pill is-active" data-ledger="confirmed">🟢 已确认（包装/参数直出）</button>
+        <button type="button" class="ledger-pill" data-ledger="supported">🔵 有依据（材质/工艺推导）</button>
+        <button type="button" class="ledger-pill" data-ledger="pending">🟡 待补证（缺检测报告）</button>
+        <button type="button" class="ledger-pill" data-ledger="forbidden">🔴 禁止（广告法/医疗红线）</button>
+      </div>
+
+      <div class="workbench-box" aria-live="polite">
+        <div class="workbench-head">
+          <span class="workbench-title" id="ec-title">A. 标准模式（缺关键证据或需先定方向）</span>
+          <span class="workbench-tag" id="ec-stop">仅在 Storyboard 后合并确认 1 次</span>
+        </div>
+        <p class="workbench-desc" id="ec-desc">先解决商品名称，输出《视觉策略与证据账本》与缺口清单，再给出可支持的 Storyboard；确认方向后一次性完成执行稿与五维自审。</p>
+        <div class="workbench-grid">
+          <div class="workbench-cell">
+            <div class="workbench-cell-label">当前模式核心动作</div>
+            <div class="workbench-cell-val" id="ec-action">偏好问卷只发一轮（全选填）→ 策略 + 证据账本 → Storyboard → 执行卡</div>
+          </div>
+          <div class="workbench-cell">
+            <div class="workbench-cell-label">当前选中的证据账本规则</div>
+            <div class="workbench-cell-val" id="ec-ledger-rule">🟢 已确认：来自商品包装、说明书或实测参数，可直接作为主图数字/证据标签并附可见引证条件。</div>
+          </div>
+        </div>
+        <div class="workbench-prompt" id="ec-prompt">这是我的产品资料、包装图和竞品参考，请先帮我梳理视觉策略、证据账本和 Storyboard，确认后再出完整执行卡。</div>
+      </div>
+    </section>
+
+    <section class="section-card" id="workflow">
+      <h2>🧭 Step 0–6 工程化策划流与核心能力</h2>
+      <p class="section-intro">与普通 AI “每张图都硬塞三行卖点、越改越不像原包装”不同，v3.0 把策划拆为 7 个带明确门禁的阶段：</p>
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-num">0</div>
+          <div class="step-body">
+            <h3>任务路由与商品名确认</h3>
+            <p>识别任务类型（主图 / 详情页 / Amazon A+ / 改稿 / 跨境本地化）。缺商品名时先请用户提供或明确授权“据图拟名”（拟名标明非官方原名），不把猜测写成已确认品牌。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>核实卖点 → 生成《证据账本》</h3>
+            <p>逐条核对卖点来源与适用范围，建立四级分类；任何销量、排名、检测、功效在没有资料支撑时一律标记“待确认”，绝不编造。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>找准成交驱动力（1 主 + 至多 1 辅）</h3>
+            <p>从视觉、痛点、参数、信任、情绪、价格组合促销 6 类中锁定主驱动力，提炼至多 3 条有依据的购买理由，按消费者决策顺序而非工厂参数表排序。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>Campaign Style Lock + Reference Fidelity</h3>
+            <p>统一锁定整套图的产品外观、包装 Logo、色彩、光影、字体与禁止漂移项，把包装变形、规格错误、人物多指等提前写进 <code>Negative Prompt</code>。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>Storyboard 动态规划（KV1 先让人认出商品）</h3>
+            <p>KV1 首图优先完成商品识别（商品名清晰时不超字数直接作主标题），后续每张图只解决一个决策问题；5 张只是默认起点，按信息密度动态增减。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <h3>逐图执行卡 + 文案规格检查</h3>
+            <p>读取 <code>references/output-contracts.md</code> 输出画面、图内文案、排版、Prompt 与禁用项，并通过 <code>scripts/count-copy.py</code> 校验中英字数上限。</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">6</div>
+          <div class="step-body">
+            <h3>硬性阻断 + 80 分五维自审</h3>
+            <p>交付前先扫描内部占位符（<code>scripts/scan-final-copy.py</code>），再按 5 个维度以必要条件为锚点自审，任一维度低于 80 分强制重写（最多 2 轮），随稿附《自审记录》。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="install">
+      <h2>📦 跨平台安装与完整资源打包</h2>
+      <p class="section-intro">支持 <code>npx skills add</code>、Claude Code Marketplace 插件、Windows/macOS 手动部署以及 Claude.ai ZIP 上传。手动复制时<strong>务必保留 <code>references/</code>、<code>examples/</code> 与 <code>scripts/</code></strong>：</p>
+
+      <div class="os-grid">
+        <div class="os-card is-featured">
+          <div class="os-card-head">
+            <h3>方法 1：npx skills / Claude 插件（推荐）</h3>
+            <span class="pill pill-cyan">全端通用</span>
+          </div>
+          <p class="os-note">一条命令即可完整装入 <code>SKILL.md</code> 与全部参考模板，无需手工挑文件。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">CLI / Claude Code Marketplace</span>
+              <button type="button" class="copy-btn" data-copy-target="ec-npx">📋 复制</button>
+            </div>
+            <pre id="ec-npx"><code># Agent Skills 通用安装
+npx skills add feichanggege/ecommerce-visual-copywriting-skill
+
+# 或在 Claude Code 中通过自带 Marketplace 安装
+/plugin marketplace add feichanggege/ecommerce-visual-copywriting-skill
+/plugin install ecommerce-visual-copywriting@ecommerce-visual-copywriting-skill</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>方法 2：Windows PowerShell 手动安装</h3>
+            <span class="pill pill-amber">PowerShell 5.1+</span>
+          </div>
+          <p class="os-note">同时复制核心文档、示例与计数/终稿扫描脚本；若用于 Claude Code，把 <code>.codex</code> 改为 <code>.claude</code>。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Windows PowerShell</span>
+              <button type="button" class="copy-btn" data-copy-target="ec-win">📋 复制</button>
+            </div>
+            <pre id="ec-win"><code>$ErrorActionPreference = 'Stop'
+git clone --depth 1 https://github.com/feichanggege/ecommerce-visual-copywriting-skill.git
+$dest = "$env:USERPROFILE\.claude\skills\ecommerce-visual-copywriting"
+New-Item -ItemType Directory -Force $dest | Out-Null
+Copy-Item -Recurse ecommerce-visual-copywriting-skill\SKILL.md,ecommerce-visual-copywriting-skill\SKILL.en.md,ecommerce-visual-copywriting-skill\LICENSE,ecommerce-visual-copywriting-skill\agents,ecommerce-visual-copywriting-skill\references,ecommerce-visual-copywriting-skill\examples,ecommerce-visual-copywriting-skill\scripts $dest</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>方法 3：Claude.ai 网页端 ZIP 打包上传</h3>
+            <span class="pill pill-green">零工程冗余文件</span>
+          </div>
+          <p class="os-note">运行内置打包脚本剔除 <code>.git</code> 和单测，仅生成单层标准 Skill ZIP，在网页端 Customize → Skills 上传。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">生成最小 ZIP + 本地校验</span>
+              <button type="button" class="copy-btn" data-copy-target="ec-zip">📋 复制</button>
+            </div>
+            <pre id="ec-zip"><code>python tools/package-skill.py --output dist/ecommerce-visual-copywriting.zip
+python tools/verify-skill.py</code></pre>
+          </div>
+        </div>
+
+        <div class="os-card">
+          <div class="os-card-head">
+            <h3>方法 4：macOS / Linux 手动部署</h3>
+            <span class="pill pill-purple">bash / zsh</span>
+          </div>
+          <p class="os-note">同样支持项目级目录（<code>.claude/skills/</code> 或 <code>.codex/skills/</code>）按仓库共享给团队。</p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-title">Shell</span>
+              <button type="button" class="copy-btn" data-copy-target="ec-mac">📋 复制</button>
+            </div>
+            <pre id="ec-mac"><code>git clone --depth 1 https://github.com/feichanggege/ecommerce-visual-copywriting-skill.git
+mkdir -p ~/.claude/skills/ecommerce-visual-copywriting
+cp -r ecommerce-visual-copywriting-skill/{SKILL.md,SKILL.en.md,LICENSE,agents,references,examples,scripts} ~/.claude/skills/ecommerce-visual-copywriting/</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card" id="boundaries">
+      <h2>⚖️ 文案规格默认阈值与合规安全边界</h2>
+      <div class="callout callout-amber">
+        <div class="callout-title">📏 防止画面文字过载的默认排版上限</div>
+        <ul class="prose-list">
+          <li><strong>主图信息上限</strong>：1 个主标题（≤ 12 汉字 / ≤ 6 英文词）+ 至多 2 条副文案（每条 ≤ 18 汉字 / ≤ 10 英文词）+ 至多 1 个数字或证据标签。</li>
+          <li><strong>详情页（PDP）模块上限</strong>：1 个标题 + 至多 3 条要点（每条 ≤ 18 汉字 / ≤ 12 英文词）；超限优先删减或拆图，绝不缩字号硬塞。</li>
+        </ul>
+      </div>
+      <div class="callout callout-red">
+        <div class="callout-title">🚫 能力边界与高风险类目提醒</div>
+        <ul class="prose-list">
+          <li><strong>不做最终法律结论与自动上架</strong>：食品、保健品、医疗器械、儿童用品等高风险类目按保守口径筛查，实际投放仍以平台最新审核规则及专业法务为准；Skill 不会代操作店铺后台上架或投放。</li>
+          <li><strong>拒绝促销造假与跨境直译</strong>：无价目或活动依据时不编造“最低价 / 限时 / 原价”；跨境版本（Amazon / Shopify / TikTok Shop / Temu / Shopee / Lazada）必须按本地度量单位与表达习惯重写。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-card" id="faq">
+      <h2>❓ 常见问题 FAQ</h2>
+      <div class="faq-list">
+        <article class="faq-item">
+          <h3>Q1：我自己没有专业拍照图，只有包装实拍或白底图能用吗？</h3>
+          <p>可以。把包装实拍图、产品参数、资质截屏和参考风格图一并交给 Agent，它会在 <code>Reference Fidelity</code> 中锁定包装文字、Logo 和结构比例不得变形，并输出场景重建的生图 Prompt 与 Negative Prompt。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q2：为什么说「一次性交付」也会附带《自审记录》？</h3>
+          <p>SKILL.md 明确区分了「暂停确认」和「质量自审」：即使用户要求“不要中途提问，直接出全套”，Step 6 的五维 80 分自审依然会在同一轮内强制执行，确保未过线的初稿不会直接交付；但若未提供真实成图，成图验收项会诚实标为“待验收”。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q3：这个 Skill 适合做纯短视频带货口播或直播间话术吗？</h3>
+          <p>不适用。它的 frontmatter 明确排除了纯短视频/直播话术与店铺投放运营，专注在主图、商品图、详情页 PDP、Amazon Listing/A+、广告图文素材以及跨境视觉本地化。</p>
+        </article>
+        <article class="faq-item">
+          <h3>Q4：怎么用仓库自带的测试脚本验证自己改过的 Prompt？</h3>
+          <p>仓库提供了 <code>test-prompts.json</code>（含 31 类提示词期望）与 <code>tools/evaluate-prompts.py</code>，运行 <code>python tools/verify-skill.py</code> 与 <code>python -m unittest discover -s tests -v</code> 即可完成结构与文本断言回归测试。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>🔗 相关高价值技能推荐</h2>
+      <div class="related-grid">
+        <a class="related-card" href="/p/xiaohongshu-mcp/">
+          <div>
+            <span class="related-tag">📣 小红书运营 · 17.3K+ ⭐</span>
+            <h3>xpzouying/xiaohongshu-mcp</h3>
+            <p>先用小红书 MCP 调研竞品爆款封面与评论区痛点，再交给本 Skill 生成高转化主图与文案方案。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/p/impeccable/">
+          <div>
+            <span class="related-tag">🎨 反 AI 味设计 · 117.2K+ ⭐</span>
+            <h3>pbakaus/impeccable</h3>
+            <p>独立站（Shopify）落地页配合 impeccable 的 24 条设计指令，避免详情页和品牌站出现廉价 AI 模板感。</p>
+          </div>
+          <span class="related-go">阅读深度指南 →</span>
+        </a>
+        <a class="related-card" href="/skills/zh-docgen/">
+          <div>
+            <span class="related-tag">🎁 本仓原创 · 中文文档</span>
+            <h3>zh-docgen</h3>
+            <p>把商品研发与卖点资料整理成结构化中文产品文档，作为电商视觉策划的权威上游输入。</p>
+          </div>
+          <span class="related-go">查看原创技能 →</span>
+        </a>
+      </div>
+    </section>
+
+    <div class="attribution-box">
+      <strong>原作者与开源许可声明：</strong>本页为 <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">claude-code-skills-zh</a> 基于原仓库中文文档与 <code>SKILL.md</code> 整理的使用指南。项目版权归作者 <strong>feichanggege</strong> 及贡献者所有，采用 <strong>MIT License</strong> 开源，完整源码与示例请访问 <a href="https://github.com/feichanggege/ecommerce-visual-copywriting-skill" target="_blank" rel="noopener noreferrer">github.com/feichanggege/ecommerce-visual-copywriting-skill ↗</a>。
+    </div>
+
+    <section class="bottom-cta">
+      <div class="bottom-cta-text">
+        <h2>⭐ 收藏中文 Claude Code Skills 精选集</h2>
+        <p>453+ 人工核验第三方技能与 22 个原创中文技能持续维护，官网支持跨分类实时搜索。</p>
+      </div>
+      <div class="bottom-cta-actions">
+        <a href="/" class="btn btn-secondary">← 返回首页目录</a>
+        <a href="https://github.com/laolaoshiren/claude-code-skills-zh" class="btn btn-primary" target="_blank" rel="noopener noreferrer">⭐ 前往 GitHub 点 Star</a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="footer-links">
+    <a href="/">首页</a>
+    <a href="/#skills">精选目录</a>
+    <a href="/#original">原创技能</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh" target="_blank" rel="noopener noreferrer">GitHub 仓库</a>
+    <a href="https://github.com/laolaoshiren/claude-code-skills-zh/blob/main/docs/MAINTENANCE.md" target="_blank" rel="noopener noreferrer">收录与维护规范</a>
+  </div>
+  <p>MIT License · Claude Code Skills 中文精选集（claude-skills.bt199.com）</p>
+</footer>
+
+<script>
+(function () {
+  var modes = {
+    standard: {
+      title: 'A. 标准模式（缺关键证据或需先定方向）',
+      stop: '仅在 Storyboard 后合并确认 1 次',
+      desc: '先解决商品名称，输出《视觉策略与证据账本》与缺口清单，再给出可支持的 Storyboard；确认方向后一次性完成执行稿与五维自审。',
+      action: '偏好问卷只发一轮（全选填）→ 策略 + 证据账本 → Storyboard → 执行卡',
+      prompt: '这是我的产品资料、包装图和竞品参考，请先帮我梳理视觉策略、证据账本和 Storyboard，确认后再出完整执行卡。'
+    },
+    oneshot: {
+      title: 'B. 一次性交付模式（资料齐全或明确直出）',
+      stop: '不机械暂停 · 同轮内必跑 80 分自审',
+      desc: '商品名称已明确且用户要求直接出完整方案时，跳过中途确认，完整交付策略、Storyboard、逐图执行卡与《自审记录》；展示缺口用默认假设标注，事实不假设。',
+      action: '命名确认 → 证据账本 → Style Lock → 逐图执行卡 + 生图 Prompt → 五维自审',
+      prompt: '面向 Amazon US，直接给我 7 张商品图 + A+ 视觉规划：每张包含画面、英文图内文案、设计说明、生图 Prompt 和 Negative Prompt。不要中途确认，缺失信息请标注假设，不要编造。'
+    },
+    review: {
+      title: 'C. 审查 / 改稿模式（已有主图/详情页成品）',
+      stop: '不推翻重做 · 最小必要修改',
+      desc: '针对已有的主图、详情页文案或 Prompt，从转化逻辑、视觉层级、证据合规、平台适配、图文一致、风格漂移 6 维度查问题并给最小修改稿。',
+      action: '6 维度逐项诊断 → 标出阻断级合规风险 → 给出可替换文案与排版微调建议',
+      prompt: '这是我们现有的淘宝主图文案和详情页初稿，帮我按国内广告法和转化逻辑做一次审查，只改必要的地方，不要全部推翻重写。'
+    },
+    handoff: {
+      title: 'D. 设计师交接模式（直接进美工/生图排期）',
+      stop: '严格套用 output-contracts.md 结构化任务卡',
+      desc: '直接面向美工或视觉团队交付可开工任务单：每张图含参考保真度锁定、留白安全区、主副文案字数校验与明确禁止项。',
+      action: '读取 references/output-contracts.md → 输出逐图标准化设计师交接执行卡',
+      prompt: '帮我把这个商品做成一套能直接交给设计师的主图和详情页执行卡，每张明确写清文字渲染方式、留白位置和参考图禁止改动项。'
+    }
+  };
+
+  var ledgerRules = {
+    confirmed: '🟢 已确认：来自商品包装、官方说明书或实测质检参数，可直接作为主图数字/证据标签（如「净含量 500g」「304 不锈钢」），并附可见引证条件。',
+    supported: '🔵 有依据：可由现有材质或结构合理推导的体验优势，允许写入副文案与详情页场景解释，但不得升级为夸大数字或绝对化结论。',
+    pending: '🟡 待补证：商家口头提起但缺少检测报告/证书原件的卖点，暂时标为「待确认」，禁止作为已验证宣称写进主图或 A+ 成品文案。',
+    forbidden: '🔴 禁止：绝对化用语（全网第一/最有效）、无依据的医疗/治疗暗示、虚构销量评价与未核验对比，直接拦截并改写为合规事实表达。'
+  };
+
+  var activeMode = 'standard';
+  var activeLedger = 'confirmed';
+
+  function render() {
+    var m = modes[activeMode];
+    document.getElementById('ec-title').textContent = m.title;
+    document.getElementById('ec-stop').textContent = m.stop;
+    document.getElementById('ec-desc').textContent = m.desc;
+    document.getElementById('ec-action').textContent = m.action;
+    document.getElementById('ec-prompt').textContent = m.prompt;
+    document.getElementById('ec-ledger-rule').textContent = ledgerRules[activeLedger];
+  }
+
+  document.querySelectorAll('.mode-tab[data-mode]').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      activeMode = tab.getAttribute('data-mode');
+      document.querySelectorAll('.mode-tab').forEach(function (t) {
+        t.classList.toggle('is-active', t === tab);
+      });
+      render();
+    });
+  });
+
+  document.querySelectorAll('.ledger-pill[data-ledger]').forEach(function (pill) {
+    pill.addEventListener('click', function () {
+      activeLedger = pill.getAttribute('data-ledger');
+      document.querySelectorAll('.ledger-pill').forEach(function (p) {
+        p.classList.toggle('is-active', p === pill);
+      });
+      render();
+    });
+  });
+
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      try {
+        var ok = document.execCommand('copy');
+        document.body.removeChild(area);
+        if (ok) resolve();
+        else reject(new Error('copy failed'));
+      } catch (err) {
+        document.body.removeChild(area);
+        reject(err);
+      }
+    });
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    }
+    return legacyCopy(text);
+  }
+  document.querySelectorAll('.copy-btn[data-copy-target]').forEach(function (btn) {
+    var defaultLabel = btn.textContent || '📋 复制';
+    btn.addEventListener('click', function () {
+      var targetId = btn.getAttribute('data-copy-target');
+      var el = targetId ? document.getElementById(targetId) : null;
+      if (!el) return;
+      copyText((el.textContent || '').trim()).then(function () {
+        btn.classList.add('copied');
+        btn.textContent = '✅ 已复制';
+        if (btn._timer) clearTimeout(btn._timer);
+        btn._timer = setTimeout(function () {
+          btn.classList.remove('copied');
+          btn.textContent = defaultLabel;
+        }, 2000);
+      }).catch(function () {});
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
